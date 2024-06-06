@@ -71,7 +71,7 @@ export default function Home() {
             </a>
           </div>
           <h4 class="m-0 pe-lg-5 d-none d-lg-block">
-            <i class="fa fa-headphones text-primary me-3"></i>+012 345 6789
+            <i class="fa fa-headphones text-primary me-3"></i>07459041500
           </h4>
         </div>
       </nav>
@@ -211,7 +211,7 @@ export default function Home() {
                 <i class="fa fa-headphones fa-2x flex-shrink-0 bg-primary p-3 text-white"></i>
                 <div class="ps-4">
                   <h6>Call for any query!</h6>
-                  <h3 class="text-primary m-0">+012 345 6789</h3>
+                  <h3 class="text-primary m-0">07459041500</h3>
                 </div>
               </div>
             </div>
@@ -626,7 +626,7 @@ export default function Home() {
                 <i class="fa fa-headphones fa-2x flex-shrink-0 bg-primary p-3 text-white"></i>
                 <div class="ps-4">
                   <h6>Call for any query!</h6>
-                  <h3 class="text-primary m-0">+012 345 6789</h3>
+                  <h3 class="text-primary m-0">07459041500</h3>
                 </div>
               </div>
             </div>
@@ -890,14 +890,13 @@ export default function Home() {
             <div class="col-lg-3 col-md-6">
               <h4 class="text-light mb-4">Address</h4>
               <p class="mb-2">
-                <i class="fa fa-map-marker-alt me-3"></i>123 Street, New York,
-                USA
+                <i class="fa fa-map-marker-alt"></i>7 Grove Avenue, Acocks Green, Birmingham. B27 7UY, United Kingdom.
               </p>
               <p class="mb-2">
-                <i class="fa fa-phone-alt me-3"></i>+012 345 67890
+                <i class="fa fa-phone-alt "></i>074590415000
               </p>
               <p class="mb-2">
-                <i class="fa fa-envelope me-3"></i>info@example.com
+                <i class="fa fa-envelope "></i>info@i-scs.co.uk
               </p>
               <div class="d-flex pt-2">
                 <a class="btn btn-outline-light btn-social" href="">
