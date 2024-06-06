@@ -16,7 +16,7 @@ export default function Home() {
 
     <nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">
         <a href="index.html" class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5">
-            <h2 class="mb-2 text-white">Logistic</h2>
+            <h2 class="mb-2 text-white">Supply Chain</h2>
         </a>
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
             <span class="navbar-toggler-icon"></span>
@@ -39,7 +39,7 @@ export default function Home() {
                 </div>
                 <a href="contact.html" class="nav-item nav-link">Contact</a>
             </div>
-            <h4 class="m-0 pe-lg-5 d-none d-lg-block"><i class="fa fa-headphones text-primary me-3"></i>+012 345 6789</h4>
+            <h4 class="m-0 pe-lg-5 d-none d-lg-block"><i class="bi bi-headphones text-primary me-2"></i>+44 7459 041500</h4>
         </div>
     </nav>
 
