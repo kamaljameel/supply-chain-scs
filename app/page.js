@@ -17,6 +17,7 @@ export default function Home() {
           class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5"
         >
           <h2 class="mb-2 text-white">ISCS</h2>
+
         </a>
         <button
           type="button"
@@ -66,13 +67,8 @@ export default function Home() {
                 </a>
               </div>
             </div>
-            <a href="contact.html" class="nav-item nav-link">
-              Contact
-            </a>
-          </div>
-          <h4 class="m-0 pe-lg-5 d-none d-lg-block">
-            <i class="fa fa-headphones text-primary me-3"></i>07459041500
-          </h4>
+
+            <h4 class="m-0 pe-lg-5 d-none d-lg-block"><i class="bi bi-headphones text-primary me-2"></i>+44 7459 041500</h4>
         </div>
       </nav>
 
