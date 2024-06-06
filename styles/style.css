@@ -1,4 +1,7 @@
 /********** Template CSS **********/
+.home-page{
+    text-align: justify;
+}
 :root {
     --primary: #FF3E41;
     --secondary: #51CFED;
