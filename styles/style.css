@@ -3,8 +3,8 @@
     text-align: justify;
 } */
 :root {
-    --primary: #FF3E41;
-    --secondary: #51CFED;
+    --primary: #33b6fb;
+    --secondary: #4A99E0;
     --light: #F8F2F0;
     --dark: #060315;
 }
@@ -83,6 +83,10 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+img.logo {
+    width: 100%;
+    height: 73px;
 }
 /*** Navbar ***/
 .navbar .dropdown-toggle::after {

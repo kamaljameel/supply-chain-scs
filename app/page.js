@@ -13,10 +13,10 @@ export default function Home() {
 
       <nav class="navbar navbar-expand-lg bg-white navbar-light shadow border-top border-5 border-primary sticky-top p-0">
         <a
-          href="index.html"
-          class="navbar-brand bg-primary d-flex align-items-center px-4 px-lg-5"
+          href="/"
+          class="navbar-brand  d-flex align-items-center px-4 px-lg-5"
         >
-          <h2 class="mb-2 text-white">ISCS</h2>
+           <img src="./img/logois.svg" className="logo" alt="logo" />
 
         </a>
         <button
@@ -88,7 +88,7 @@ export default function Home() {
                       Transport & Logistics Solution
                     </h5> */}
                     <h1 class="display-3 text-white animated slideInDown mb-4">
-                      #1 Supply Chain Solutions Limited{" "}
+                    Integrated Supply Chain Solutions Limited
                       <span class="text-primary">(ISCS)</span>
                     </h1>
                     <p class="fs-5 fw-medium text-white mb-4 pb-2 home-page">
