@@ -28,7 +28,7 @@ export default function Home() {
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
-          <div class="navbar-nav ms-auto p-4 p-lg-0">
+          <div class="navbar-nav ms-auto p-4 p-lg-0 align-items-center">
             <a href="index.html" class="nav-item nav-link active">
               Home
             </a>
@@ -69,6 +69,7 @@ export default function Home() {
             </div>
 
             <h4 class="m-0 pe-lg-5 d-none d-lg-block"><i class="bi bi-headphones text-primary me-2"></i>+44 7459 041500</h4>
+        </div>
         </div>
       </nav>
 

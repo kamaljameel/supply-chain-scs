@@ -1,7 +1,7 @@
 /********** Template CSS **********/
-.home-page{
+/* .home-page{
     text-align: justify;
-}
+} */
 :root {
     --primary: #FF3E41;
     --secondary: #51CFED;
@@ -71,7 +71,19 @@
     justify-content: center;
     font-weight: normal;
 }
-
+.btn-slide {
+    display: flex !important;
+  }
+  .service-item {
+    min-height: 100%;
+}
+.service-item p {
+    display: -webkit-box;
+    -webkit-line-clamp: 6;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 /*** Navbar ***/
 .navbar .dropdown-toggle::after {
     border: none;
