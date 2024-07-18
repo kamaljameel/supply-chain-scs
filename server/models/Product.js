@@ -1,38 +1,39 @@
-// server/models/Contact.js
 const { DataTypes } = require("sequelize");
 const sequelize = require("../server/sequelizeConfig");
 
-const Contact = sequelize.define(
-  "Contact",
+const Product = sequelize.define(
+  "Product",
   {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
     name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+
+    price: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+
     email: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
       validate: {
         isEmail: true,
       },
     },
-    subject: {
+    password: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    message: {
-      type: DataTypes.TEXT,
+    role: {
+      type: DataTypes.STRING,
       allowNull: false,
     },
   },
   {
-    timestamps: true, // This enables `createdAt` and `updatedAt`
+    timestamps: true,
   }
 );
 
-module.exports = Contact;
+module.exports = Product;
