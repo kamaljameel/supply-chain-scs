@@ -1,51 +1,52 @@
 const express = require("express");
-const bcrypt = require("bcryptjs");
-const env = require("dotenv").config();
-const User = require("../models/User");
-const jwt = require("jsonwebtoken");
+const { createUser } = require("../controllers/userController");
+const axios = require("axios");
 const router = express.Router();
 
+// Route to handle user registration
 router.post("/", async (req, res) => {
-  const { name, email, phone, password, role } = req.body;
+  const { FirstName, LastName, Email, MobileNumber, Password, role } = req.body;
 
   try {
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create the user
-    const user = await User.create({
-      name,
-      email,
-      phone,
-      password: hashedPassword,
+    // Create user in local database
+    const user = await createUser({
+      FirstName,
+      LastName,
+      Email,
+      MobileNumber,
+      Password,
       role,
     });
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { email: user.email, role: user.role },
-      process.env.JWT_SECRET_KEY,
-      {
-        expiresIn: "1y", // Token expiration time
-      }
-    );
+    // If user creation is successful, also post data to external API
+    const data = {
+      FirstName: FirstName || "",
+      LastName: LastName || "",
+      Email: Email || "",
+      MobileNumber: MobileNumber || "",
+      Password: Password || "",
+    };
+    // console.log(data);
 
-    // Respond with the created user and token
-    res.status(201).json({ user, accessToken: token });
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "https://api.abisolcrm.com.au/v1/CreateTenantUser",
+      headers: {
+        "x-api-key": "f797e8f61eec4323b003bd2cca68c226",
+        // "Content-Type": "application/json",
+      },
+      data: data,
+    };
+
+    const externalResponse = await axios(config);
+
+    console.log("Response from external API:", externalResponse.data);
+
+    res.status(201).json({ user, externalResponse: externalResponse.data });
   } catch (error) {
-    console.error("Signup error:", error);
-
-    // Check if Sequelize validation error
-    if (error.name === "SequelizeValidationError") {
-      const errors = error.errors.map((e) => ({
-        field: e.path,
-        message: e.message,
-      }));
-      res.status(400).json({ errors });
-    } else {
-      // For other errors, respond with generic message
-      res.status(500).json({ error: "User creation failed" });
-    }
+    console.error("Error: ---> ", error.message);
+    res.status(400).json({ error: error.message });
   }
 });
 

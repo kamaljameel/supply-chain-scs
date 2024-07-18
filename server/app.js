@@ -1,13 +1,23 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const routes = require("./routers/routes");
+
 const signuproutes = require("./routers/signup");
 const loginroutes = require("./routers/login");
 const contactRoutes = require("./routers/contact");
 const sequelize = require("./server/sequelizeConfig");
+const productRouter = require("./routers/product");
+const forgotpassword = require("./routers/forgot-password");
+const resetpassword = require("./routers/reset-password");
+const verifyemail = require("./routers/verify-email");
+const businessInquiryRoutes = require("./routers/businessInquiryRoutes");
+
 const app = express();
 require("dotenv").config();
+
+process.setUncaughtExceptionCaptureCallback((err) => {
+  console.error("UncaughtExceptionCapture: ", err);
+});
 
 // Middleware
 app.use(express.json());
@@ -27,10 +37,16 @@ sequelize
   .catch((err) => console.log("Error: " + err));
 
 // Mount routes
-app.use("/api", routes);
-app.use("/api", contactRoutes);
-app.use("/sign-up", signuproutes);
-app.use("/login", loginroutes);
+app.use("/api", productRouter);
+app.use("/api/contact", contactRoutes);
+app.use("/api/signup", signuproutes);
+app.use("/api/login", loginroutes);
+app.use("/api/forgot-password", forgotpassword);
+app.use("/api/reset-password", resetpassword);
+app.use("/api/verify-email", verifyemail);
+
+// busness inquiry
+app.use("/api/business-inquiries", businessInquiryRoutes);
 // Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

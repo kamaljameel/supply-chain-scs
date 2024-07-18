@@ -1,46 +1,45 @@
-// models/User.js
 const { DataTypes } = require("sequelize");
 const sequelize = require("../server/sequelizeConfig");
 
-const User = sequelize.define(
-  "User",
+const BusinessInquiry = sequelize.define(
+  "BusinessInquiry",
   {
+    BusinessName: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     FirstName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    LastName: {
+    OfficialEmail: {
       type: DataTypes.STRING,
       allowNull: false,
-    },
-    Email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
       validate: {
         isEmail: true,
       },
     },
-    MobileNumber: {
+    PersonalMobile1: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    Password: {
+    InquiryLine: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    role: {
-      type: DataTypes.STRING,
+    Description: {
+      type: DataTypes.TEXT,
       allowNull: false,
     },
-    verified: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
+    InterestedInName: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
   },
   {
+    tableName: "business_inquiries",
     timestamps: true,
   }
 );
 
-module.exports = User;
+module.exports = BusinessInquiry;

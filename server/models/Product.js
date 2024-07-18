@@ -1,19 +1,20 @@
-// models/User.js
 const { DataTypes } = require("sequelize");
 const sequelize = require("../server/sequelizeConfig");
 
-const User = sequelize.define(
-  "User",
+const Product = sequelize.define(
+  "Product",
   {
-    FirstName: {
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    LastName: {
-      type: DataTypes.STRING,
+
+    price: {
+      type: DataTypes.FLOAT,
       allowNull: false,
     },
-    Email: {
+
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
@@ -21,11 +22,7 @@ const User = sequelize.define(
         isEmail: true,
       },
     },
-    MobileNumber: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    Password: {
+    password: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -33,14 +30,10 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    verified: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
   },
   {
     timestamps: true,
   }
 );
 
-module.exports = User;
+module.exports = Product;

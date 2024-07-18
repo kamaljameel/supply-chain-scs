@@ -4,6 +4,6 @@ const { handleContactForm } = require("../controllers/contactController");
 
 const router = express.Router();
 
-router.post("/contact", handleContactForm);
+router.post("/", handleContactForm);
 
 module.exports = router;
