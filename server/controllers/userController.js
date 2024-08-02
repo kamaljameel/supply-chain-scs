@@ -87,7 +87,7 @@ const forgotPassword = async (email) => {
     );
 
     // Construct the reset password URL
-    const resetURL = `http://localhost:3000/resetpassword?token=${resetToken}`;
+    const resetURL = `https://i-scs.co.uk/resetpassword?token=${resetToken}`;
 
     // Send password reset email
     await transporter.sendMail({
@@ -118,7 +118,7 @@ const resetPassword = async (token, newPassword) => {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
     // Update user's password
-    user.Password = hashedPassword;
+    user.password = hashedPassword;
     await user.save();
   } catch (error) {
     throw error; // Forward any errors to the caller
