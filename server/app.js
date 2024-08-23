@@ -6,11 +6,12 @@ const signuproutes = require("./routers/signup");
 const loginroutes = require("./routers/login");
 const contactRoutes = require("./routers/contact");
 const sequelize = require("./server/sequelizeConfig");
-const productRouter = require("./routers/product");
+// const productRouter = require("./routers/product");
 const forgotpassword = require("./routers/forgot-password");
 const resetpassword = require("./routers/reset-password");
 const verifyemail = require("./routers/verify-email");
 const businessInquiryRoutes = require("./routers/businessInquiryRoutes");
+const productRoutes = require("./routers/products");
 
 const app = express();
 require("dotenv").config();
@@ -37,13 +38,14 @@ sequelize
   .catch((err) => console.log("Error: " + err));
 
 // Mount routes
-app.use("/api", productRouter);
+// app.use("/api", productRouter);
 app.use("/api/contact", contactRoutes);
 app.use("/api/signup", signuproutes);
 app.use("/api/login", loginroutes);
 app.use("/api/forgot-password", forgotpassword);
 app.use("/api/reset-password", resetpassword);
 app.use("/api/verify-email", verifyemail);
+app.use("/api/products", productRoutes);
 
 // busness inquiry
 app.use("/api/business-inquiries", businessInquiryRoutes);

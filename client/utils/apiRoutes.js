@@ -10,3 +10,6 @@ export const profile = `${host}/api/profile`;
 export const verifyEmailApi = `${host}/api/verify-email`;
 export const forgotPasswordApi = `${host}/api/forgot-password`;
 export const resetPasswordApi = `${host}/api/reset-password`;
+export const addProductApi = `${host}/api/products`;
+
+// export const tariffcodeApi = `${host}/api/commodity/${query}`;

@@ -1,4 +1,4 @@
-// File: D:\supply-chain\client\app\dashboard\page.js
+// File: D:\supply-chain-scs\client\app\dashboard\page.js
 import * as entry from '../../../../app/dashboard/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

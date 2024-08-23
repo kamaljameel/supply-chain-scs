@@ -1,39 +1,42 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../server/sequelizeConfig");
-
-const Product = sequelize.define(
-  "Product",
-  {
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-
-    price: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-
-    email: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-      validate: {
-        isEmail: true,
-      },
-    },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    role: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
+const Product = sequelize.define("Product", {
+  productName: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
-  {
-    timestamps: true,
-  }
-);
+  productDescription: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  hsCode: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  customDescription: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  unitOfMeasurement: {
+    type: DataTypes.ENUM("kg", "numbers", "litters", "pics"),
+    allowNull: false,
+  },
+  size: {
+    type: DataTypes.ENUM("XS", "S", "M", "L", "XL", "XXL", "XXXL"),
+    allowNull: false,
+  },
+  length: {
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+  width: {
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+  height: {
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+});
 
 module.exports = Product;

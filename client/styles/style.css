@@ -451,7 +451,30 @@ p.home-page {
   background: var(--light);
   border-color: var(--primary);
 }
-
+.fs-11 {
+  font-size: 11px !important;
+}
+.fade.mainmodelP.modal.show {
+  z-index: 1050;
+}
+.addProductForm {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tarifsearch {
+  border: 1px solid #d0cbcb;
+  padding: 9px;
+  border-radius: 5px;
+}
+.addProductForm * {
+  background: white;
+  border: 1px solid #d0cbcb;
+  width: 49%;
+  padding: 9px;
+  border-radius: 5px;
+}
 /*** Contact ***/
 @media (min-width: 992px) {
   .container.contact-page {
@@ -460,6 +483,10 @@ p.home-page {
 
   .contact-page .contact-form {
     padding-left: calc(((100% - 960px) / 2) + 0.75rem);
+  }
+  .modal-lg,
+  .modal-xl {
+    --bs-modal-width: 1000px !important;
   }
 }
 

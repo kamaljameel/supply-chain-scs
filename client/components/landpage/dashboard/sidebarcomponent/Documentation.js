@@ -166,7 +166,7 @@ const Documentation = () => {
               value={selectedInvoiceType}
               onChange={handleInvoiceTypeSelect}
             >
-              <option value="">Select Invoice Type</option>
+              <option value="">Select Document Type</option>
               {invoiceTypeOptions.map((type, index) => (
                 <option key={index} value={type}>
                   {type}
@@ -177,7 +177,7 @@ const Documentation = () => {
               onClick={() => setShowNewInvoiceTypeInput(true)}
               className="mt-2"
             >
-              Add new Invoice Type
+              Add new Document Type
             </Button>
             {showNewInvoiceTypeInput && (
               <>
@@ -189,7 +189,7 @@ const Documentation = () => {
                   className="mt-2"
                 />
                 <Button onClick={handleAddInvoiceType} className="mt-2">
-                  Add Invoice Type
+                  Add Document Type
                 </Button>
               </>
             )}
@@ -199,7 +199,6 @@ const Documentation = () => {
           <Button variant="secondary" onClick={handleCloseInvoiceModal}>
             Close
           </Button>
-          <Button variant="primary">Understood</Button>
         </Modal.Footer>
       </Modal>
       <FullWidthModal

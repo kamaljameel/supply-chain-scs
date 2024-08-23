@@ -17,17 +17,12 @@ import AirShipment from "./sidebarcomponent/AirShipment";
 const Dashboard = () => {
   const router = useRouter();
   const [user, setUser] = useState(null);
-  const [seeFooter, setSeeFooter] = useState(false);
   const [pinnedLinks, setPinnedLinks] = useState([]);
   const [selectedPage, setSelectedPage] = useState("home");
 
-  const seefooter = () => {
-    setSeeFooter(true);
-  };
-
-  const hidefooter = () => {
-    setSeeFooter(false);
-  };
+  // const seefooter = () => {
+  //   setSeeFooter(true);
+  // };
 
   const handlePinClick = (pageName) => {
     if (!pinnedLinks.includes(pageName)) {
@@ -49,7 +44,9 @@ const Dashboard = () => {
       setSelectedPage("home");
     }
   };
-
+  const handleCardClick = (pageName) => {
+    setSelectedPage(pageName);
+  };
   useEffect(() => {
     const savedPinnedLinks = JSON.parse(localStorage.getItem("pinnedLinks"));
     if (savedPinnedLinks) {
@@ -96,7 +93,12 @@ const Dashboard = () => {
   const renderMainContent = () => {
     switch (selectedPage) {
       case "home":
-        return <HomeCards onPinClick={handlePinClick} />;
+        return (
+          <HomeCards
+            onPinClick={handlePinClick}
+            onCardClick={handleCardClick}
+          />
+        );
       case "Goods Declarations":
         return <GoodsDeclarations />;
       case "Documentation":
@@ -108,7 +110,12 @@ const Dashboard = () => {
       case "Air Shipment":
         return <AirShipment />;
       default:
-        return <HomeCards onPinClick={handlePinClick} />;
+        return (
+          <HomeCards
+            onPinClick={handlePinClick}
+            onCardClick={handleCardClick}
+          />
+        );
     }
   };
 
@@ -199,12 +206,12 @@ const Dashboard = () => {
           <div className="dashboardcontainer">{renderMainContent()}</div>
 
           <div className="position-absolute bottom-0 end-0 start-0 mx-auto mb-3 text-center">
-            <span
+            {/* <span
               onMouseEnter={seefooter}
               className="seefooter rounded-3 shadow-sm border-1 px-3 py-1"
             >
               See Footer
-            </span>
+            </span> */}
           </div>
         </div>
       </div>

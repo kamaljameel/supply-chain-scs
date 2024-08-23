@@ -21,6 +21,7 @@ import Contact from "@/components/landpage/Contact";
 import ServiceItem from "@/components/landpage/ServiceItem";
 import services from "@/data/servicesData";
 import BusinessInquiryForm from "@/components/landpage/BusinessInquiryForm";
+import Tariff from "@/components/landpage/Tariff";
 // import SearatesWidget from "@/components/searates/SearatesWidget";
 
 export default function Home() {
@@ -42,6 +43,7 @@ export default function Home() {
         </Carousel.Item>
       </Carousel>
       {/* <SearatesWidget /> */}
+
       <About />
       {/* <Facts/> */}
       <div className="container-fluid">
