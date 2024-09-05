@@ -10,18 +10,35 @@ body {
   background: #33b6fb !important;
   color: #fff;
   padding: 1rem;
-  min-height: 550px;
+  min-height: 100vh;
+  padding: 10px 7px 10px 6px !important;
+}
+.sidebaritems {
   max-height: 500px;
   overflow-y: auto;
+  background: #0f8dfd;
+  padding: 10px;
+  border-radius: 7px;
+  box-shadow: 0px 0px 11px #fff;
 }
-
+.dashlink a {
+  width: 100%;
+  font-size: 14px !important;
+}
+.userdata {
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+}
 .sidebar h2 {
   font-size: 24px;
   text-align: center;
   margin-bottom: 1.5rem;
   color: #fff;
 }
-
+.w-150 {
+  width: 150px;
+}
 .sidebar a {
   display: block;
   color: #fff;
@@ -30,7 +47,9 @@ body {
   margin-bottom: 0.5rem;
   transition: background-color 0.3s ease;
 }
-
+.addcombtn {
+  height: fit-content;
+}
 .sidebar a:hover {
   background-color: #343a40; /* Darker background color on hover */
   border-radius: 4px;
@@ -147,11 +166,15 @@ body {
   box-shadow: 0px 0px 10px #00000021;
   border: 1px solid #33b6fb;
   border-radius: 8px;
+  background: #dff0ff;
+  padding-block: 8px;
 }
 .IXcard {
   border-radius: 10px !important;
   overflow: hidden;
   border: 1px solid #ced4da;
+  background-color: white;
+  box-shadow: 0px 4px 7px #0000001a;
 }
 .text-bluesh {
   color: #1a9dda !important;
@@ -163,7 +186,74 @@ body {
   border-radius: 5px;
 }
 .dashlink a.active {
-  background: #1a9dda !important;
+  background: #00608c !important;
   padding: 5px 10px !important;
   border-radius: 5px;
+}
+
+.progress-indicator {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.step-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.step-indicator .circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 5px;
+  position: relative;
+  z-index: 2;
+}
+
+.step-indicator.active .circle {
+  background-color: #0f8dfd;
+  color: white;
+}
+
+.step-indicator .label {
+  font-size: 12px;
+  text-align: center;
+  color: #000000;
+}
+.stepindi {
+  background: #76d0ff !important;
+  margin: 0 !important;
+  padding: 18px 0px 8px 0px;
+}
+.modal-content {
+  border-radius: 20px !important;
+  overflow: hidden;
+}
+.invoicMB.modal-body {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: flex-start;
+}
+.invoicMB.modal-body h6 {
+  width: 100%;
+}
+.invoicMB.modal-body .btndiv {
+  width: 100%;
+}
+.formgroupk label {
+  color: black;
+}
+@media (min-width: 992px) {
+  .mainmodelP .modal-lg {
+    max-width: 1200px !important;
+  }
 }

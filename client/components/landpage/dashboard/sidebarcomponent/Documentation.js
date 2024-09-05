@@ -30,6 +30,9 @@ const Documentation = () => {
     if (value === "Proforma Invoice") {
       setShowFullWidthModal(true);
       setShowInvoiceModal(false);
+    } else if (value === "Commercial Invoice") {
+      setShowFullWidthModal(true);
+      setShowInvoiceModal(false);
     }
     setSelectedInvoiceType(value);
   };
@@ -77,6 +80,16 @@ const Documentation = () => {
       });
     }
 
+    // Table for tax, subtotal, and totals
+    if (data) {
+      doc.autoTable({
+        startY: doc.previousAutoTable.finalY + 10,
+        head: [["Tax", "Subtotal", "Total"]],
+        body: [
+          [data.tax, data.subtotal, data.total], // Single row with the corresponding values
+        ],
+      });
+    }
     doc.autoTable({
       startY: doc.previousAutoTable ? doc.previousAutoTable.finalY + 10 : 50,
       head: [["Field", "Value"]],
@@ -159,7 +172,10 @@ const Documentation = () => {
           <Modal.Title>Select Document Type</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form.Group className="mb-3" controlId="formInvoiceType">
+          <Form.Group
+            className="formgroupk mb-3 w-100 h-100"
+            controlId="formInvoiceType"
+          >
             <Form.Label>Select Document Type</Form.Label>
             <Form.Control
               as="select"
@@ -175,7 +191,7 @@ const Documentation = () => {
             </Form.Control>
             <Button
               onClick={() => setShowNewInvoiceTypeInput(true)}
-              className="mt-2"
+              className="mt-2 px-0 bg-transparent text-primary text-decoration-underline border-0 pb-0"
             >
               Add new Document Type
             </Button>
@@ -188,7 +204,7 @@ const Documentation = () => {
                   onChange={(e) => setNewInvoiceType(e.target.value)}
                   className="mt-2"
                 />
-                <Button onClick={handleAddInvoiceType} className="mt-2">
+                <Button onClick={handleAddInvoiceType} className="mt-2 ">
                   Add Document Type
                 </Button>
               </>

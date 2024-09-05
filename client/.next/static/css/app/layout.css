@@ -16017,6 +16017,69 @@ p.home-page {
   padding: 9px;
   border-radius: 5px;
 }
+.step-indicator {
+  position: relative;
+}
+.step-indicator::after {
+  content: "";
+  width: 100%;
+  height: 3px;
+  background: rgb(255, 255, 255);
+  position: absolute;
+  left: 0;
+  top: 15px;
+  z-index: 1;
+}
+.step-indicator.active:after {
+  background: #0f8dfd;
+}
+
+.formgroupk {
+  border: 1px solid #fff;
+  padding: 11px;
+  border-radius: 8px;
+  margin-block: 5px;
+  box-shadow: 0px 0px 8px #00000045;
+  width: 49%;
+  height: 100px;
+}
+.h-150 {
+  height: 149px;
+}
+.form-control,
+.css-13cymwt-control,
+.PhoneInputInput,
+.form-select,
+.formgroupk input {
+  border-radius: 6px !important;
+  background: #e6f3ff !important;
+}
+.PhoneInputInput {
+  border: 1px solid #ccc;
+  min-height: 38px;
+}
+.modal-body button,
+.modal-footer button {
+  border-radius: 6px;
+}
+.btn-close {
+  box-shadow: 0px 0px 7px red;
+  border-radius: 5px;
+}
+.modal-body h6 {
+  letter-spacing: 1px;
+  font-weight: normal;
+  font-size: 20px;
+}
+tr td {
+  text-align: center;
+  vertical-align: middle;
+}
+tr th {
+  font-size: 12px;
+  width: min-content;
+  min-width: 82px;
+}
 /*** Contact ***/
 @media (min-width: 992px) {
   .container.contact-page {

@@ -86,7 +86,7 @@ export default function ProductForm({ closeModel, onFormSubmit }) {
 
   return (
     <>
-      <Form.Group className="mb-3" htmlFor="formProductSearch">
+      <Form.Group className="mb-3 " htmlFor="formProductSearch">
         <Form.Control
           id="searchField"
           type="text"
@@ -109,7 +109,10 @@ export default function ProductForm({ closeModel, onFormSubmit }) {
           </ul>
         )}
       </Form.Group>
-      <form onSubmit={handleSubmit} className="addProductForm">
+      <form
+        onSubmit={handleSubmit}
+        className="addProductForm formgroupk w-100 h-100"
+      >
         <input
           name="productName"
           placeholder="Product Name"
