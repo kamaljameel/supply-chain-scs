@@ -15999,6 +15999,13 @@ p.home-page {
 .fade.mainmodelP.modal.show {
   z-index: 1050;
 }
+.taxFild {
+  display: flex;
+  height: -moz-fit-content;
+  height: fit-content;
+  align-items: center;
+  gap: 5px;
+}
 .addProductForm {
   display: flex;
   flex-direction: row;

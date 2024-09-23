@@ -12,4 +12,7 @@ export const forgotPasswordApi = `${host}/api/forgot-password`;
 export const resetPasswordApi = `${host}/api/reset-password`;
 export const addProductApi = `${host}/api/products`;
 
+// New route for updating a product
+export const updateProductApi = `${host}/api/products`;
+
 // export const tariffcodeApi = `${host}/api/commodity/${query}`;

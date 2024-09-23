@@ -13,6 +13,7 @@ import RoadTransport from "./sidebarcomponent/RoadTransport";
 import SeaShipment from "./sidebarcomponent/SeaShipment";
 import HomeCards from "./sidebarcomponent/HomeCards";
 import AirShipment from "./sidebarcomponent/AirShipment";
+import FileUploadForm from "./FileUploadForm";
 
 const Dashboard = () => {
   const router = useRouter();
@@ -204,7 +205,10 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="dashboardcontainer">{renderMainContent()}</div>
-
+          <div>
+            {" "}
+            <FileUploadForm />
+          </div>
           <div className="position-absolute bottom-0 end-0 start-0 mx-auto mb-3 text-center">
             {/* <span
               onMouseEnter={seefooter}

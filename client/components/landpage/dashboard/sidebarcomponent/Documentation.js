@@ -17,13 +17,25 @@ const Documentation = () => {
   ]);
   const [newInvoiceType, setNewInvoiceType] = useState("");
   const [showNewInvoiceTypeInput, setShowNewInvoiceTypeInput] = useState(false);
+  const [invoiceConvert, SetInvoiceConevert] = useState(false);
   const [invoiceTypeOptions, setInvoiceTypeOptions] = useState([
     "Proforma Invoice",
     "Commercial Invoice",
   ]);
 
-  const handleCloseInvoiceModal = () => setShowInvoiceModal(false);
+  const handleCloseInvoiceModal = () => {
+    setShowInvoiceModal(false);
+    SetInvoiceConevert(false);
+    setSelectedInvoiceType("");
+  };
   const handleShowInvoiceModal = () => setShowInvoiceModal(true);
+  const handleInvoiceConvert = () => {
+    SetInvoiceConevert(true);
+  };
+  const handleInvoiceCancel = () => {
+    SetInvoiceConevert(false);
+    setSelectedInvoiceType("");
+  };
 
   const handleInvoiceTypeSelect = (e) => {
     const value = e.target.value;
@@ -31,8 +43,8 @@ const Documentation = () => {
       setShowFullWidthModal(true);
       setShowInvoiceModal(false);
     } else if (value === "Commercial Invoice") {
-      setShowFullWidthModal(true);
-      setShowInvoiceModal(false);
+      // setShowFullWidthModal(true);
+      // setShowInvoiceModal(false);
     }
     setSelectedInvoiceType(value);
   };
@@ -84,9 +96,9 @@ const Documentation = () => {
     if (data) {
       doc.autoTable({
         startY: doc.previousAutoTable.finalY + 10,
-        head: [["Tax", "Subtotal", "Total"]],
+        head: [["Tax in %", "Tax in amount", "Subtotal", "Total"]],
         body: [
-          [data.tax, data.subtotal, data.total], // Single row with the corresponding values
+          [data.tax, data.taxPercentage, data.subtotal, data.total], // Single row with the corresponding values
         ],
       });
     }
@@ -172,44 +184,73 @@ const Documentation = () => {
           <Modal.Title>Select Document Type</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form.Group
-            className="formgroupk mb-3 w-100 h-100"
-            controlId="formInvoiceType"
-          >
-            <Form.Label>Select Document Type</Form.Label>
-            <Form.Control
-              as="select"
-              value={selectedInvoiceType}
-              onChange={handleInvoiceTypeSelect}
-            >
-              <option value="">Select Document Type</option>
-              {invoiceTypeOptions.map((type, index) => (
-                <option key={index} value={type}>
-                  {type}
-                </option>
-              ))}
-            </Form.Control>
-            <Button
-              onClick={() => setShowNewInvoiceTypeInput(true)}
-              className="mt-2 px-0 bg-transparent text-primary text-decoration-underline border-0 pb-0"
-            >
-              Add new Document Type
-            </Button>
-            {showNewInvoiceTypeInput && (
-              <>
-                <Form.Control
-                  type="text"
-                  placeholder="New Invoice Type"
-                  value={newInvoiceType}
-                  onChange={(e) => setNewInvoiceType(e.target.value)}
-                  className="mt-2"
-                />
-                <Button onClick={handleAddInvoiceType} className="mt-2 ">
-                  Add Document Type
+          {selectedInvoiceType === "Commercial Invoice" ? (
+            !invoiceConvert ? (
+              <div>
+                <h6>
+                  Do you want to convert performa invoice into commercial
+                  invoice?
+                </h6>
+                <Button variant="primary" onClick={handleInvoiceConvert}>
+                  Yes
                 </Button>
-              </>
-            )}
-          </Form.Group>
+                <Button variant="danger" onClick={handleInvoiceCancel}>
+                  No
+                </Button>
+              </div>
+            ) : (
+              <Form.Group
+                className="formgroupk mb-3 w-100 h-100"
+                controlId="formInvoiceType"
+              >
+                <Form.Label>Select</Form.Label>
+                <Form.Control as="select">
+                  <option value="">Select Type</option>
+                  <option value="">performa invoice 1</option>
+                  <option value="">performa invoice 2</option>
+                </Form.Control>
+              </Form.Group>
+            )
+          ) : (
+            <Form.Group
+              className="formgroupk mb-3 w-100 h-100"
+              controlId="formInvoiceType"
+            >
+              <Form.Label>Select Document Type</Form.Label>
+              <Form.Control
+                as="select"
+                value={selectedInvoiceType}
+                onChange={handleInvoiceTypeSelect}
+              >
+                <option value="">Select Document Type</option>
+                {invoiceTypeOptions.map((type, index) => (
+                  <option key={index} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </Form.Control>
+              <Button
+                onClick={() => setShowNewInvoiceTypeInput(true)}
+                className="mt-2 px-0 bg-transparent text-primary text-decoration-underline border-0 pb-0"
+              >
+                Add new Document Type
+              </Button>
+              {showNewInvoiceTypeInput && (
+                <>
+                  <Form.Control
+                    type="text"
+                    placeholder="New Invoice Type"
+                    value={newInvoiceType}
+                    onChange={(e) => setNewInvoiceType(e.target.value)}
+                    className="mt-2"
+                  />
+                  <Button onClick={handleAddInvoiceType} className="mt-2 ">
+                    Add Document Type
+                  </Button>
+                </>
+              )}
+            </Form.Group>
+          )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseInvoiceModal}>

@@ -17,18 +17,26 @@
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "font-awesome": "^4.7.0",
+    "formidable": "^3.5.1",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.8.2",
+    "mammoth": "^1.8.0",
+    "multer": "^1.4.5-lts.1",
     "next": "14.2.3",
     "next-auth": "^4.24.7",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.6.82",
     "react": "^18",
     "react-bootstrap": "^2.10.2",
     "react-dom": "^18",
+    "react-pdf": "^9.1.1",
     "react-phone-number-input": "^3.4.5",
     "react-select": "^5.8.0",
     "react-select-country-list": "^2.2.3",
     "react-slick": "^0.30.2",
     "sass": "^1.77.4",
-    "slick-carousel": "^1.8.1"
+    "slick-carousel": "^1.8.1",
+    "tesseract.js": "^5.1.1",
+    "xlsx": "^0.18.5"
   }
 }

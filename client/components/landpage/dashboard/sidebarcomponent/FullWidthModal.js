@@ -135,14 +135,16 @@ const FullWidthModal = ({
   // get products===============
   const [products, setProducts] = useState([]);
   const [showNewProduct, setNewProductShow] = useState(false);
-
+  const [pid, setpid] = useState("");
   const handleNewProductClose = () => setNewProductShow(false);
   const handleNewProductShow = () => setNewProductShow(true);
-
+  const [selectedProduct, setSelectedProduct] = useState("");
   const fetchProducts = async () => {
     try {
       const response = await axios.get(addProductApi);
       setProducts(response.data);
+      setpid(null);
+      setSelectedProduct("");
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -154,6 +156,7 @@ const FullWidthModal = ({
   }, []);
   const [subtotal, setSubtotal] = useState(0);
   const [tax, setTax] = useState(0);
+  const [taxPercentage, setTaxPercentage] = useState(0);
   const [total, setTotal] = useState(0);
 
   // Calculate subtotal, tax, and total when product details change
@@ -171,9 +174,10 @@ const FullWidthModal = ({
 
     calculateTotals();
   }, [productDetails, tax]);
+
   const handleSelect = (e) => {
     const selectedProductId = e.target.value;
-
+    setSelectedProduct(selectedProductId);
     // Check if selectedProductId is a valid selection
     if (!selectedProductId || selectedProductId === "Select a Product") {
       setNewProduct({
@@ -189,11 +193,11 @@ const FullWidthModal = ({
 
     // Parse selectedProductId as a number if it's not already
     const parsedProductId = parseInt(selectedProductId);
-
-    // Find the selected product by id
     const selectedProduct = products.find(
       (product) => product.id === parsedProductId
     );
+    setpid(selectedProduct);
+    // Find the selected product by id
 
     if (selectedProduct) {
       setNewProduct({
@@ -280,8 +284,22 @@ const FullWidthModal = ({
     onHide();
   };
 
+  // Handle change in tax percentage
+  const handleTaxPercentageChange = (e) => {
+    const newPercentage = e.target.value;
+    setTaxPercentage(newPercentage);
+
+    const calculatedTax = (subtotal * newPercentage) / 100;
+    setTax(calculatedTax); // Update tax based on percentage
+  };
+
+  // Handle change in tax amount field
   const handleTaxChange = (e) => {
-    setTax(e.target.value);
+    const newTax = e.target.value;
+    setTax(newTax);
+
+    const calculatedPercentage = (newTax / subtotal) * 100;
+    setTaxPercentage(calculatedPercentage); // Update percentage based on tax amount
   };
   const handleAddCompany = () => {
     addCompany(newCompany);
@@ -416,6 +434,7 @@ const FullWidthModal = ({
       unitPrice: 0,
       totalPrice: 0,
     });
+    setSelectedProduct("");
   };
 
   const handleShippingCountrySelect = (selectedOption, field) => {
@@ -545,6 +564,7 @@ const FullWidthModal = ({
       subtotal,
       tax,
       total,
+      taxPercentage,
       selectedSellerCompany,
       selectedBuyerCompany,
       sellerLogo: formData.sellerLogo ? formData.sellerLogo.name : null,
@@ -1182,6 +1202,8 @@ const FullWidthModal = ({
                         <Form.Select
                           aria-label="Default select"
                           onChange={handleSelect}
+                          as="select"
+                          value={selectedProduct}
                         >
                           <option>Select a Product</option>
                           {products.map((product, index) => (
@@ -1197,6 +1219,13 @@ const FullWidthModal = ({
                         >
                           Add
                         </Button>
+                        <Button
+                          onClick={handleNewProductShow}
+                          className="fs-6 px-0 bg-transparent text-primary text-decoration-underline border-0 pb-0 "
+                          disabled={!selectedProduct}
+                        >
+                          Edit
+                        </Button>
                       </div>
                       <Modal
                         show={showNewProduct}
@@ -1211,6 +1240,7 @@ const FullWidthModal = ({
                           <ProductForm
                             closeModel={handleNewProductClose}
                             onFormSubmit={fetchProducts}
+                            productToEdit={pid}
                           />
                         </Modal.Body>
                       </Modal>
@@ -1270,7 +1300,7 @@ const FullWidthModal = ({
                     />
                   </div>
                 </div>
-                <div className="form-group d-flex gap-3 w-100">
+                {/* <div className="form-group d-flex gap-3 w-100">
                   <label className=" col-form-label">Tax</label>
                   <div className="w-100">
                     <input
@@ -1280,7 +1310,33 @@ const FullWidthModal = ({
                       onChange={handleTaxChange}
                     />
                   </div>
+                </div> */}
+
+                {/* Tax Percentage and Amount Fields */}
+                <div className="form-group d-flex gap-3 w-100">
+                  <label className=" col-form-label">Tax</label>
+                  <div className="col-sm-5 taxFild">
+                    <input
+                      type="number"
+                      className="form-control"
+                      placeholder="Percentage"
+                      value={taxPercentage}
+                      onChange={handleTaxPercentageChange}
+                    />
+                    <span className="m-0 fs-11">%</span>
+                  </div>
+                  <div className="col-sm-5 taxFild">
+                    <input
+                      type="number"
+                      className="form-control"
+                      placeholder="Amount"
+                      value={tax}
+                      onChange={handleTaxChange}
+                    />
+                    <span className="m-0 fs-11">Amount</span>
+                  </div>
                 </div>
+
                 <div className="form-group d-flex gap-3 w-100">
                   <label className=" col-form-label">Total</label>
                   <div className="w-100">
@@ -1540,12 +1596,20 @@ const FullWidthModal = ({
             </Form.Group>
             <Form.Group className="formgroupk mb-3" htmlFor="formSellerPhone">
               <Form.Label>Phone</Form.Label>
-              <Form.Control
+              {/* <Form.Control
                 type="text"
                 placeholder="Phone Number"
                 name="sellerPhone"
                 value={formData.sellerPhone || ""}
                 onChange={handleFormChange}
+              /> */}
+
+              <PhoneInput
+                international
+                defaultCountry={formData.sellerCountryCode} // Set default country if needed
+                value={formData.sellerPhone}
+                onChange={handlePhoneChange}
+                placeholder="Enter phone number"
               />
             </Form.Group>
             <Form.Group className="formgroupk mb-3" htmlFor="formSellerEmail">
@@ -1689,24 +1753,32 @@ const FullWidthModal = ({
                 onChange={handleFormChange}
               />
             </Form.Group>
+
             <Form.Group className="formgroupk mb-3" htmlFor="formBuyerCountry">
               <Form.Label>Country</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Country"
-                name="buyerCountry"
-                value={formData.buyerCountry || ""}
-                onChange={handleFormChange}
+
+              <Select
+                options={countries}
+                value={
+                  formData.buyerCountryCode
+                    ? countries.find(
+                        (country) => country.value === formData.buyerCountryCode
+                      )
+                    : null
+                }
+                onChange={handleBuyerCountrySelect}
+                placeholder="Select a country"
               />
             </Form.Group>
             <Form.Group className="formgroupk mb-3" htmlFor="formBuyerPhone">
               <Form.Label>Phone</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Phone Number"
-                name="buyerPhone"
-                value={formData.buyerPhone || ""}
-                onChange={handleFormChange}
+
+              <PhoneInput
+                international
+                defaultCountry={formData.buyerCountryCode} // Set default country if needed
+                value={formData.buyerPhone}
+                onChange={handleBuyerPhoneChange}
+                placeholder="Enter phone number"
               />
             </Form.Group>
             <Form.Group className="formgroupk mb-3" htmlFor="formBuyerEmail">
@@ -1809,7 +1881,13 @@ const FullWidthModal = ({
     >
       <div className="stepindi">{renderProgress()}</div>
       <Modal.Header closeButton>
-        <Modal.Title> {selectedInvoiceType}</Modal.Title>
+        <Modal.Title>
+          {addsellercom
+            ? "Add New Seller Company"
+            : AddBuyercom
+            ? "Add New Buyer Company"
+            : selectedInvoiceType}
+        </Modal.Title>
       </Modal.Header>
       <Modal.Body className="invoicMB">
         {currentStep === 1 ? (

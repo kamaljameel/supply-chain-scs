@@ -1,10 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { addProductApi } from "@/utils/apiRoutes";
+import { addProductApi, updateProductApi } from "@/utils/apiRoutes";
 import { Form } from "react-bootstrap";
-export default function ProductForm({ closeModel, onFormSubmit }) {
+
+export default function ProductForm({
+  closeModel,
+  onFormSubmit,
+  productToEdit,
+}) {
   const [query, setQuery] = useState("");
   const [products, setProducts] = useState([]);
+  console.log(productToEdit);
 
   const [product, setProduct] = useState({
     productName: "",
@@ -17,6 +23,24 @@ export default function ProductForm({ closeModel, onFormSubmit }) {
     width: "",
     height: "",
   });
+
+  // Initialize form for editing
+  useEffect(() => {
+    if (productToEdit) {
+      setProduct({
+        productName: productToEdit.productName,
+        productDescription: productToEdit.productDescription,
+        hsCode: productToEdit.hsCode,
+        customDescription: productToEdit.customDescription,
+        unitOfMeasurement: productToEdit.unitOfMeasurement,
+        size: productToEdit.size,
+        length: productToEdit.length,
+        width: productToEdit.width,
+        height: productToEdit.height,
+      });
+    }
+  }, [productToEdit]);
+
   // tarif api
   const handleProductSearch = async (e) => {
     setQuery(e.target.value);
@@ -51,6 +75,7 @@ export default function ProductForm({ closeModel, onFormSubmit }) {
       height: "",
     });
   };
+
   // tarif api end
   const handleChange = (e) => {
     setProduct({ ...product, [e.target.name]: e.target.value });
@@ -59,12 +84,19 @@ export default function ProductForm({ closeModel, onFormSubmit }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(addProductApi, product);
-      if (response.status === 201) {
-        // setTimeout(() => {
+      let response;
+      if (productToEdit) {
+        // Update product
+        response = await axios.put(
+          `${updateProductApi}/${productToEdit.id}`,
+          product
+        );
+      } else {
+        // Add new product
+        response = await axios.post(addProductApi, product);
+      }
 
-        // }, 500);
-        // alert("Product added successfully");
+      if (response.status === 201 || response.status === 200) {
         closeModel();
         onFormSubmit();
         setProduct({
@@ -80,13 +112,13 @@ export default function ProductForm({ closeModel, onFormSubmit }) {
         });
       }
     } catch (error) {
-      console.error("Error adding product:", error);
+      console.error("Error saving product:", error);
     }
   };
 
   return (
     <>
-      <Form.Group className="mb-3 " htmlFor="formProductSearch">
+      <Form.Group className="mb-3" htmlFor="formProductSearch">
         <Form.Control
           id="searchField"
           type="text"
@@ -188,7 +220,7 @@ export default function ProductForm({ closeModel, onFormSubmit }) {
           required
         />
         <button type="submit" className="text-white fw-bold">
-          Add Product
+          {productToEdit ? "Update Product" : "Add Product"}
         </button>
       </form>
     </>
