@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 
 import styles from "./login.css";
 import Link from "next/link";
+import { Button, Spinner } from "react-bootstrap";
 const LoginPage = () => {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const [formData, setFormData] = useState({
@@ -21,7 +23,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setLoading(true);
     try {
       const response = await axios.post(loginApi, formData);
       // Assuming your API returns an access token upon successful login
@@ -29,6 +31,7 @@ const LoginPage = () => {
       setError(null);
 
       router.push("/dashboard");
+      setLoading(false);
     } catch (error) {
       if (error.response) {
         // The request was made and the server responded with a status code
@@ -44,6 +47,7 @@ const LoginPage = () => {
         console.log("Error message:", error.message);
         setError("An unexpected error occurred. Please try again later.");
       }
+      setLoading(false);
     }
   };
   useEffect(() => {
@@ -77,7 +81,20 @@ const LoginPage = () => {
             placeholder="Password"
             required
           />
-          <button type="submit">Login</button>
+
+          {!loading && <button type="submit">Login</button>}
+          {loading && (
+            <Button variant="primary" disabled>
+              <Spinner
+                as="span"
+                animation="grow"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+              />
+              Loading...
+            </Button>
+          )}
           <Link href="/forgotpassword" className="text-primary">
             Forgot Password?
           </Link>

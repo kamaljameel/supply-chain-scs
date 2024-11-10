@@ -25,17 +25,19 @@ exports.login = async (req, res) => {
     }
     console.log("testing other endpoint login...");
 
-    const response = await axios.post(
-      "https://api.abisolcrm.com.au/v1/TenantUserLogin_WithPassword",
+    const response = await axios.post;
+    // "https://api.abisolcrm.com.au/v1/TenantUserLogin_WithPassword",
+    "https://api.abisolcrm.com.au/v1/CorporateUserLogin",
       { Email, Password },
-      { headers: { "x-api-key": "7d771e41bb5c449582122749df6bc0a3" } }
-    );
+      { headers: { "x-api-key": "7d771e41bb5c449582122749df6bc0a3" } };
 
     if (response.data && response.data.data) {
       const token = jwt.sign(
         { email: user.Email },
         process.env.JWT_SECRET_KEY,
-        { expiresIn: "1y" }
+        {
+          expiresIn: "1y",
+        }
       );
 
       res.status(200).json({

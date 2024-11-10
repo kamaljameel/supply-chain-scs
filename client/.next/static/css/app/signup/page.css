@@ -1,0 +1,76 @@
+/*!*******************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[13].oneOf[12].use[3]!./app/signup/signup.css ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************/
+/* Centering the form */
+.signupForm form {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  width: 100%;
+}
+
+.signupForm form input[type="text"],
+.signupForm form input[type="email"],
+.signupForm form input[type="password"],
+.signupForm form input[type="radio"] {
+  width: calc(100% - 20px);
+  padding: 10px;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.signupForm form input[type="radio"] {
+  width: auto;
+  margin-right: 10px;
+}
+
+.signupForm form label {
+  font-size: 16px;
+  margin-left: 5px;
+}
+
+.signupForm form button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+}
+
+.signupForm form button:hover {
+  background-color: #45a049;
+}
+
+.signupForm form div {
+  margin-bottom: 1rem;
+}
+
+.signupForm form p {
+  margin-top: 1rem;
+  font-size: 14px;
+}
+
+/* Adding some space between radio buttons and labels */
+.signupForm form div input[type="radio"] + label {
+  margin-left: 5px;
+}
+
+.signupForm form div label {
+  margin-right: 20px;
+}
+
+.success {
+  color: green;
+}
+
+.error {
+  color: red;
+}
+

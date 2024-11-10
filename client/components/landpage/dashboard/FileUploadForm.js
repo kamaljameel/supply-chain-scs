@@ -3,15 +3,16 @@ import * as pdfjsLib from "pdfjs-dist/webpack";
 import Tesseract from "tesseract.js";
 import mammoth from "mammoth";
 import * as XLSX from "xlsx";
+import { Form, Button } from "react-bootstrap";
 
-export default function FileUploadForm() {
+export default function FileUploadForm({ setFormData }) {
   const [file, setFile] = useState(null);
-  const [formData, setFormData] = useState({
-    name: "",
-    address: "",
-    phone: "",
-    email: "",
-  });
+  // const [formData, setFormData] = useState({
+  //   name: "",
+  //   address: "",
+  //   phone: "",
+  //   email: "",
+  // });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -71,8 +72,8 @@ export default function FileUploadForm() {
         }
 
         setFormData({
-          name: extractField(extractedText, "Name:"),
-          address: extractField(extractedText, "Address:"),
+          sellerAddress: extractField(extractedText, "Address:"),
+          // address: extractField(extractedText, "Address:"),
           phone: extractField(extractedText, "Phone:"),
           email: extractField(extractedText, "Email:"),
         });
@@ -84,21 +85,21 @@ export default function FileUploadForm() {
     reader.readAsArrayBuffer(file);
   };
 
-  const processImage = async (file) => {
-    Tesseract.recognize(file, "eng")
-      .then(({ data: { text } }) => {
-        setFormData({
-          name: extractField(text, "Name:"),
-          address: extractField(text, "Address:"),
-          phone: extractField(text, "Phone:"),
-          email: extractField(text, "Email:"),
-        });
-      })
-      .catch((err) => {
-        console.error("OCR error:", err);
-        setError("OCR failed. Ensure the file contains text.");
-      });
-  };
+  // const processImage = async (file) => {
+  //   Tesseract.recognize(file, "eng")
+  //     .then(({ data: { text } }) => {
+  //       setFormData({
+  //         name: extractField(text, "Name:"),
+  //         address: extractField(text, "Address:"),
+  //         phone: extractField(text, "Phone:"),
+  //         email: extractField(text, "Email:"),
+  //       });
+  //     })
+  //     .catch((err) => {
+  //       console.error("OCR error:", err);
+  //       setError("OCR failed. Ensure the file contains text.");
+  //     });
+  // };
 
   const processDOCX = async (file) => {
     const reader = new FileReader();
@@ -106,8 +107,8 @@ export default function FileUploadForm() {
       const arrayBuffer = e.target.result;
       const { value: text } = await mammoth.extractRawText({ arrayBuffer });
       setFormData({
-        name: extractField(text, "Name:"),
-        address: extractField(text, "Address:"),
+        sellerAddress: extractField(text, "Address:"),
+        // address: extractField(text, "Address:"),
         phone: extractField(text, "Phone:"),
         email: extractField(text, "Email:"),
       });
@@ -126,8 +127,8 @@ export default function FileUploadForm() {
       const firstRow = rows[0] || {};
 
       setFormData({
-        name: firstRow.Name || "N/A",
-        address: firstRow.Address || "N/A",
+        sellerAddress: firstRow.Address || "N/A",
+        // address: firstRow.Address || "N/A",
         phone: firstRow.Phone || "N/A",
         email: firstRow.Email || "N/A",
       });
@@ -143,18 +144,36 @@ export default function FileUploadForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input
+      {/* <input
         type="file"
         accept=".pdf,.docx,.xlsx,.png,.jpg,.jpeg"
         onChange={handleFileChange}
       />
       <button type="submit" disabled={loading}>
         {loading ? "Processing..." : "Upload File"}
-      </button>
+      </button> */}
+
+      <Form.Label>Attach Performa Invoice</Form.Label>
+      <div className="d-flex">
+        <Form.Control
+          type="file"
+          accept=".pdf,.docx,.xlsx,.png,.jpg,.jpeg"
+          onChange={handleFileChange}
+          className="w-auto"
+        />
+        <Button
+          type="submit"
+          disabled={loading}
+          className="mt-0 px-3  text-white  border-0 rounded-3 ms-1 w-auto"
+          variant="primary"
+        >
+          {loading ? "Processing..." : "Upload File"}
+        </Button>
+      </div>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <div>
+      {/* <div>
         <label>Name</label>
         <input type="text" value={formData.name} readOnly />
       </div>
@@ -169,7 +188,7 @@ export default function FileUploadForm() {
       <div>
         <label>Email</label>
         <input type="text" value={formData.email} readOnly />
-      </div>
+      </div> */}
     </form>
   );
 }

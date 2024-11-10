@@ -469,6 +469,9 @@ p.home-page {
   flex-wrap: wrap;
   gap: 8px;
 }
+.btn.borderB {
+  border-bottom: 4px solid #33b6fb !important;
+}
 .tarifsearch {
   border: 1px solid #d0cbcb;
   padding: 9px;

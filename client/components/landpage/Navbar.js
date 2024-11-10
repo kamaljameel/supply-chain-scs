@@ -106,11 +106,15 @@ const Navbar = () => {
         </div>
         <span className="ms-3">
           {isLoggedIn ? (
-            <Link href="/signup" passHref>
-              {/* <button className="btn border-1 border-black rounded-3 text-primary">
-                    Sign Up
-                  </button> */}
-            </Link>
+            <div>
+              <Link href="/signup" passHref>
+                <button className="btn borderB text-primary">Sign Up</button>
+              </Link>
+              <span className="mx-2">OR</span>
+              <Link href="/login" passHref>
+                <button className="btn borderB  text-primary ">login</button>
+              </Link>
+            </div>
           ) : (
             <div>
               <Link href="/dashboard" passHref className="me-2 text-dark">

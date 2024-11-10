@@ -42,7 +42,6 @@ export default function Home() {
           <Hero3 />
         </Carousel.Item>
       </Carousel>
-      {/* <SearatesWidget /> */}
 
       <About />
       {/* <Facts/> */}

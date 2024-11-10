@@ -1,12 +1,27 @@
 import React, { useReducer, useEffect, useState } from "react";
-import { Modal, Form, Button, Table, ProgressBar } from "react-bootstrap";
+import {
+  Modal,
+  Form,
+  Button,
+  Table,
+  ProgressBar,
+  Alert,
+} from "react-bootstrap";
 import axios from "axios";
+import * as pdfjsLib from "pdfjs-dist/webpack"; // Change this import to webpack
+import { GlobalWorkerOptions } from "pdfjs-dist/webpack";
 import { addProductApi } from "@/utils/apiRoutes";
 import ProductForm from "./ProductForm";
 import Select from "react-select";
 import PhoneInput, { parsePhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import countryList from "react-select-country-list";
+
+import mammoth from "mammoth"; // For .doc and .docx handling
+import * as XLSX from "xlsx";
+
+// Set the workerSrc to the PDF.js worker file
+GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 // Initial state for the reducer
 const initialState = {
@@ -77,6 +92,8 @@ const FullWidthModal = ({
   const [selectedSellerCompany, setselectedSellerCompany] = useState("");
   const [selectedBuyerCompany, setSelectedBuyerCompany] = useState("");
   const [newCompany, setNewCompany] = useState("");
+  const [pdfText, setPdfText] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState({
     sellerPhone: "",
     sellerCountry: "",
@@ -91,10 +108,14 @@ const FullWidthModal = ({
     sellerLogo: null,
     buyerLogo: null,
     sellerDocument: null,
+    name: "",
+    address: "",
+    phone: "",
+    email: "",
   });
   const [productDetails, setProductDetails] = useState([]);
   const [state, dispatch] = useReducer(reducer, initialState);
-
+  const apiKey = "AIzaSyA5DS0UK5hhUa7g4hGBMjkOXLupWrmdFkY";
   // const [isSearchVisible, setIsSearchVisible] = useState(true);
   const [newProduct, setNewProduct] = useState({
     description: "",
@@ -104,7 +125,122 @@ const FullWidthModal = ({
     unitPrice: "",
     totalPrice: 0,
   });
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedFile(file); // Store the selected file in state
+  };
 
+  // Handle file upload button click
+  const handleFileUpload = async () => {
+    if (selectedFile) {
+      const fileType = selectedFile.type;
+
+      if (fileType === "application/pdf") {
+        const text = await extractTextFromPDF(selectedFile);
+        setPdfText(text);
+      } else if (
+        fileType ===
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+        fileType === "application/msword"
+      ) {
+        const text = await extractTextFromDoc(selectedFile);
+        setPdfText(text);
+      } else if (
+        fileType === "application/vnd.ms-excel" ||
+        fileType ===
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      ) {
+        const text = await extractTextFromExcel(selectedFile);
+        setPdfText(text);
+      } else {
+        console.error(
+          "Unsupported file type. Please upload a PDF, DOC, DOCX, XLS, or XLSX file."
+        );
+      }
+
+      if (pdfText) {
+        await askQuestions(pdfText); // Automatically ask questions
+        await extractProducts(pdfText); // Extract and add products
+      }
+    }
+  };
+
+  const extractTextFromPDF = async (file) => {
+    const arrayBuffer = await file.arrayBuffer();
+    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+    const pdf = await loadingTask.promise;
+    let fullText = "";
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map((item) => item.str).join(" ");
+      fullText += pageText + " ";
+    }
+
+    return fullText;
+  };
+
+  // Extract text from .doc and .docx using Mammoth
+  const extractTextFromDoc = async (file) => {
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    return result.value; // Returns extracted text from the .doc/.docx file
+  };
+
+  // Extract text from Excel files (.xls, .xlsx)
+  const extractTextFromExcel = async (file) => {
+    const data = await file.arrayBuffer();
+    const workbook = XLSX.read(data, { type: "array" });
+    let extractedText = "";
+
+    workbook.SheetNames.forEach((sheetName) => {
+      const sheet = workbook.Sheets[sheetName];
+      const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // Convert sheet to JSON
+      sheetData.forEach((row) => {
+        extractedText += row.join(" ") + " "; // Concatenate rows into a single string
+      });
+    });
+
+    return extractedText;
+  };
+  // Automatically ask predefined questions and fill the form
+
+  // Extract product details from the PDF text
+
+  // Parse extracted product details
+
+  // Auto add products one by one to the table
+
+  // Send request to OpenAI API with the extracted PDF text and the user's question
+  const askChatGPT = async (pdfText, question) => {
+    try {
+      const prompt = `You are analyzing the following text from a PDF:\n\n${pdfText}\n\nQuestion: ${question}`;
+      const response = await axios.post(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
+        {
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      // Extract the required data
+      return (
+        response.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+        "No content available"
+      );
+    } catch (error) {
+      console.error("Error with ChatGPT API:", error);
+      return "Error retrieving data";
+    }
+  };
   // Generate country options with country codes
   const countries = countryList()
     .getData()
@@ -317,36 +453,36 @@ const FullWidthModal = ({
     setAddsellercom(false);
     setAddBuyercom(false);
   };
-  const handleFileChange = (file) => {
-    // Define allowed file types
-    const allowedTypes = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    ];
+  // const handleFileChange = (file) => {
+  //   // Define allowed file types
+  //   const allowedTypes = [
+  //     "application/pdf",
+  //     "application/msword",
+  //     "application/vnd.ms-excel",
+  //     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  //     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  //   ];
 
-    if (file) {
-      // Check file type
-      if (!allowedTypes.includes(file.type)) {
-        alert("Only PDF, DOC, and XLS files are allowed.");
-        return;
-      }
+  //   if (file) {
+  //     // Check file type
+  //     if (!allowedTypes.includes(file.type)) {
+  //       alert("Only PDF, DOC, and XLS files are allowed.");
+  //       return;
+  //     }
 
-      // Optional: Check file size (e.g., 10 MB limit)
-      if (file.size > 10 * 1024 * 1024) {
-        alert("File size should not exceed 10 MB.");
-        return;
-      }
+  //     // Optional: Check file size (e.g., 10 MB limit)
+  //     if (file.size > 10 * 1024 * 1024) {
+  //       alert("File size should not exceed 10 MB.");
+  //       return;
+  //     }
 
-      // Update formData state with the selected file
-      setFormData({
-        ...formData,
-        sellerDocument: file,
-      });
-    }
-  };
+  //     // Update formData state with the selected file
+  //     setFormData({
+  //       ...formData,
+  //       sellerDocument: file,
+  //     });
+  //   }
+  // };
 
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -625,6 +761,7 @@ const FullWidthModal = ({
         return (
           <>
             <h6>Seller/Shipper/Exporter/Supplier Information</h6>
+
             <Form.Group
               className="formgroupk mb-3 h-150"
               htmlFor="formSellerDocument"
@@ -632,10 +769,21 @@ const FullWidthModal = ({
               <Form.Label>Attach Performa Invoice</Form.Label>
               <Form.Control
                 type="file"
-                name="sellerDocument"
-                onChange={(e) => handleFileChange(e.target.files[0])}
+                id="fileInput"
+                onChange={handleFileChange}
+                accept=".pdf,.doc,.docx,.xls,.xlsx"
               />
+              <button onClick={handleFileUpload}>Upload</button>
+              {/* <input
+        type="file"
+        id="fileInput"
+        onChange={handleFileChange}
+        accept=".pdf,.doc,.docx,.xls,.xlsx"
+      />
+      <button onClick={handleFileUpload}>Upload</button> */}
+              <div className="p-3">{pdfText}</div>
             </Form.Group>
+
             <Form.Group className="formgroupk h-150" htmlFor="companySelect">
               <Form.Label>Select Company</Form.Label>
               <Form.Control
