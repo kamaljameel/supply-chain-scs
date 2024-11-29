@@ -8,8 +8,8 @@ import {
   Alert,
 } from "react-bootstrap";
 import axios from "axios";
-import * as pdfjsLib from "pdfjs-dist/webpack"; // Change this import to webpack
-import { GlobalWorkerOptions } from "pdfjs-dist/webpack";
+// import * as pdfjsLib from "pdfjs-dist/webpack"; // Change this import to webpack
+// import { GlobalWorkerOptions } from "pdfjs-dist/webpack";
 import { addProductApi } from "@/utils/apiRoutes";
 import ProductForm from "./ProductForm";
 import Select from "react-select";
@@ -17,11 +17,11 @@ import PhoneInput, { parsePhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import countryList from "react-select-country-list";
 
-import mammoth from "mammoth"; // For .doc and .docx handling
-import * as XLSX from "xlsx";
+// import mammoth from "mammoth"; // For .doc and .docx handling
+// import * as XLSX from "xlsx";
 
 // Set the workerSrc to the PDF.js worker file
-GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 // Initial state for the reducer
 const initialState = {
@@ -93,7 +93,7 @@ const FullWidthModal = ({
   const [selectedBuyerCompany, setSelectedBuyerCompany] = useState("");
   const [newCompany, setNewCompany] = useState("");
   const [pdfText, setPdfText] = useState("");
-  const [selectedFile, setSelectedFile] = useState(null);
+  // const [selectedFile, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState({
     sellerPhone: "",
     sellerCountry: "",
@@ -115,7 +115,7 @@ const FullWidthModal = ({
   });
   const [productDetails, setProductDetails] = useState([]);
   const [state, dispatch] = useReducer(reducer, initialState);
-  const apiKey = "AIzaSyA5DS0UK5hhUa7g4hGBMjkOXLupWrmdFkY";
+  // const apiKey = "AIzaSyA5DS0UK5hhUa7g4hGBMjkOXLupWrmdFkY";
   // const [isSearchVisible, setIsSearchVisible] = useState(true);
   const [newProduct, setNewProduct] = useState({
     description: "",
@@ -127,7 +127,7 @@ const FullWidthModal = ({
   });
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setSelectedFile(file); // Store the selected file in state
+    // setSelectedFile(file); // Store the selected file in state
   };
 
   // Handle file upload button click
@@ -165,45 +165,45 @@ const FullWidthModal = ({
     }
   };
 
-  const extractTextFromPDF = async (file) => {
-    const arrayBuffer = await file.arrayBuffer();
-    const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-    const pdf = await loadingTask.promise;
-    let fullText = "";
+  // const extractTextFromPDF = async (file) => {
+  //   const arrayBuffer = await file.arrayBuffer();
+  //   const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+  //   const pdf = await loadingTask.promise;
+  //   let fullText = "";
 
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items.map((item) => item.str).join(" ");
-      fullText += pageText + " ";
-    }
+  //   for (let i = 1; i <= pdf.numPages; i++) {
+  //     const page = await pdf.getPage(i);
+  //     const textContent = await page.getTextContent();
+  //     const pageText = textContent.items.map((item) => item.str).join(" ");
+  //     fullText += pageText + " ";
+  //   }
 
-    return fullText;
-  };
+  //   return fullText;
+  // };
 
   // Extract text from .doc and .docx using Mammoth
-  const extractTextFromDoc = async (file) => {
-    const arrayBuffer = await file.arrayBuffer();
-    const result = await mammoth.extractRawText({ arrayBuffer });
-    return result.value; // Returns extracted text from the .doc/.docx file
-  };
+  // const extractTextFromDoc = async (file) => {
+  //   const arrayBuffer = await file.arrayBuffer();
+  //   const result = await mammoth.extractRawText({ arrayBuffer });
+  //   return result.value; // Returns extracted text from the .doc/.docx file
+  // };
 
   // Extract text from Excel files (.xls, .xlsx)
-  const extractTextFromExcel = async (file) => {
-    const data = await file.arrayBuffer();
-    const workbook = XLSX.read(data, { type: "array" });
-    let extractedText = "";
+  // const extractTextFromExcel = async (file) => {
+  //   const data = await file.arrayBuffer();
+  //   const workbook = XLSX.read(data, { type: "array" });
+  //   let extractedText = "";
 
-    workbook.SheetNames.forEach((sheetName) => {
-      const sheet = workbook.Sheets[sheetName];
-      const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // Convert sheet to JSON
-      sheetData.forEach((row) => {
-        extractedText += row.join(" ") + " "; // Concatenate rows into a single string
-      });
-    });
+  //   workbook.SheetNames.forEach((sheetName) => {
+  //     const sheet = workbook.Sheets[sheetName];
+  //     const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1 }); // Convert sheet to JSON
+  //     sheetData.forEach((row) => {
+  //       extractedText += row.join(" ") + " "; // Concatenate rows into a single string
+  //     });
+  //   });
 
-    return extractedText;
-  };
+  //   return extractedText;
+  // };
   // Automatically ask predefined questions and fill the form
 
   // Extract product details from the PDF text
@@ -213,34 +213,34 @@ const FullWidthModal = ({
   // Auto add products one by one to the table
 
   // Send request to OpenAI API with the extracted PDF text and the user's question
-  const askChatGPT = async (pdfText, question) => {
-    try {
-      const prompt = `You are analyzing the following text from a PDF:\n\n${pdfText}\n\nQuestion: ${question}`;
-      const response = await axios.post(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
-        {
-          contents: [
-            {
-              parts: [{ text: prompt }],
-            },
-          ],
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      // Extract the required data
-      return (
-        response.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-        "No content available"
-      );
-    } catch (error) {
-      console.error("Error with ChatGPT API:", error);
-      return "Error retrieving data";
-    }
-  };
+  // const askChatGPT = async (pdfText, question) => {
+  //   try {
+  //     const prompt = `You are analyzing the following text from a PDF:\n\n${pdfText}\n\nQuestion: ${question}`;
+  //     const response = await axios.post(
+  //       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
+  //       {
+  //         contents: [
+  //           {
+  //             parts: [{ text: prompt }],
+  //           },
+  //         ],
+  //       },
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+  //     // Extract the required data
+  //     return (
+  //       response.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+  //       "No content available"
+  //     );
+  //   } catch (error) {
+  //     console.error("Error with ChatGPT API:", error);
+  //     return "Error retrieving data";
+  //   }
+  // };
   // Generate country options with country codes
   const countries = countryList()
     .getData()
@@ -279,6 +279,7 @@ const FullWidthModal = ({
     try {
       const response = await axios.get(addProductApi);
       setProducts(response.data);
+      console.log("ddddttt", response.data);
       setpid(null);
       setSelectedProduct("");
     } catch (error) {
@@ -330,7 +331,7 @@ const FullWidthModal = ({
     // Parse selectedProductId as a number if it's not already
     const parsedProductId = parseInt(selectedProductId);
     const selectedProduct = products.find(
-      (product) => product.id === parsedProductId
+      (product) => product.ProductID === parsedProductId
     );
     setpid(selectedProduct);
     // Find the selected product by id
@@ -338,9 +339,9 @@ const FullWidthModal = ({
     if (selectedProduct) {
       setNewProduct({
         // description: selectedProduct.productDescription || "",
-        description: selectedProduct.productName || "",
+        description: selectedProduct.Name || "",
 
-        hsCode: selectedProduct.hsCode || "",
+        hsCode: selectedProduct.Code_SKU || "",
         origin: "",
         quantity: "",
         unitPrice: "",
@@ -552,7 +553,7 @@ const FullWidthModal = ({
   };
   // Handling port selection if the country has valid port options
   const handleEditProduct = (index) => {
-    const productToEdit = productDetails[index];
+    var productToEdit = productDetails[index];
     setNewProduct(productToEdit); // Populate the form with the product details
     setProductDetails((prev) => prev.filter((_, i) => i !== index));
   };
@@ -1355,8 +1356,8 @@ const FullWidthModal = ({
                         >
                           <option>Select a Product</option>
                           {products.map((product, index) => (
-                            <option key={index} value={product.id}>
-                              {product.productName}
+                            <option key={index} value={product.ProductID}>
+                              {product.Name}
                             </option>
                           ))}
                         </Form.Select>
@@ -1380,6 +1381,7 @@ const FullWidthModal = ({
                         onHide={handleNewProductClose}
                         backdrop="static"
                         keyboard={false}
+                        size="lg"
                       >
                         <Modal.Header closeButton>
                           <Modal.Title>Add New Product</Modal.Title>

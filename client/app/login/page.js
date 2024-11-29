@@ -95,9 +95,15 @@ const LoginPage = () => {
               Loading...
             </Button>
           )}
-          <Link href="/forgotpassword" className="text-primary">
-            Forgot Password?
-          </Link>
+          <div className="mt-2">
+            <Link href="/forgotpassword" className="text-primary">
+              Forgot Password?
+            </Link>
+            <span className="mx-2">OR</span>
+            <Link href="/signup" passHref className="text-primary fw-medium">
+              Sign Up
+            </Link>
+          </div>
 
           {error && <p style={{ color: "red" }}>{error}</p>}
         </form>

@@ -16,13 +16,18 @@ import AirShipment from "./sidebarcomponent/AirShipment";
 import ChatGPTWithAutoQuestions from "./ChatGPTWithAutoQuestions";
 import Opentest from "@/components/Opentest";
 import SearatesWidget from "@/components/searates/SearatesWidget";
+import ProductForm from "./sidebarcomponent/ProductForm";
+import { Button, Modal } from "react-bootstrap";
 
 const Dashboard = () => {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [pinnedLinks, setPinnedLinks] = useState([]);
   const [selectedPage, setSelectedPage] = useState("home");
-
+  const [showNewProduct, setNewProductShow] = useState(false);
+  const [pid, setpid] = useState("");
+  const handleNewProductClose = () => setNewProductShow(false);
+  const handleNewProductShow = () => setNewProductShow(true);
   // const seefooter = () => {
   //   setSeeFooter(true);
   // };
@@ -143,13 +148,11 @@ const Dashboard = () => {
     <>
       <Navbar />
       <div className={`${styles.body} d-flex gap-2`}>
-        <div
-          className={`${styles.sidebar} p-3 sidebar d-flex flex-column justify-content-between`}
-        >
+        <div className={`${styles.sidebar} p-3 sidebar d-flex flex-column `}>
           <div className="sidebaritems">
-            <div>
+            {/* <div>
               <p>{user.id}</p>
-            </div>
+            </div> */}
             <div className="my-2">
               <a
                 href="#"
@@ -181,6 +184,30 @@ const Dashboard = () => {
               </div>
             ))}
           </div>
+          <Button
+            className="fs-6 px-0 bg-transparent text-white mt-2 w-100 addproductbtn"
+            onClick={handleNewProductShow}
+          >
+            Add Product
+          </Button>
+          <Modal
+            show={showNewProduct}
+            onHide={handleNewProductClose}
+            backdrop="static"
+            keyboard={false}
+            size="lg"
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Add New Product</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <ProductForm
+                closeModel={handleNewProductClose}
+                ///onFormSubmit={fetchProducts}
+                productToEdit={pid}
+              />
+            </Modal.Body>
+          </Modal>
         </div>
         <div
           className={`${styles["main-content"]} bg-white w-100 p-3  position-relative`}

@@ -22,6 +22,7 @@ import ServiceItem from "@/components/landpage/ServiceItem";
 import services from "@/data/servicesData";
 import BusinessInquiryForm from "@/components/landpage/BusinessInquiryForm";
 import Tariff from "@/components/landpage/Tariff";
+import Hero4 from "@/components/landpage/Hero4";
 // import SearatesWidget from "@/components/searates/SearatesWidget";
 
 export default function Home() {
@@ -40,6 +41,9 @@ export default function Home() {
         </Carousel.Item>
         <Carousel.Item>
           <Hero3 />
+        </Carousel.Item>
+        <Carousel.Item>
+          <Hero4 />
         </Carousel.Item>
       </Carousel>
 

@@ -59,7 +59,7 @@ exports.createBusinessInquiry = async (req, res) => {
   `;
     // Example: Send email with inquiry details
     await sendEmail({
-      to: `info@i-scs.co.uk, kamaljameel14@gmail.com`,
+      to: `info@i-scs.co.uk`,
       subject: "New Business Inquiry",
       html: emailContent,
     });

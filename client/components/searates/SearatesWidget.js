@@ -20,7 +20,7 @@ const SearatesWidget = () => {
       <div
         id="marketplace"
         className="container-fluid"
-        data-filter='{"platform": "1", "currency": "USD"}'
+        data-filter='{"platform": "14833", "currency": "USD"}'
       ></div>
     </>
   );

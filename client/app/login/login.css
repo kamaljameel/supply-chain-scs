@@ -51,3 +51,10 @@
   font-size: 14px;
   color: red;
 }
+
+.loginmaincon {
+  background-image: url("/img/A visually.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}

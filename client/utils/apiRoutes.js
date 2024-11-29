@@ -1,6 +1,6 @@
 import { host } from "./apiHost";
 
-export const studentapi = `${host}/api/student`;
+// export const studentapi = `${host}/api/student`;
 export const contactApi = `${host}/api/contact`;
 export const signupApi = `${host}/api/signup`;
 export const loginApi = `${host}/api/login`;
@@ -14,5 +14,10 @@ export const addProductApi = `${host}/api/products`;
 
 // New route for updating a product
 export const updateProductApi = `${host}/api/products`;
+
+export const deletProductApi = `${host}/api/products`;
+
+export const deletExternalProductApi = (productId) =>
+  `${host}/api/products/${productId}`;
 
 // export const tariffcodeApi = `${host}/api/commodity/${query}`;

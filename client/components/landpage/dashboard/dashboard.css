@@ -252,6 +252,13 @@ body {
 .formgroupk label {
   color: black;
 }
+.addproductbtn {
+  background: #0f8dfd !important;
+
+  border-radius: 10px;
+
+  border: 1px solid white !important;
+}
 @media (min-width: 992px) {
   .mainmodelP .modal-lg {
     max-width: 1200px !important;

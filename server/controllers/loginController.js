@@ -8,39 +8,44 @@ exports.login = async (req, res) => {
   const { Email, Password } = req.body;
 
   try {
+    // Check if the user exists in the local database
     const user = await User.findOne({ where: { Email } });
-
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
+    // Check if the user's email is verified
     if (!user.verified) {
       return res.status(403).json({ message: "Email not verified" });
     }
 
+    // Validate password
     const isPasswordValid = await bcrypt.compare(Password, user.Password);
-
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
-    console.log("testing other endpoint login...");
 
-    const response = await axios.post;
-    // "https://api.abisolcrm.com.au/v1/TenantUserLogin_WithPassword",
-    "https://api.abisolcrm.com.au/v1/CorporateUserLogin",
+    // Request to Abisol API
+    console.log("Requesting Abisol API...");
+    const abisolResponse = await axios.post(
+      "https://api.abisolcrm.com.au/v1/CorporateUserLogin",
       { Email, Password },
-      { headers: { "x-api-key": "7d771e41bb5c449582122749df6bc0a3" } };
+      { headers: { "x-api-key": "7d771e41bb5c449582122749df6bc0a3" } }
+    );
 
-    if (response.data && response.data.data) {
+    // Check if Abisol API response contains data token
+    if (abisolResponse.data && abisolResponse.data.data) {
+      const abisolToken = abisolResponse.data.data;
+
+      // Create a local JWT token for the user
       const token = jwt.sign(
         { email: user.Email },
         process.env.JWT_SECRET_KEY,
-        {
-          expiresIn: "1y",
-        }
+        { expiresIn: "1y" }
       );
 
-      res.status(200).json({
+      // Send response with user info, local JWT token, and Abisol token
+      return res.status(200).json({
         user: {
           id: user.id,
           FirstName: user.FirstName,
@@ -49,12 +54,15 @@ exports.login = async (req, res) => {
           role: user.role,
         },
         accessToken: token,
+        abisolToken, // Abisol token added to response
       });
     } else {
-      return res.status(401).json({ message: "Invalid credentials" });
+      return res
+        .status(400)
+        .json({ message: "Invalid credentials from Abisol" });
     }
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("Login error:", error.message);
     res.status(500).json({ message: "Internal server error" });
   }
 };

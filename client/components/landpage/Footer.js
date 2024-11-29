@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
@@ -46,6 +47,15 @@ export default function Footer() {
                   info@i-scs.co.uk
                 </Link>
               </p>
+              <div>
+                <Image
+                  src="/img/dflogo.png"
+                  className="dflogo object-fit-contain"
+                  alt="logo"
+                  width={100}
+                  height={50}
+                />
+              </div>
             </div>
             <div className="col-lg-3 col-md-6">
               <h4 className="text-light mb-4">Services</h4>

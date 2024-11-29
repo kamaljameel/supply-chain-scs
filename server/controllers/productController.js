@@ -1,9 +1,17 @@
-const Product = require("../models/Product");
-
+const axios = require("axios");
+// API Configuration
+const API_BASE_URL = "https://api.abisolcrm.com.au/v1/Product";
+const API_HEADERS = {
+  "x-api-key": "7d771e41bb5c449582122749df6bc0a3",
+  "audience-key": "cd055e6fe492453c93f1f25c04a6cc60",
+  Authorization:
+    "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjdkNzcxZTQxYmI1YzQ0OTU4MjEyMjc0OWRmNmJjMGEzIn0.eyJhcGlfQXBwVXNlcklEIjoiOTFmZjdiYTItODBiNC00MDU3LWJkZDQtZWZkMDc3MjY2MDA4Iiwic2Vzc2lvbnVzZXJpZCI6IjQiLCJUZW5hbnREb21haW4iOiJ0ZG9tYWluMDIiLCJleHAiOjE3MzEwMjIyNTIsImlzcyI6Imh0dHBzOi8vd3d3LmFiaXNvbGNybS5jb20uYXUiLCJhdWQiOiJjZDA1NWU2ZmU0OTI0NTNjOTNmMWYyNWMwNGE2Y2M2MCJ9.IbE0YEp8jFavI5sk_nmd4OrHj9zN3O9DssXEhWcwzfA",
+};
 // Create a new product
 exports.createProduct = async (req, res) => {
   try {
     const {
+      productCategoryId,
       productName,
       productDescription,
       hsCode,
@@ -13,25 +21,27 @@ exports.createProduct = async (req, res) => {
       length,
       width,
       height,
+      price,
+      weight,
     } = req.body;
 
-    // Create and save the new product
-    const product = await Product.create({
-      productName,
-      productDescription,
-      hsCode,
-      customDescription,
-      unitOfMeasurement,
-      size,
-      length,
-      width,
-      height,
-    });
+    const response = await axios.post(
+      API_BASE_URL,
+      {
+        Name: productName,
+        Description: productDescription,
+        Price: price,
+        ProductCategoryID: productCategoryId,
+        Code_SKU: hsCode,
+        Dimensions: `${length}x${width}x${height}`,
+        Weight: weight,
+      },
+      { headers: API_HEADERS }
+    );
 
-    // Send a success response with the created product
-    res.status(201).json(product);
+    res.status(201).json(response.data);
   } catch (error) {
-    // Handle errors and send a 500 status with the error message
+    console.error("Error creating product:", error.message);
     res
       .status(500)
       .json({ error: "Error creating product", details: error.message });
@@ -39,15 +49,29 @@ exports.createProduct = async (req, res) => {
 };
 
 // Get all products
+// exports.getProducts = async (req, res) => {
+//   try {
+//     // Fetch all products from the database
+//     const products = await Product.findAll();
+
+//     // Send the products as a response
+//     res.status(200).json(products);
+//   } catch (error) {
+//     // Handle errors and send a 500 status with the error message
+//     res
+//       .status(500)
+//       .json({ error: "Error fetching products", details: error.message });
+//   }
+// };
+
 exports.getProducts = async (req, res) => {
   try {
-    // Fetch all products from the database
-    const products = await Product.findAll();
-
-    // Send the products as a response
+    const { data: products } = await axios.get(API_BASE_URL, {
+      headers: API_HEADERS,
+    });
     res.status(200).json(products);
   } catch (error) {
-    // Handle errors and send a 500 status with the error message
+    console.error("Error fetching products:", error.message);
     res
       .status(500)
       .json({ error: "Error fetching products", details: error.message });
@@ -57,18 +81,16 @@ exports.getProducts = async (req, res) => {
 // Get a product by ID
 exports.getProductById = async (req, res) => {
   try {
-    // Fetch the product by its ID
-    const product = await Product.findByPk(req.params.id);
-
-    if (!product) {
-      // Send a 404 status if the product is not found
-      return res.status(404).json({ error: "Product not found" });
-    }
-
-    // Send the product as a response
+    const { id } = req.params;
+    const { data: product } = await axios.get(`${API_BASE_URL}/${id}`, {
+      headers: API_HEADERS,
+    });
     res.status(200).json(product);
   } catch (error) {
-    // Handle errors and send a 500 status with the error message
+    console.error(
+      `Error fetching product with ID ${req.params.id}:`,
+      error.message
+    );
     res
       .status(500)
       .json({ error: "Error fetching product", details: error.message });
@@ -76,9 +98,12 @@ exports.getProductById = async (req, res) => {
 };
 
 // Update a product by ID
+
 exports.updateProduct = async (req, res) => {
   try {
+    const { id } = req.params;
     const {
+      productCategoryId,
       productName,
       productDescription,
       hsCode,
@@ -88,33 +113,30 @@ exports.updateProduct = async (req, res) => {
       length,
       width,
       height,
+      price,
+      weight,
     } = req.body;
 
-    // Find the product by ID
-    const product = await Product.findByPk(req.params.id);
+    const response = await axios.put(
+      `${API_BASE_URL}/${id}`,
+      {
+        Name: productName,
+        Description: productDescription,
+        Price: price,
+        ProductCategoryID: productCategoryId,
+        Code_SKU: hsCode,
+        Dimensions: `${length}x${width}x${height}`,
+        Weight: weight,
+      },
+      { headers: API_HEADERS }
+    );
 
-    if (!product) {
-      // Send a 404 status if the product is not found
-      return res.status(404).json({ error: "Product not found" });
-    }
-
-    // Update the product with the new data
-    await product.update({
-      productName,
-      productDescription,
-      hsCode,
-      customDescription,
-      unitOfMeasurement,
-      size,
-      length,
-      width,
-      height,
-    });
-
-    // Send the updated product as a response
-    res.status(200).json(product);
+    res.status(200).json(response.data);
   } catch (error) {
-    // Handle errors and send a 500 status with the error message
+    console.error(
+      `Error updating product with ID ${req.params.id}:`,
+      error.message
+    );
     res
       .status(500)
       .json({ error: "Error updating product", details: error.message });
@@ -122,25 +144,49 @@ exports.updateProduct = async (req, res) => {
 };
 
 // Delete a product by ID
-exports.deleteProduct = async (req, res) => {
-  try {
-    // Find the product by ID
-    const product = await Product.findByPk(req.params.id);
 
-    if (!product) {
-      // Send a 404 status if the product is not found
-      return res.status(404).json({ error: "Product not found" });
+exports.deleteProductFromExternalApi = async (req, res) => {
+  try {
+    // Extract product ID from the request parameters
+    const productId = req.params.id;
+
+    if (!productId) {
+      return res.status(400).json({ error: "Product ID is required" });
     }
 
-    // Delete the product
-    await product.destroy();
+    // External API URL
+    const externalApiUrl = `https://api.abisolcrm.com.au/v1/Product/${productId}`;
+    console.log("Sending DELETE request to:", externalApiUrl);
 
-    // Send a 204 status to indicate successful deletion
-    res.status(204).json({ message: "Product deleted successfully" });
+    // Set up headers for the external API request
+    const headers = {
+      "x-api-key": "7d771e41bb5c449582122749df6bc0a3",
+      "audience-key": "cd055e6fe492453c93f1f25c04a6cc60",
+      Authorization: `bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjdkNzcxZTQxYmI1YzQ0OTU4MjEyMjc0OWRmNmJjMGEzIn0.eyJhcGlfQXBwVXNlcklEIjoiOTFmZjdiYTItODBiNC00MDU3LWJkZDQtZWZkMDc3MjY2MDA4Iiwic2Vzc2lvbnVzZXJpZCI6IjQiLCJUZW5hbnREb21haW4iOiJ0ZG9tYWluMDIiLCJleHAiOjE3MzEwMjIyNTIsImlzcyI6Imh0dHBzOi8vd3d3LmFiaXNvbGNybS5jb20uYXUiLCJhdWQiOiJjZDA1NWU2ZmU0OTI0NTNjOTNmMWYyNWMwNGE2Y2M2MCJ9.IbE0YEp8jFavI5sk_nmd4OrHj9zN3O9DssXEhWcwzfA`, // Make sure the token is correct and not expired
+    };
+
+    // Call the external API to delete the product
+    try {
+      const response = await axios.delete(externalApiUrl, { headers });
+      console.log("External API response:", response.data);
+      res
+        .status(200)
+        .json({ message: "Product deleted successfully from external API" });
+    } catch (apiError) {
+      console.error(
+        "External API error:",
+        apiError.response?.data || apiError.message
+      );
+      return res.status(500).json({
+        error: "Failed to delete product from external API",
+        details: apiError.response?.data || apiError.message,
+      });
+    }
   } catch (error) {
-    // Handle errors and send a 500 status with the error message
-    res
-      .status(500)
-      .json({ error: "Error deleting product", details: error.message });
+    console.error("Error deleting product from external API:", error.message);
+    res.status(500).json({
+      error: "Error deleting product from external API",
+      details: error.message,
+    });
   }
 };

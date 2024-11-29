@@ -37,6 +37,18 @@ const Product = sequelize.define("Product", {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
+  price: {
+    type: DataTypes.FLOAT,
+    allowNull: false,
+  },
+  productCategoryId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
+  weight: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+  },
 });
 
 module.exports = Product;

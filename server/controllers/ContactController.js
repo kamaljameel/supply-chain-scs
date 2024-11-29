@@ -30,7 +30,7 @@ const handleContactForm = async (req, res) => {
   try {
     const info = await transporter.sendMail({
       from: "info@i-scs.co.uk", // sender address
-      to: `kamaljameel14@gmail.com, ${email}`,
+      to: ` ${email}`,
       subject: subject, // Subject line
       text: `Subject: ${subject}\nName: ${name}\nEmail: ${email}\nMessage: ${textContent}`,
     });

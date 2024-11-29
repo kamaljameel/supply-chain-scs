@@ -107,12 +107,12 @@ const Navbar = () => {
         <span className="ms-3">
           {isLoggedIn ? (
             <div>
-              <Link href="/signup" passHref>
+              {/* <Link href="/signup" passHref>
                 <button className="btn borderB text-primary">Sign Up</button>
               </Link>
-              <span className="mx-2">OR</span>
+              <span className="mx-2">OR</span> */}
               <Link href="/login" passHref>
-                <button className="btn borderB  text-primary ">login</button>
+                <button className="btn borderB  text-primary ">Sign in</button>
               </Link>
             </div>
           ) : (
