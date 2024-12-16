@@ -1,17 +1,20 @@
 import Link from "next/link";
 import React from "react";
 import { useState } from "react";
+import { Button, Spinner } from "react-bootstrap";
 
 import { submitBusinessInquiry } from "@/lib/api/business-inquiry";
 export default function BusinessInquiryForm() {
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    BusinessName: "",
     FirstName: "",
-    OfficialEmail: "",
+    LastName: "",
+    PersonalEmail1: "",
     PersonalMobile1: "",
-    InquiryLine: "",
-    Description: "",
     InterestedInName: "",
+    Remarks: "",
+    EstimatedRevenue: "",
+    LeadSourceName: "",
   });
 
   const [responseMessage, setResponseMessage] = useState(null);
@@ -24,18 +27,21 @@ export default function BusinessInquiryForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await submitBusinessInquiry(formData);
       setResponseMessage("Business inquiry submitted successfully!");
+      setLoading(false);
       setErrorMessage(null);
       setFormData({
-        BusinessName: "",
         FirstName: "",
-        OfficialEmail: "",
+        LastName: "",
+        PersonalEmail1: "",
         PersonalMobile1: "",
-        InquiryLine: "",
-        Description: "",
         InterestedInName: "",
+        Remarks: "",
+        EstimatedRevenue: "",
+        LeadSourceName: "",
       });
     } catch (error) {
       setErrorMessage(
@@ -43,6 +49,7 @@ export default function BusinessInquiryForm() {
       );
       setResponseMessage(null);
       console.error("Error submitting business inquiry:", error);
+      setLoading(false);
     }
   };
   const address =
@@ -95,17 +102,6 @@ export default function BusinessInquiryForm() {
                   <div className="col-12 col-sm-6">
                     <input
                       type="text"
-                      name="BusinessName"
-                      value={formData.BusinessName}
-                      onChange={handleChange}
-                      placeholder="Business Name"
-                      className="form-control border-0 rounded-3"
-                      style={{ height: "55px" }}
-                    />
-                  </div>
-                  <div className="col-12 col-sm-6">
-                    <input
-                      type="text"
                       name="FirstName"
                       value={formData.FirstName}
                       onChange={handleChange}
@@ -117,11 +113,23 @@ export default function BusinessInquiryForm() {
                   </div>
                   <div className="col-12 col-sm-6">
                     <input
-                      type="email"
-                      name="OfficialEmail"
-                      value={formData.OfficialEmail}
+                      type="text"
+                      name="LastName"
+                      value={formData.LastName}
                       onChange={handleChange}
-                      placeholder="Official Email"
+                      placeholder="Last Name"
+                      required
+                      className="form-control border-0 rounded-3"
+                      style={{ height: "55px" }}
+                    />
+                  </div>
+                  <div className="col-12 col-sm-6">
+                    <input
+                      type="email"
+                      name="PersonalEmail1"
+                      value={formData.PersonalEmail1}
+                      onChange={handleChange}
+                      placeholder="Personal Email"
                       required
                       className="form-control border-0 rounded-3"
                       style={{ height: "55px" }}
@@ -141,11 +149,11 @@ export default function BusinessInquiryForm() {
                   </div>
                   <div className="col-12 col-sm-6">
                     <input
-                      type="text"
-                      name="InquiryLine"
-                      value={formData.InquiryLine}
+                      type="number"
+                      name="EstimatedRevenue"
+                      value={formData.EstimatedRevenue}
                       onChange={handleChange}
-                      placeholder="Inquiry Line"
+                      placeholder="Estimated Revenue"
                       required
                       className="form-control border-0 rounded-3"
                       style={{ height: "55px" }}
@@ -176,20 +184,44 @@ export default function BusinessInquiryForm() {
 
                   <div className="col-12">
                     <textarea
-                      name="Description"
-                      value={formData.Description}
+                      name="Remarks"
+                      value={formData.Remarks}
                       onChange={handleChange}
-                      placeholder="Description"
+                      placeholder="Remarks"
                       required
                       className="form-control border-0 rounded-3"
                     ></textarea>
+                  </div>
+                  <div className="col-12">
+                    <input
+                      type="text"
+                      name="LeadSourceName"
+                      value={formData.LeadSourceName}
+                      onChange={handleChange}
+                      placeholder="Lead Source"
+                      required
+                      className="form-control border-0 rounded-3"
+                      style={{ height: "55px" }}
+                    />
                   </div>
                   <div className="col-12">
                     <button
                       className="btn btn-primary w-100 py-3 rounded-5"
                       type="submit"
                     >
-                      Submit
+                      {loading && (
+                        <span>
+                          <Spinner
+                            as="span"
+                            animation="grow"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                          />
+                          Loading...
+                        </span>
+                      )}{" "}
+                      {!loading && "Submit"}
                     </button>
                   </div>
                 </div>

@@ -1,63 +1,70 @@
 const BusinessInquiry = require("../models/BusinessInquiry");
 const axios = require("axios");
-const { sendEmail } = require("../services/emailService"); // Assuming emailService.js is implemented as shown later
-
+const { sendEmail } = require("../services/emailService");
+require("dotenv").config();
 // Create a new business inquiry
 exports.createBusinessInquiry = async (req, res) => {
   const {
-    BusinessName,
     FirstName,
-    OfficialEmail,
+    LastName,
+    PersonalEmail1,
     PersonalMobile1,
-    InquiryLine,
-    Description,
     InterestedInName,
+    Remarks,
+    EstimatedRevenue,
+    LeadSourceName,
   } = req.body;
 
   const data = JSON.stringify({
-    BusinessName: BusinessName || "",
     FirstName: FirstName,
-    OfficialEmail: OfficialEmail,
+    LastName: LastName || "",
+    PersonalEmail1: PersonalEmail1,
     PersonalMobile1: PersonalMobile1,
-    InquiryLine: InquiryLine,
-    Description: Description,
     InterestedInName: InterestedInName || "",
+    Remarks: Remarks || "",
+    EstimatedRevenue: EstimatedRevenue || 0,
+    LeadSourceName: LeadSourceName || "",
   });
 
   const config = {
     method: "post",
     maxBodyLength: Infinity,
-    url: "https://api.abisolcrm.com.au/v1/CreateQuickInquiry",
+    // url: "https://api.abisolcrm.com.au/v1/CreateQuickInquiry",
+    url: "https://api.abisolcrm.com.au/v1/CreateLead",
     headers: {
-      "x-api-key": "75c8f08c5ae14bac9a0ec3f2d1c06b0e",
+      // "x-api-key": "75c8f08c5ae14bac9a0ec3f2d1c06b0e",
+      "x-api-key": "7d771e41bb5c449582122749df6bc0a3",
       "Content-Type": "application/json",
     },
     data: data,
   };
+
   try {
     const response = await axios(config);
 
     const inquiry = await BusinessInquiry.create({
-      BusinessName,
       FirstName,
-      OfficialEmail,
+      LastName,
+      PersonalEmail1,
       PersonalMobile1,
-      InquiryLine,
-      Description,
       InterestedInName,
+      Remarks,
+      EstimatedRevenue,
+      LeadSourceName,
     });
+
     const emailContent = `
-    <h1>New Business Inquiry Received</h1>
-    <p><strong>Business Name:</strong> ${BusinessName || "-"}</p>
-    <p><strong>Contact Name:</strong> ${FirstName}</p>
-    <p><strong>Email:</strong> ${OfficialEmail}</p>
-    <p><strong>Phone:</strong> ${PersonalMobile1}</p>
-    <p><strong>Inquiry Line:</strong> ${InquiryLine}</p>
-    <p><strong>Description:</strong></p>
-    <p>${Description}</p>
-    <p><strong>Interested In:</strong> ${InterestedInName || "-"}</p>
-  `;
-    // Example: Send email with inquiry details
+      <h1>New Business Inquiry Received</h1>
+      <p><strong>First Name:</strong> ${FirstName}</p>
+      <p><strong>Last Name:</strong> ${LastName || "-"}</p>
+      <p><strong>Email:</strong> ${PersonalEmail1}</p>
+      <p><strong>Phone:</strong> ${PersonalMobile1}</p>
+      <p><strong>Interested In:</strong> ${InterestedInName || "-"}</p>
+      <p><strong>Remarks:</strong> ${Remarks || "-"}</p>
+      <p><strong>Estimated Revenue:</strong> ${EstimatedRevenue || "-"}</p>
+      <p><strong>Lead Source:</strong> ${LeadSourceName || "-"}</p>
+    `;
+
     await sendEmail({
       to: `info@i-scs.co.uk`,
       subject: "New Business Inquiry",

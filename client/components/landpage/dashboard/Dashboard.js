@@ -107,7 +107,7 @@ const Dashboard = () => {
             onCardClick={handleCardClick}
           />
         );
-      case "Goods Declarations":
+      case "Customs Declarations":
         return <GoodsDeclarations />;
       case "Documentation":
         return <Documentation />;
@@ -135,7 +135,7 @@ const Dashboard = () => {
         return "bi bi-bus-front-fill me-2";
       case "Sea Shipment":
         return "bi bi-compass me-2";
-      case "Goods Declarations":
+      case "Customs Declarations":
         return "bi bi-box-fill me-2";
       case "Air Shipment":
         return "bi bi-airplane me-2";
@@ -237,7 +237,7 @@ const Dashboard = () => {
           <div>
             {" "}
             {/* <ChatGPTWithAutoQuestions /> */}
-            <SearatesWidget />
+            {/* <SearatesWidget /> */}
           </div>
           <div className="position-absolute bottom-0 end-0 start-0 mx-auto mb-3 text-center">
             {/* <span

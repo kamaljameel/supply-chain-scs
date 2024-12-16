@@ -4,15 +4,15 @@ const sequelize = require("../server/sequelizeConfig");
 const BusinessInquiry = sequelize.define(
   "BusinessInquiry",
   {
-    BusinessName: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
     FirstName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    OfficialEmail: {
+    LastName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    PersonalEmail1: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
@@ -23,11 +23,7 @@ const BusinessInquiry = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    InquiryLine: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    Description: {
+    Remarks: {
       type: DataTypes.TEXT,
       allowNull: false,
     },
@@ -35,10 +31,28 @@ const BusinessInquiry = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    EstimatedRevenue: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
+    LeadSourceName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     tableName: "business_inquiries",
-    timestamps: true,
+    timestamps: false, // This will create `createdAt` and `updatedAt` columns automatically
   }
 );
 

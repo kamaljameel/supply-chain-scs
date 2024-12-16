@@ -4,10 +4,10 @@ import { Breadcrumb, Button } from "react-bootstrap";
 export default function GoodsDeclarations() {
   return (
     <div className="dashboadmainarea">
-      <h6>Goods Declarations</h6>
+      <h6>Customs Declarations</h6>
       <Breadcrumb>
         <Breadcrumb.Item href="#">Home</Breadcrumb.Item>
-        <Breadcrumb.Item active>Goods Declarations</Breadcrumb.Item>
+        <Breadcrumb.Item active>Customs Declarations</Breadcrumb.Item>
       </Breadcrumb>
       <div className="row w-100 mx-auto dashcard">
         <div className="col-md-6 py-2">

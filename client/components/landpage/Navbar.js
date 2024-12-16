@@ -23,6 +23,7 @@ const Navbar = () => {
   };
   const logout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("abisolToken");
     router.push("/login");
   };
   return (

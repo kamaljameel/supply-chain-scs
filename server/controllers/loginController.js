@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const axios = require("axios");
-
+require("dotenv").config();
 exports.login = async (req, res) => {
   const { Email, Password } = req.body;
 
@@ -30,7 +30,7 @@ exports.login = async (req, res) => {
     const abisolResponse = await axios.post(
       "https://api.abisolcrm.com.au/v1/CorporateUserLogin",
       { Email, Password },
-      { headers: { "x-api-key": "7d771e41bb5c449582122749df6bc0a3" } }
+      { headers: { "x-api-key": process.env.X_API_KEY } }
     );
 
     // Check if Abisol API response contains data token

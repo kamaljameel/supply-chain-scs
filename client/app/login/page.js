@@ -28,6 +28,7 @@ const LoginPage = () => {
       const response = await axios.post(loginApi, formData);
       // Assuming your API returns an access token upon successful login
       localStorage.setItem("accessToken", response.data.accessToken); // Store token in localStorage
+      localStorage.setItem("abisolToken", response.data.abisolToken);
       setError(null);
 
       router.push("/dashboard");

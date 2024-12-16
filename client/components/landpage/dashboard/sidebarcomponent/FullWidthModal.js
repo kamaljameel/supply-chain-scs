@@ -275,9 +275,20 @@ const FullWidthModal = ({
   const handleNewProductClose = () => setNewProductShow(false);
   const handleNewProductShow = () => setNewProductShow(true);
   const [selectedProduct, setSelectedProduct] = useState("");
+
   const fetchProducts = async () => {
+    const abisolToken2 = localStorage.getItem("abisolToken");
+    if (!abisolToken2) {
+      console.error("No token found.");
+      return;
+    }
+
     try {
-      const response = await axios.get(addProductApi);
+      const response = await axios.get(addProductApi, {
+        headers: {
+          Authorization: `bearer ${abisolToken2}`,
+        },
+      });
       setProducts(response.data);
       console.log("ddddttt", response.data);
       setpid(null);

@@ -34,9 +34,18 @@ export default function ProductForm({
     productCategoryId: "",
     weight: "",
   });
+  const abisolToken = localStorage.getItem("abisolToken");
+  if (!abisolToken) {
+    console.error("No token found.");
+    return;
+  }
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(addProductApi);
+      const response = await axios.get(addProductApi, {
+        headers: {
+          Authorization: `bearer ${abisolToken}`,
+        },
+      });
       setallProducts(response.data);
       console.log(response.data);
     } catch (error) {
@@ -117,18 +126,27 @@ export default function ProductForm({
     e.preventDefault();
     try {
       let response;
-      if (productToEdit || edit || productToEdit2) {
+      if (productToEdit && edit && productToEdit2) {
         // Update product
         console.log("kamp", productToEdit2);
         response = await axios.put(
           `${updateProductApi}/${
             productToEdit.ProductID || productToEdit2.productID
           }`,
-          product
+          product,
+          {
+            headers: {
+              Authorization: `bearer ${abisolToken}`,
+            },
+          }
         );
       } else {
         // Add new product
-        response = await axios.post(addProductApi, product);
+        response = await axios.post(addProductApi, product, {
+          headers: {
+            Authorization: `bearer ${abisolToken}`,
+          },
+        });
       }
 
       if (response.status === 201 || response.status === 200) {
