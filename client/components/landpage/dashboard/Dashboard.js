@@ -18,20 +18,42 @@ import Opentest from "@/components/Opentest";
 import SearatesWidget from "@/components/searates/SearatesWidget";
 import ProductForm from "./sidebarcomponent/ProductForm";
 import { Button, Modal } from "react-bootstrap";
+import FullWidthModal from "./sidebarcomponent/FullWidthModal";
+import ProfileUpdate from "./ProfileUpdate";
 
 const Dashboard = () => {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [pinnedLinks, setPinnedLinks] = useState([]);
   const [selectedPage, setSelectedPage] = useState("home");
+  const [businessbutton, setbuisnessButton] = useState("");
   const [showNewProduct, setNewProductShow] = useState(false);
+
+  const [showbuisness, setShowbuisness] = useState(false);
   const [pid, setpid] = useState("");
+  const [companyOptions, setCompanyOptions] = useState([
+    "Company A",
+    "Company B",
+    "Company C",
+  ]);
+
+  const addCompany = (newCompany) => {
+    setCompanyOptions((prevOptions) => [...prevOptions, newCompany]);
+  };
+
   const handleNewProductClose = () => setNewProductShow(false);
   const handleNewProductShow = () => setNewProductShow(true);
+
+  const handleBuisnessShow = () => {
+    setbuisnessButton("buisnessButton");
+    setShowbuisness(true);
+  };
   // const seefooter = () => {
   //   setSeeFooter(true);
   // };
-
+  const handleFullWidthModalClose = () => {
+    setShowbuisness(false);
+  };
   const handlePinClick = (pageName) => {
     if (!pinnedLinks.includes(pageName)) {
       const updatedLinks = [...pinnedLinks, pageName];
@@ -143,7 +165,7 @@ const Dashboard = () => {
         return "bi bi-pin";
     }
   };
-
+  console.log("busi", showbuisness);
   return (
     <>
       <Navbar />
@@ -190,6 +212,13 @@ const Dashboard = () => {
           >
             Add Product
           </Button>
+
+          <Button
+            className="fs-6 px-0 bg-transparent text-white mt-2 w-100 addproductbtn"
+            onClick={handleBuisnessShow}
+          >
+            Add Buisness
+          </Button>
           <Modal
             show={showNewProduct}
             onHide={handleNewProductClose}
@@ -235,8 +264,7 @@ const Dashboard = () => {
           </div>
           <div className="dashboardcontainer">{renderMainContent()}</div>
           <div>
-            {" "}
-            {/* <ChatGPTWithAutoQuestions /> */}
+            <ProfileUpdate /> {/* <ChatGPTWithAutoQuestions /> */}
             {/* <SearatesWidget /> */}
           </div>
           <div className="position-absolute bottom-0 end-0 start-0 mx-auto mb-3 text-center">
@@ -256,6 +284,13 @@ const Dashboard = () => {
       >
         <Footer />
       </div> */}
+      <FullWidthModal
+        show={showbuisness}
+        companyOptions={companyOptions}
+        addCompany={addCompany}
+        onHide={handleFullWidthModalClose}
+        businessbutton={businessbutton}
+      />
     </>
   );
 };

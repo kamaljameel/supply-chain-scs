@@ -12,6 +12,8 @@ const resetpassword = require("./routers/reset-password");
 const verifyemail = require("./routers/verify-email");
 const businessInquiryRoutes = require("./routers/businessInquiryRoutes");
 const productRoutes = require("./routers/products");
+const inquiryRoutes = require("./routers/inquiry");
+const profileRoutes = require("./routers/userRoutes");
 
 const app = express();
 require("dotenv").config();
@@ -46,6 +48,8 @@ app.use("/api/forgot-password", forgotpassword);
 app.use("/api/reset-password", resetpassword);
 app.use("/api/verify-email", verifyemail);
 app.use("/api/products", productRoutes);
+app.use("/api/inquiry", inquiryRoutes);
+app.use("/api/userRoutes", profileRoutes);
 
 // busness inquiry
 app.use("/api/business-inquiries", businessInquiryRoutes);

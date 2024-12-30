@@ -11,6 +11,10 @@ export const verifyEmailApi = `${host}/api/verify-email`;
 export const forgotPasswordApi = `${host}/api/forgot-password`;
 export const resetPasswordApi = `${host}/api/reset-password`;
 export const addProductApi = `${host}/api/products`;
+export const inquiryApi = `${host}/api/inquiry/submit`;
+export const profileApi = `${host}/api/userRoutes/profile`;
+
+export const addProductToListApi = `${host}/api/inquiry/add-product-to-list`;
 
 // New route for updating a product
 export const updateProductApi = `${host}/api/products`;

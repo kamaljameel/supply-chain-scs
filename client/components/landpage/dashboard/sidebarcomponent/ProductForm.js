@@ -347,6 +347,28 @@ export default function ProductForm({
             value={product.weight}
             onChange={handleChange}
           />
+          <select
+            name="use-for"
+            // value={product.size}
+            // onChange={handleChange}
+            required
+          >
+            <option value="">Intended Use</option>
+            <option value="Commercial Use">Commercial Use</option>
+            <option value="Personal Use">Personal Use</option>
+            <option value="Charitable Use">Charitable Use</option>
+            <option value="Scientific or Educational Use">
+              Scientific or Educational Use
+            </option>
+            <option value="Temporary Use">Temporary Use</option>
+            <option value="End-Use Relief">End-Use Relief</option>
+            <option value="Re-Export After Processing">
+              Re-Export After Processing
+            </option>
+            <option value="Return Goods Relief (RGR)">
+              Return Goods Relief (RGR)
+            </option>
+          </select>
           <button type="submit" className="text-white fw-bold">
             {productToEdit || edit ? "Update Product" : "Add Product"}
           </button>

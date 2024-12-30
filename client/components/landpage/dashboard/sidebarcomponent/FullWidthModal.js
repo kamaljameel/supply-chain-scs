@@ -10,7 +10,11 @@ import {
 import axios from "axios";
 // import * as pdfjsLib from "pdfjs-dist/webpack"; // Change this import to webpack
 // import { GlobalWorkerOptions } from "pdfjs-dist/webpack";
-import { addProductApi } from "@/utils/apiRoutes";
+import {
+  addProductApi,
+  inquiryApi,
+  addProductToListApi,
+} from "@/utils/apiRoutes";
 import ProductForm from "./ProductForm";
 import Select from "react-select";
 import PhoneInput, { parsePhoneNumber } from "react-phone-number-input";
@@ -41,6 +45,7 @@ const initialState = {
     quantity: "",
     unitPrice: "",
     totalPrice: 0,
+    productID: 2,
   },
   showNewProduct: false,
   addSellerCompany: false,
@@ -87,12 +92,16 @@ const FullWidthModal = ({
   companyOptions,
   addCompany,
   selectedInvoiceType,
+  businessbutton,
 }) => {
   const [currentStep, setCurrentStep] = useState(2);
   const [selectedSellerCompany, setselectedSellerCompany] = useState("");
   const [selectedBuyerCompany, setSelectedBuyerCompany] = useState("");
   const [newCompany, setNewCompany] = useState("");
   const [pdfText, setPdfText] = useState("");
+  const [inquieryId, setInquireyId] = useState(null);
+  const [showDAN, setShowDAN] = useState(false);
+
   // const [selectedFile, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState({
     sellerPhone: "",
@@ -112,6 +121,39 @@ const FullWidthModal = ({
     address: "",
     phone: "",
     email: "",
+    tenantDomain: null,
+    recordTitle: null,
+    inquiryLine: "",
+    inquiryID: 0,
+    businessID: null,
+    businessName: null,
+    contactID: null,
+    contactName: null,
+    convertStatusName: null,
+    description: null,
+    engageStatusID: null,
+    engageStatusName: null,
+    estimatedDeliveryDate: null,
+    estimatedRevenue: null,
+    estimatedRevenueString: null,
+    revenueCurrency: null,
+    inquiryStatusID: null,
+    inquiryStatusName: null,
+    interestedInID: null,
+    interestedInName: null,
+    leadID: null,
+    lead: null,
+    nextFollowupDate: null,
+    priorityID: null,
+    priorityName: null,
+    probabilityID: null,
+    probabilityName: null,
+    qualifyStatusID: null,
+    qualifyStatusName: null,
+    isDisabled: false,
+    EORI: "",
+    DAN: "",
+    postcode: "",
   });
   const [productDetails, setProductDetails] = useState([]);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -124,12 +166,13 @@ const FullWidthModal = ({
     quantity: "",
     unitPrice: "",
     totalPrice: 0,
+    ProductID: 0,
   });
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     // setSelectedFile(file); // Store the selected file in state
   };
-
+  console.log("productdetailsk", productDetails);
   // Handle file upload button click
   const handleFileUpload = async () => {
     if (selectedFile) {
@@ -165,6 +208,12 @@ const FullWidthModal = ({
     }
   };
 
+  const handleCheckboxChange = () => {
+    setShowDAN((prevShowDAN) => !prevShowDAN);
+    if (!showDAN) {
+      setFormData((prevData) => ({ ...prevData, DAN: "" })); // Clear DAN value when hiding
+    }
+  };
   // const extractTextFromPDF = async (file) => {
   //   const arrayBuffer = await file.arrayBuffer();
   //   const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
@@ -302,6 +351,8 @@ const FullWidthModal = ({
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  console.log("product idk", products);
   const [subtotal, setSubtotal] = useState(0);
   const [tax, setTax] = useState(0);
   const [taxPercentage, setTaxPercentage] = useState(0);
@@ -335,6 +386,7 @@ const FullWidthModal = ({
         quantity: "",
         unitPrice: "",
         totalPrice: "",
+        ProductID: selectedProductId,
       });
       return; // Exit early if no valid selection is made
     }
@@ -346,7 +398,8 @@ const FullWidthModal = ({
     );
     setpid(selectedProduct);
     // Find the selected product by id
-
+    console.log("pid01", pid);
+    console.log("slectedprdut01", selectedProduct);
     if (selectedProduct) {
       setNewProduct({
         // description: selectedProduct.productDescription || "",
@@ -357,6 +410,7 @@ const FullWidthModal = ({
         quantity: "",
         unitPrice: "",
         totalPrice: "",
+        ProductID: selectedProduct.ProductID,
       });
     } else {
       console.error(`Product with ID ${parsedProductId} not found.`);
@@ -378,7 +432,7 @@ const FullWidthModal = ({
 
       setFormData((prevData) => ({
         ...prevData,
-        invoiceNumber: `PIN-${Date.now()}`, // Simple auto-generated invoice number
+        inquiryLine: `PIN-${Date.now()}`, // Simple auto-generated invoice number
         invoiceDate: currentDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
         dueDate: dueDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
       }));
@@ -390,6 +444,7 @@ const FullWidthModal = ({
 
     setCurrentStep(2);
   };
+
   const [addsellercom, setAddsellercom] = useState(false);
   const [AddBuyercom, setAddBuyercom] = useState(false);
   const handleBuyerCompanySelect = (value) => {
@@ -408,7 +463,43 @@ const FullWidthModal = ({
       setCurrentStep(11);
       setAddBuyercom(true);
     }
+    setFormData((prevData) => {
+      const { businessID, sequenceNumber } = generateBusinessID(prevData);
+      return {
+        ...prevData,
+        businessID,
+        sequenceNumber, // Save the sequence number
+      };
+    });
   };
+  const generateBusinessID = (prevData) => {
+    const currentYear = new Date().getFullYear();
+    const nextSequence = (prevData.sequenceNumber || 0) + 1;
+    const newBusinessID = `GB-${prevData.EORI}-${currentYear}-${String(
+      nextSequence
+    ).padStart(3, "0")}`;
+
+    return {
+      businessID: newBusinessID,
+      sequenceNumber: nextSequence,
+    };
+  };
+  useEffect(() => {
+    if (show && businessbutton) {
+      console.log("full width show ppp", businessbutton);
+      setselectedSellerCompany("addNew");
+      setCurrentStep(10);
+      setAddsellercom(true);
+      setFormData((prevData) => {
+        const { businessID, sequenceNumber } = generateBusinessID(prevData);
+        return {
+          ...prevData,
+          businessID,
+          sequenceNumber, // Save the sequence number
+        };
+      });
+    }
+  }, [show, businessbutton]);
   useEffect(() => {
     if (currentStep === 10 || currentStep === 11) {
       setIsAddingNewForm(true);
@@ -581,6 +672,7 @@ const FullWidthModal = ({
       quantity: 1,
       unitPrice: 0,
       totalPrice: 0,
+      ProductID: 0,
     });
     setSelectedProduct("");
   };
@@ -607,18 +699,56 @@ const FullWidthModal = ({
   // };
 
   // const portOfDischargeOptions = portOptions[formData.portOfDischargeCountry] || [];
-  const addProduct = () => {
-    // setProductDetails([...productDetails, newProduct]);
-    // // Reset newProduct state after adding
-    // setNewProduct({
-    //   description: "",
-    //   hsCode: "",
-    //   origin: "",
-    //   quantity: "",
-    //   unitPrice: "",
-    //   totalPrice: 0,
-    // });
+  // const addProduct = () => {
+  //   // setProductDetails([...productDetails, newProduct]);
+  //   // // Reset newProduct state after adding
+  //   // setNewProduct({
+  //   //   description: "",
+  //   //   hsCode: "",
+  //   //   origin: "",
+  //   //   quantity: "",
+  //   //   unitPrice: "",
+  //   //   totalPrice: 0,
+  //   // });
+  //   setProductDetails((prev) => [...prev, newProduct]);
+  //   setNewProduct({
+  //     description: "",
+  //     hsCode: "",
+  //     origin: "",
+  //     quantity: 1,
+  //     unitPrice: 0,
+  //     totalPrice: 0,
+  //   });
+  //   dispatch({ type: "ADD_PRODUCT_DETAIL", productDetail: state.newProduct });
+  //   dispatch({ type: "SET_NEW_PRODUCT", newProduct: initialState.newProduct });
+  // };
+
+  const addProduct = async () => {
+    try {
+      // Call the secondary API
+      const payload = {
+        inquiryID: inquieryId, // Replace this with dynamic inquiryID if required
+        productID: newProduct?.ProductID, // Replace this with the actual product ID if it's available
+        comments: newProduct?.comments || null,
+        price: newProduct?.unitPrice || 0,
+        quantity: newProduct?.quantity || 1,
+        orderPreferenceDRSID: null, // Add this if you have any dynamic value for it
+      };
+
+      const response = await axios.post(addProductToListApi, payload);
+      console.log("API Response product to list:", response.data);
+      console.log("test19", newProduct);
+    } catch (error) {
+      console.error(
+        "Error calling secondary API:",
+        error?.response?.data || error.message
+      );
+    }
+
+    // Add product details to state
     setProductDetails((prev) => [...prev, newProduct]);
+
+    // Reset newProduct state after adding
     setNewProduct({
       description: "",
       hsCode: "",
@@ -626,7 +756,10 @@ const FullWidthModal = ({
       quantity: 1,
       unitPrice: 0,
       totalPrice: 0,
+      ProductID: 0,
     });
+
+    // Dispatch actions to update context or global state
     dispatch({ type: "ADD_PRODUCT_DETAIL", productDetail: state.newProduct });
     dispatch({ type: "SET_NEW_PRODUCT", newProduct: initialState.newProduct });
   };
@@ -657,7 +790,29 @@ const FullWidthModal = ({
   //     [portKey]: "", // Reset the port selection when the country changes
   //   }));
   // };
-  const nextStep = () => setCurrentStep(currentStep + 1);
+
+  const nextStep = async () => {
+    if (currentStep === 4) {
+      console.log("steppp 444");
+      // Call the API when navigating to step 3
+      try {
+        const response = await axios.post(inquiryApi, formData);
+        console.log("API response:", response.data);
+        alert("Inquiry successfully created");
+        setInquireyId(response.data.InquiryID);
+      } catch (error) {
+        console.error(
+          "Error calling the API:",
+          error?.response?.data || error.message
+        );
+        alert("Failed to submit inquiry.");
+      }
+    }
+
+    setCurrentStep(currentStep + 1);
+  };
+
+  console.log("stored inquery id", inquieryId);
   const prevStep = () => setCurrentStep(currentStep - 1);
 
   // const handleSubmit = (e) => {
@@ -1022,8 +1177,8 @@ const FullWidthModal = ({
               <Form.Control
                 type="text"
                 placeholder="Invoice Number"
-                name="invoiceNumber"
-                value={formData.invoiceNumber || ""}
+                name="inquiryLine"
+                value={formData.inquiryLine || ""}
                 onChange={handleFormChange}
                 readOnly
               />
@@ -1685,7 +1840,7 @@ const FullWidthModal = ({
       case 10:
         return (
           <>
-            <h6>Seller/Shipper/Exporter/Supplier Information</h6>
+            <h6>Business Details</h6>
             <Form.Group
               className="formgroupk mb-3"
               htmlFor="formSellerCompanyName"
@@ -1713,6 +1868,18 @@ const FullWidthModal = ({
                 />
               )}
             </Form.Group>
+            <Form.Group className="formgroupk mb-3" controlId="businessid">
+              <Form.Label>Business ID</Form.Label>
+              <Form.Control
+                type="text"
+                name="businessID"
+                placeholder="Business ID"
+                value={formData.businessID || null}
+                onChange={handleFormChange}
+                readOnly
+              />
+            </Form.Group>
+
             <Form.Group className="formgroupk mb-3" htmlFor="formSellerAddress">
               <Form.Label>Address</Form.Label>
               <Form.Control
@@ -1727,15 +1894,32 @@ const FullWidthModal = ({
               className="formgroupk mb-3"
               htmlFor="formSellerCityStateZIP"
             >
-              <Form.Label>City, State, ZIP</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="City, State, ZIP"
-                name="sellerCityStateZIP"
-                value={formData.sellerCityStateZIP || ""}
-                onChange={handleFormChange}
-              />
+              <div className="d-flex gap-2">
+                <div className="w-100">
+                  <Form.Label>City, State, ZIP</Form.Label>
+
+                  <Form.Control
+                    type="text"
+                    placeholder="City, State, ZIP"
+                    name="sellerCityStateZIP"
+                    value={formData.sellerCityStateZIP || ""}
+                    onChange={handleFormChange}
+                  />
+                </div>
+                <div className="w-100">
+                  <Form.Label>Post Code</Form.Label>
+
+                  <Form.Control
+                    type="text"
+                    placeholder="Post Code"
+                    name="postcode"
+                    value={formData.postcode || ""}
+                    onChange={handleFormChange}
+                  />
+                </div>
+              </div>
             </Form.Group>
+
             <Form.Group className="formgroupk mb-3" htmlFor="formSellerCountry">
               <Form.Label>Country</Form.Label>
 
@@ -1794,6 +1978,27 @@ const FullWidthModal = ({
               />
             </Form.Group>
 
+            <Form.Group className="formgroupk mb-3" htmlFor="formSellerWebsite">
+              <Form.Label>EORI & VAT</Form.Label>
+              <div className="d-flex gap-2">
+                <Form.Control
+                  type="text"
+                  placeholder="EORI #"
+                  name="EORI"
+                  value={formData.EORI || ""}
+                  onChange={handleFormChange}
+                />
+
+                <Form.Control
+                  type="text"
+                  placeholder="VAT #"
+                  name="sellerWebsite"
+                  // value={formData.sellerWebsite || ""}
+                  // onChange={handleFormChange}
+                />
+              </div>
+            </Form.Group>
+
             <h6>Seller Bank Details</h6>
             <Form.Group
               className="formgroupk mb-3"
@@ -1845,7 +2050,7 @@ const FullWidthModal = ({
               />
             </Form.Group>
             <Form.Group
-              className="formgroupk mb-3"
+              className="formgroupk  mb-3"
               htmlFor="formSellerBankAddress"
             >
               <Form.Label>Bank Address</Form.Label>
@@ -1857,12 +2062,34 @@ const FullWidthModal = ({
                 onChange={handleFormChange}
               />
             </Form.Group>
+
+            <div className={`formgroupk ${showDAN && "h-100"}`}>
+              <Form.Check
+                type="checkbox"
+                label="Is Deferment Account?"
+                onChange={handleCheckboxChange}
+                checked={showDAN}
+              />
+
+              {showDAN && (
+                <Form.Group className="w-100  mb-3">
+                  <Form.Label className="fs-6">DAN#</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="DAN#"
+                    name="DAN"
+                    value={formData.DAN}
+                    onChange={handleFormChange}
+                  />
+                </Form.Group>
+              )}
+            </div>
           </>
         );
       case 11:
         return (
           <>
-            <h6>Buyer Information</h6>
+            <h6>Business Details</h6>
             <Form.Group
               className="formgroupk mb-3"
               htmlFor="formBuyerCompanyName"
@@ -1891,6 +2118,18 @@ const FullWidthModal = ({
               )}
             </Form.Group>
 
+            <Form.Group className="formgroupk mb-3" controlId="businessid">
+              <Form.Label>Business ID</Form.Label>
+              <Form.Control
+                type="text"
+                name="businessID"
+                placeholder="Business ID"
+                value={formData.businessID || null}
+                onChange={handleFormChange}
+                readOnly
+              />
+            </Form.Group>
+
             <Form.Group className="formgroupk mb-3" htmlFor="formBuyerAddress">
               <Form.Label>Address</Form.Label>
               <Form.Control
@@ -1905,14 +2144,30 @@ const FullWidthModal = ({
               className="formgroupk mb-3"
               htmlFor="formBuyerCityStateZIP"
             >
-              <Form.Label>City, State, ZIP</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="City, State, ZIP"
-                name="buyerCityStateZIP"
-                value={formData.buyerCityStateZIP || ""}
-                onChange={handleFormChange}
-              />
+              <div className="d-flex gap-2">
+                <div className="w-100">
+                  <Form.Label>City, State, ZIP</Form.Label>
+
+                  <Form.Control
+                    type="text"
+                    placeholder="City, State, ZIP"
+                    name="buyerCityStateZIP"
+                    value={formData.buyerCityStateZIP || ""}
+                    onChange={handleFormChange}
+                  />
+                </div>
+                <div className="w-100">
+                  <Form.Label>Post Code</Form.Label>
+
+                  <Form.Control
+                    type="text"
+                    placeholder="post Code"
+                    name="postcode"
+                    value={formData.postcode || ""}
+                    onChange={handleFormChange}
+                  />
+                </div>
+              </div>
             </Form.Group>
 
             <Form.Group className="formgroupk mb-3" htmlFor="formBuyerCountry">
@@ -1961,6 +2216,26 @@ const FullWidthModal = ({
                 value={formData.buyerWebsite || ""}
                 onChange={handleFormChange}
               />
+            </Form.Group>
+            <Form.Group className="formgroupk mb-3" htmlFor="formSellerWebsite">
+              <Form.Label>EORI & VAT</Form.Label>
+              <div className="d-flex gap-2">
+                <Form.Control
+                  type="text"
+                  placeholder="EORI #"
+                  name="EORI"
+                  value={formData.EORI || ""}
+                  onChange={handleFormChange}
+                />
+
+                <Form.Control
+                  type="text"
+                  placeholder="VAT #"
+                  name="sellerWebsite"
+                  // value={formData.sellerWebsite || ""}
+                  // onChange={handleFormChange}
+                />
+              </div>
             </Form.Group>
 
             <h6>Buyer Bank Details</h6>
@@ -2043,11 +2318,7 @@ const FullWidthModal = ({
       <div className="stepindi">{renderProgress()}</div>
       <Modal.Header closeButton>
         <Modal.Title>
-          {addsellercom
-            ? "Add New Seller Company"
-            : AddBuyercom
-            ? "Add New Buyer Company"
-            : selectedInvoiceType}
+          {addsellercom ? "" : AddBuyercom ? "" : selectedInvoiceType}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className="invoicMB">

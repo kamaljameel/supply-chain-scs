@@ -19,7 +19,7 @@ const Documentation = () => {
   const [showNewInvoiceTypeInput, setShowNewInvoiceTypeInput] = useState(false);
   const [invoiceConvert, SetInvoiceConevert] = useState(false);
   const [invoiceTypeOptions, setInvoiceTypeOptions] = useState([
-    "Proforma Invoice",
+    "Performa Invoice",
     "Commercial Invoice",
   ]);
 
@@ -41,7 +41,7 @@ const Documentation = () => {
 
   const handleInvoiceTypeSelect = (e) => {
     const value = e.target.value;
-    if (value === "Proforma Invoice") {
+    if (value === "Performa Invoice") {
       setShowFullWidthModal(true);
       setShowInvoiceModal(false);
     } else if (value === "Commercial Invoice") {

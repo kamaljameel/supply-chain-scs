@@ -125,4 +125,52 @@ const resetPassword = async (token, newPassword) => {
   }
 };
 
-module.exports = { createUser, forgotPassword, resetPassword };
+// Update user profile
+const updateUserProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { Address, City, State, Country, ZipCode, ProfilePicture } = req.body;
+
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    await user.update({
+      Address,
+      City,
+      State,
+      Country,
+      ZipCode,
+      ProfilePicture,
+    });
+
+    res.status(200).json({ message: "Profile updated successfully", user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error updating profile", error });
+  }
+};
+
+const getUserProfile = async (userId) => {
+  try {
+    const user = await User.findByPk(userId);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user;
+  } catch (error) {
+    throw error;
+  }
+};
+
+module.exports = {
+  createUser,
+  forgotPassword,
+  resetPassword,
+  updateUserProfile,
+  getUserProfile,
+};
