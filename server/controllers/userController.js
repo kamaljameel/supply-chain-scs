@@ -129,7 +129,8 @@ const resetPassword = async (token, newPassword) => {
 const updateUserProfile = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { Address, City, State, Country, ZipCode, ProfilePicture } = req.body;
+    const { LastName, Address, City, State, Country, ZipCode, ProfilePicture } =
+      req.body;
 
     const user = await User.findByPk(userId);
 
@@ -138,6 +139,7 @@ const updateUserProfile = async (req, res) => {
     }
 
     await user.update({
+      LastName,
       Address,
       City,
       State,

@@ -32,7 +32,8 @@ export default function ProductForm({
     height: "",
     price: "",
     productCategoryId: "",
-    weight: "",
+    netweight: "",
+    grossweight: "",
   });
   const abisolToken = localStorage.getItem("abisolToken");
   if (!abisolToken) {
@@ -63,6 +64,8 @@ export default function ProductForm({
     if (productToEdit) {
       const [length, width, height] =
         productToEdit.Dimensions.split("x").map(Number);
+      const [netweight, grossweight] =
+        productToEdit.Weight.split("x").map(Number);
       setProduct({
         productName: productToEdit.Name || "",
         productDescription: productToEdit.Description,
@@ -73,9 +76,11 @@ export default function ProductForm({
         length: length,
         width: width,
         height: height,
+        netweight: netweight,
+        grossweight: grossweight || "",
         price: productToEdit.Price,
         productCategoryId: productToEdit.ProductCategoryID,
-        weight: productToEdit.weight,
+        // weight: productToEdit.weight,
       });
     }
     console.log("edipp333", productToEdit);
@@ -114,6 +119,8 @@ export default function ProductForm({
       length: "",
       width: "",
       height: "",
+      netweight: "",
+      grossweight: "",
     });
   };
 
@@ -163,6 +170,8 @@ export default function ProductForm({
           length: "",
           width: "",
           height: "",
+          netweight: "",
+          grossweight: "",
         });
       }
     } catch (error) {
@@ -188,7 +197,9 @@ export default function ProductForm({
       height: productToEdit2.Dimensions?.split("x")[2] || "",
       price: productToEdit2.Price || "",
       productCategoryId: productToEdit2.ProductCategoryID || "",
-      weight: productToEdit2.weight || "",
+      // weight: productToEdit2.weight || "",
+      netweight: productToEdit2.Weight,
+      grossweight: productToEdit2.Weight?.split("x")[1] || "",
     });
     // setallProducts((prev) => prev.filter((_, i) => i !== index));
     console.log("ghfgh", productToEdit2);
@@ -341,12 +352,29 @@ export default function ProductForm({
             onChange={handleChange}
           />
 
-          <input
+          {/* <input
             name="weight"
             placeholder="Weight"
             value={product.weight}
             onChange={handleChange}
-          />
+          /> */}
+          <div>
+            <input
+              name="netweight"
+              placeholder="netweight"
+              value={product.netweight}
+              onChange={handleChange}
+              required
+            />
+            <input
+              name="grossweight"
+              placeholder="grossweight"
+              value={product.grossweight}
+              onChange={handleChange}
+              required
+              // className="ms-2"
+            />
+          </div>
           <select
             name="use-for"
             // value={product.size}
@@ -405,7 +433,8 @@ export default function ProductForm({
                       <td>{product.Price ? `$${product.Price}` : "-"}</td>
                       <td>{product.Code_SKU || "-"}</td>
                       <td>{product.Dimensions || "-"}</td>
-                      <td>{product.Weight ? `${product.Weight} kg` : "-"}</td>
+                      <td>{product.Weight || "-"}</td>
+                      {/* <td>{product.Weight ? `${product.Weight} kg` : "-"}</td> */}
 
                       <td className="d-flex gap-3">
                         <Button

@@ -14,6 +14,7 @@ const businessInquiryRoutes = require("./routers/businessInquiryRoutes");
 const productRoutes = require("./routers/products");
 const inquiryRoutes = require("./routers/inquiry");
 const profileRoutes = require("./routers/userRoutes");
+const businessRoutes = require("./routers/businessRouter");
 
 const app = express();
 require("dotenv").config();
@@ -50,7 +51,7 @@ app.use("/api/verify-email", verifyemail);
 app.use("/api/products", productRoutes);
 app.use("/api/inquiry", inquiryRoutes);
 app.use("/api/userRoutes", profileRoutes);
-
+app.use("/api/business", businessRoutes);
 // busness inquiry
 app.use("/api/business-inquiries", businessInquiryRoutes);
 // Error Handling Middleware

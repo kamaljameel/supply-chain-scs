@@ -19,7 +19,6 @@ import SearatesWidget from "@/components/searates/SearatesWidget";
 import ProductForm from "./sidebarcomponent/ProductForm";
 import { Button, Modal } from "react-bootstrap";
 import FullWidthModal from "./sidebarcomponent/FullWidthModal";
-import ProfileUpdate from "./ProfileUpdate";
 
 const Dashboard = () => {
   const router = useRouter();
@@ -30,6 +29,7 @@ const Dashboard = () => {
   const [showNewProduct, setNewProductShow] = useState(false);
 
   const [showbuisness, setShowbuisness] = useState(false);
+  const [showMyProfile, setShowMyProfile] = useState(false);
   const [pid, setpid] = useState("");
   const [companyOptions, setCompanyOptions] = useState([
     "Company A",
@@ -47,6 +47,11 @@ const Dashboard = () => {
   const handleBuisnessShow = () => {
     setbuisnessButton("buisnessButton");
     setShowbuisness(true);
+  };
+  const handleMyProfileShow = () => {
+    setbuisnessButton("buisnessButton");
+    setShowbuisness(true);
+    setShowMyProfile(true);
   };
   // const seefooter = () => {
   //   setSeeFooter(true);
@@ -206,6 +211,13 @@ const Dashboard = () => {
               </div>
             ))}
           </div>
+
+          <Button
+            className="fs-6 px-0 bg-transparent text-white mt-2 w-100 addproductbtn"
+            onClick={handleMyProfileShow}
+          >
+            My Profile
+          </Button>
           <Button
             className="fs-6 px-0 bg-transparent text-white mt-2 w-100 addproductbtn"
             onClick={handleNewProductShow}
@@ -258,13 +270,16 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="userdata">
-              <i className="bi bi-person-circle me-2"></i>
-              {user.FirstName} {user.LastName}
+              <Link href="/profile" className="text-white">
+                {" "}
+                <i className="bi bi-person-circle me-2"></i>
+                {user.FirstName} {user.LastName}
+              </Link>
             </div>
           </div>
           <div className="dashboardcontainer">{renderMainContent()}</div>
           <div>
-            <ProfileUpdate /> {/* <ChatGPTWithAutoQuestions /> */}
+            {/* <ChatGPTWithAutoQuestions /> */}
             {/* <SearatesWidget /> */}
           </div>
           <div className="position-absolute bottom-0 end-0 start-0 mx-auto mb-3 text-center">
@@ -277,6 +292,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
       {/* <div
         className={`dashfooter ${seeFooter ? "footervisible" : ""}`}
         onClick={hidefooter}
@@ -290,6 +306,7 @@ const Dashboard = () => {
         addCompany={addCompany}
         onHide={handleFullWidthModalClose}
         businessbutton={businessbutton}
+        showMyProfile={showMyProfile}
       />
     </>
   );

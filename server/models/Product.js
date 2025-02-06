@@ -45,7 +45,11 @@ const Product = sequelize.define("Product", {
     type: DataTypes.INTEGER,
     allowNull: true,
   },
-  weight: {
+  netweight: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
+  },
+  grossweight: {
     type: DataTypes.FLOAT,
     allowNull: true,
   },

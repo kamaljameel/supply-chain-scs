@@ -259,6 +259,9 @@ body {
 
   border: 1px solid white !important;
 }
+.bg-greenC {
+  background-color: #2a9d8f;
+}
 @media (min-width: 992px) {
   .mainmodelP .modal-lg {
     max-width: 1200px !important;

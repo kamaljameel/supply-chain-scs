@@ -41,7 +41,8 @@ exports.createProduct = async (req, res) => {
       width,
       height,
       price,
-      weight,
+      netweight,
+      grossweight,
     } = req.body;
 
     const response = await axios.post(
@@ -53,7 +54,7 @@ exports.createProduct = async (req, res) => {
         ProductCategoryID: productCategoryId,
         Code_SKU: hsCode,
         Dimensions: `${length}x${width}x${height}`,
-        Weight: weight,
+        Weight: netweight,
       },
       { headers: API_HEADERS }
     );
@@ -151,7 +152,8 @@ exports.updateProduct = async (req, res) => {
       width,
       height,
       price,
-      weight,
+      netweight,
+      grossweight,
     } = req.body;
 
     const response = await axios.put(
@@ -163,7 +165,7 @@ exports.updateProduct = async (req, res) => {
         ProductCategoryID: productCategoryId,
         Code_SKU: hsCode,
         Dimensions: `${length}x${width}x${height}`,
-        Weight: weight,
+        Weight: netweight,
       },
       { headers: API_HEADERS }
     );

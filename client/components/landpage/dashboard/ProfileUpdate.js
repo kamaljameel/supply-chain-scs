@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { profileApi, loginApi } from "@/utils/apiRoutes";
+import styles from "../../../app/signup/signup.css";
 const ProfileUpdate = () => {
   const [formData, setFormData] = useState({
+    LastName: "",
     Address: "",
     City: "",
     State: "",
@@ -13,7 +15,8 @@ const ProfileUpdate = () => {
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true); // To handle loading state
+  const [loading, setLoading] = useState(true);
+  const [profileLoader, setprofileLoader] = useState(false);
 
   useEffect(() => {
     async function fetchUser() {
@@ -30,14 +33,8 @@ const ProfileUpdate = () => {
         if (response.status === 200) {
           setLoading(false);
           setUser(response.data.user);
-          //   const profileresponse = await axios.get(`${profileApi}/${user.id}`, {
-          //     headers: {
-          //       Authorization: `Bearer ${token}`,
-          //     },
-          //   });
+
           setFormData(response.data.user); // Populate form with user data
-          console.log("pprroooo", response.data);
-          console.log(response.data.user);
         } else {
           console.error("Failed to fetch user:", response.statusText);
         }
@@ -49,24 +46,6 @@ const ProfileUpdate = () => {
     fetchUser();
   }, []);
 
-  //   useEffect(() => {
-  //     const fetchUserData = async () => {
-  //       try {
-  //         setLoading(true);
-
-  //         const response = await axios.get(`${profileApi}/${user.id}`);
-  //         setFormData(response.data); // Populate form with user data
-  //         console.log("pprroooo", response.data);
-  //         setLoading(false);
-  //       } catch (err) {
-  //         setError(err.response?.data?.message || "Failed to load user data.");
-  //         setLoading(false);
-  //       }
-  //     };
-
-  //     fetchUserData();
-  //   }, []);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -77,14 +56,31 @@ const ProfileUpdate = () => {
     setMessage("");
     setError("");
 
-    try {
-      const response = await axios.put(`${profileApi}/${user.id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    const token = localStorage.getItem("accessToken");
 
-      setMessage(response.data.message);
+    if (!token) {
+      setError("User is not authenticated.");
+      return;
+    }
+    setprofileLoader(true);
+    try {
+      const response = await axios.put(
+        `${profileApi}/${user.id}`, // Use the API route from apiRoutes
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        setprofileLoader(false);
+        setMessage("Profile updated successfully!");
+      } else {
+        setError("Failed to update profile.");
+      }
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong.");
     }
@@ -95,9 +91,22 @@ const ProfileUpdate = () => {
   }
 
   return (
-    <div style={{ maxWidth: "600px", margin: "0 auto" }}>
-      <h2>Update Profile</h2>
-      <form onSubmit={handleSubmit}>
+    <div
+      className={`${styles.signup} w-100 mx-auto d-flex flex-column align-items-center justify-content-center my-3 signupForm`}
+    >
+      <h2 className="mb-3">Update Profile</h2>
+      <form onSubmit={handleSubmit} className={`${styles.form} text-center`}>
+        <div>
+          <label htmlFor="Address">Last Name:</label>
+          <input
+            type="text"
+            id="LastName"
+            name="LastName"
+            value={formData.LastName || ""}
+            onChange={handleChange}
+            required
+          />
+        </div>
         <div>
           <label htmlFor="Address">Address:</label>
           <input
@@ -163,7 +172,9 @@ const ProfileUpdate = () => {
             onChange={handleChange}
           />
         </div>
-        <button type="submit">Update Profile</button>
+        <button type="submit">
+          {profileLoader ? "Updating...." : "Update Profile"}
+        </button>
       </form>
       {message && <p style={{ color: "green" }}>{message}</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}

@@ -1,4 +1,5 @@
-import React, { useReducer, useEffect, useState } from "react";
+import React, { useReducer, useEffect, useState, useRef } from "react";
+
 import {
   Modal,
   Form,
@@ -14,12 +15,17 @@ import {
   addProductApi,
   inquiryApi,
   addProductToListApi,
+  createBusiness,
+  getBusinesses,
+  deleteBusiness,
+  updateBusiness,
 } from "@/utils/apiRoutes";
 import ProductForm from "./ProductForm";
 import Select from "react-select";
 import PhoneInput, { parsePhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import countryList from "react-select-country-list";
+// import BusinessForm from "../BusinessForm";
 
 // import mammoth from "mammoth"; // For .doc and .docx handling
 // import * as XLSX from "xlsx";
@@ -93,6 +99,7 @@ const FullWidthModal = ({
   addCompany,
   selectedInvoiceType,
   businessbutton,
+  showMyProfile,
 }) => {
   const [currentStep, setCurrentStep] = useState(2);
   const [selectedSellerCompany, setselectedSellerCompany] = useState("");
@@ -101,7 +108,9 @@ const FullWidthModal = ({
   const [pdfText, setPdfText] = useState("");
   const [inquieryId, setInquireyId] = useState(null);
   const [showDAN, setShowDAN] = useState(false);
-
+  // const businessFormRef = useRef();
+  const [businesses, setBusinesses] = useState([]);
+  const [editingBusiness, setEditingBusiness] = useState(null);
   // const [selectedFile, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState({
     sellerPhone: "",
@@ -154,11 +163,65 @@ const FullWidthModal = ({
     EORI: "",
     DAN: "",
     postcode: "",
+    currency: "",
+    AnnualRevenue: null,
+    BusinessEmail1: null,
+    BusinessEmail2: null,
+    BusinessFax: null,
+    BusinessName: "",
+    BusinessPhone1: null,
+    BusinessPhone2: null,
+    BusinessRegNumber: null,
+    BusinessTypeID: null,
+    BusinessTypeName: null,
+    EmployeesCount: null,
+    IndustryID: null,
+    Industry: null,
+    LBuildingName: null,
+    LCity: null,
+    LCountry: null,
+    LeadID: null,
+    Lead: null,
+    LPOBox: null,
+    LPostCode: null,
+    LState: null,
+    LStreetNumber: null,
+    LStreetType: null,
+    LSuburb: null,
+    LUnit_Level: null,
+    Remarks: null,
+    SBuildingName: null,
+    SCountry: null,
+    SPOBox: null,
+    SPostCode: null,
+    SState: null,
+    SStreetNumber: null,
+    SStreetType: null,
+    SSuburb: null,
+    SUnit_Level: null,
+    Website: null,
+    FileDisplayName_Logo: "",
+    FileStorageName_Logo: "",
+    FileURI_Logo: "",
+    FileSize: 0.0,
+    Billing_FullAddress: "",
+    Shipping_FullAddress: "",
+    BankName: null,
+    AccountName: null,
+    AccountNumber: null,
+    SWIFTNumber: null,
+    IBAN: null,
   });
   const [productDetails, setProductDetails] = useState([]);
   const [state, dispatch] = useReducer(reducer, initialState);
   // const apiKey = "AIzaSyA5DS0UK5hhUa7g4hGBMjkOXLupWrmdFkY";
   // const [isSearchVisible, setIsSearchVisible] = useState(true);
+  const abisolToken = localStorage.getItem("abisolToken");
+
+  if (!abisolToken) {
+    console.error("No token found.");
+    return;
+  }
   const [newProduct, setNewProduct] = useState({
     description: "",
     hsCode: "",
@@ -167,7 +230,34 @@ const FullWidthModal = ({
     unitPrice: "",
     totalPrice: 0,
     ProductID: 0,
+    netweight: 0,
+    grossweight: 0,
   });
+
+  // currencies
+  const currencies = [
+    { code: "USD", name: "United States Dollar" },
+    { code: "EUR", name: "Euro" },
+    { code: "JPY", name: "Japanese Yen" },
+    { code: "GBP", name: "British Pound Sterling" },
+    { code: "AUD", name: "Australian Dollar" },
+    { code: "CAD", name: "Canadian Dollar" },
+    { code: "CHF", name: "Swiss Franc" },
+    { code: "CNY", name: "Chinese Yuan" },
+    { code: "INR", name: "Indian Rupee" },
+    { code: "BRL", name: "Brazilian Real" },
+    { code: "ZAR", name: "South African Rand" },
+    { code: "RUB", name: "Russian Ruble" },
+    { code: "KRW", name: "South Korean Won" },
+    { code: "MXN", name: "Mexican Peso" },
+    { code: "SGD", name: "Singapore Dollar" },
+    { code: "HKD", name: "Hong Kong Dollar" },
+    { code: "NOK", name: "Norwegian Krone" },
+    { code: "SEK", name: "Swedish Krona" },
+    { code: "NZD", name: "New Zealand Dollar" },
+    { code: "THB", name: "Thai Baht" },
+    // Add more currencies if needed
+  ];
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     // setSelectedFile(file); // Store the selected file in state
@@ -350,14 +440,40 @@ const FullWidthModal = ({
   // Fetch products when the component mounts
   useEffect(() => {
     fetchProducts();
+    fetchBusinesses();
   }, []);
-
+  const fetchBusinesses = async () => {
+    try {
+      const response = await getBusinesses();
+      setBusinesses(response.data);
+    } catch (error) {
+      console.error(
+        "Error fetching businesses:",
+        error.response?.data || error.message
+      );
+    }
+  };
+  // Handle delete business
+  const handleDeleteBusiness = async (id) => {
+    try {
+      await deleteBusiness(id);
+      fetchBusinesses(); // Refresh list
+    } catch (error) {
+      console.error(
+        "Error deleting business:",
+        error.response?.data || error.message
+      );
+    }
+  };
   console.log("product idk", products);
   const [subtotal, setSubtotal] = useState(0);
   const [tax, setTax] = useState(0);
   const [taxPercentage, setTaxPercentage] = useState(0);
   const [total, setTotal] = useState(0);
-
+  const [TotalNetWeight, setTotalNetWeight] = useState(0);
+  const [TotalGrossWeight, setTotalGrossWeight] = useState(0);
+  const [response, setResponse] = useState(null);
+  const [error, setError] = useState(null);
   // Calculate subtotal, tax, and total when product details change
   useEffect(() => {
     const calculateTotals = () => {
@@ -365,8 +481,20 @@ const FullWidthModal = ({
         (acc, product) => acc + product.totalPrice,
         0
       );
-      const total = subtotal + parseFloat(tax || 0);
 
+      const totalNetWeight = productDetails.reduce(
+        (acc, product) => acc + (parseFloat(product.netweight) || 0),
+        0
+      );
+
+      const totalGrossWeight = productDetails.reduce(
+        (acc, product) => acc + (parseFloat(product.grossweight) || 0),
+        0
+      );
+
+      const total = subtotal + parseFloat(tax || 0);
+      setTotalNetWeight(totalNetWeight);
+      setTotalGrossWeight(totalGrossWeight);
       setSubtotal(subtotal);
       setTotal(total);
     };
@@ -387,6 +515,8 @@ const FullWidthModal = ({
         unitPrice: "",
         totalPrice: "",
         ProductID: selectedProductId,
+        netweight: "",
+        grossweight: "",
       });
       return; // Exit early if no valid selection is made
     }
@@ -411,6 +541,8 @@ const FullWidthModal = ({
         unitPrice: "",
         totalPrice: "",
         ProductID: selectedProduct.ProductID,
+        netweight: selectedProduct.Weight,
+        grossweight: "",
       });
     } else {
       console.error(`Product with ID ${parsedProductId} not found.`);
@@ -540,7 +672,67 @@ const FullWidthModal = ({
     const calculatedPercentage = (newTax / subtotal) * 100;
     setTaxPercentage(calculatedPercentage); // Update percentage based on tax amount
   };
-  const handleAddCompany = () => {
+  const handleAddCompany = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingBusiness) {
+        // Update existing business
+        await updateBusiness(editingBusiness.BusinessID, formData);
+        setEditingBusiness(null); // Clear editing mode
+        alert("Business update");
+      } else {
+        // Create new business
+        await createBusiness(formData);
+      }
+
+      setResponse(res.data);
+      setFormData({
+        BusinessName: "",
+        BusinessEmail1: "",
+        BusinessEmail2: "",
+        BusinessFax: "",
+        BusinessPhone1: "",
+        BusinessPhone2: "",
+        BusinessRegNumber: "",
+        BusinessTypeID: "",
+        BusinessTypeName: "",
+        EmployeesCount: "",
+        IndustryID: "",
+        Industry: "",
+        Website: "",
+        BankName: "",
+        AccountName: "",
+        AccountNumber: "",
+        SWIFTNumber: "",
+        IBAN: "",
+        LBuildingName: "",
+        LCity: "",
+        LCountry: "",
+        LPOBox: "",
+        LPostCode: "",
+        LState: "",
+        LStreetNumber: "",
+        LStreetType: "",
+        LSuburb: "",
+        LUnit_Level: "",
+        SBuildingName: "",
+        SCountry: "",
+        SPOBox: "",
+        SPostCode: "",
+        SState: "",
+        SStreetNumber: "",
+        SStreetType: "",
+        SSuburb: "",
+        SUnit_Level: "",
+        FileDisplayName_Logo: "",
+        FileStorageName_Logo: "",
+        FileURI_Logo: "",
+        FileSize: 0.0,
+      });
+      fetchBusinesses(); // Refresh list
+    } catch (err) {
+      setError(err.response?.data || err.message);
+    }
     addCompany(newCompany);
     if (selectedBuyerCompany === "addNew") {
       setSelectedBuyerCompany(newCompany);
@@ -551,10 +743,22 @@ const FullWidthModal = ({
       setCurrentStep(2);
       setAddsellercom(false);
     }
+    // if (businessFormRef.current) {
+    //   businessFormRef.current.handleSubmit(); // Trigger the form submit in the child
+    //   console.log("Child form submitted");
+    // }
+    setError(null);
+    setResponse(null);
+
     setNewCompany("");
     setCurrentStep(2);
     setAddsellercom(false);
     setAddBuyercom(false);
+  };
+
+  const handleEditClick = (business) => {
+    setEditingBusiness(business);
+    setFormData(business);
   };
   // const handleFileChange = (file) => {
   //   // Define allowed file types
@@ -645,12 +849,23 @@ const FullWidthModal = ({
   const handleProductChange = (e) => {
     const { name, value } = e.target;
     const updatedProduct = { ...newProduct, [name]: value };
-
+    const numericValue = parseFloat(value) || 0;
     if (name === "quantity" || name === "unitPrice") {
       updatedProduct.totalPrice =
         updatedProduct.quantity * updatedProduct.unitPrice;
     }
 
+    if (name === "quantity") {
+      const previousQuantity = parseFloat(newProduct.quantity) || 0;
+      const currentNetweight = parseFloat(newProduct.netweight) || 0;
+
+      // Calculate the change in quantity and adjust netweight
+      const quantityDifference = numericValue - previousQuantity;
+      updatedProduct.netweight = currentNetweight + quantityDifference;
+
+      // Update the quantity
+      updatedProduct.quantity = numericValue;
+    }
     setNewProduct(updatedProduct);
   };
   // Handling port selection if the country has valid port options
@@ -665,6 +880,9 @@ const FullWidthModal = ({
     setSubtotal(0);
     setTax(0);
     setTotal(0);
+    setTotalGrossWeight(0);
+    setTotalNetWeight(0);
+    setTotalGrossWeight(0);
     setNewProduct({
       description: "",
       hsCode: "",
@@ -673,6 +891,8 @@ const FullWidthModal = ({
       unitPrice: 0,
       totalPrice: 0,
       ProductID: 0,
+      netweight: 0,
+      grossweight: 0,
     });
     setSelectedProduct("");
   };
@@ -757,6 +977,8 @@ const FullWidthModal = ({
       unitPrice: 0,
       totalPrice: 0,
       ProductID: 0,
+      netweight: 0,
+      grossweight: 0,
     });
 
     // Dispatch actions to update context or global state
@@ -867,6 +1089,8 @@ const FullWidthModal = ({
       subtotal,
       tax,
       total,
+      TotalNetWeight,
+      TotalGrossWeight,
       taxPercentage,
       selectedSellerCompany,
       selectedBuyerCompany,
@@ -892,33 +1116,39 @@ const FullWidthModal = ({
       { step: 3, label: "Invoice Details" },
       { step: 4, label: "Shipping Information" },
       { step: 5, label: "Product Details" },
-      { step: 6, label: "Payment Terms" },
-      { step: 7, label: "Seller Bank Details" },
-      { step: 8, label: "Buyer Bank Details" },
 
-      { step: 9, label: "Review & Submit" },
+      { step: 6, label: "Seller Bank Details" },
+      { step: 7, label: "Buyer Bank Details" },
+
+      { step: 8, label: "Review & Submit" },
     ];
 
     return (
-      <div className="progress-indicator">
-        {steps.map(({ step, label }) => (
-          <div
-            key={step}
-            className={`step-indicator ${
-              currentStep >= step + 1 ? "active" : ""
-            }`}
-          >
-            <div className="circle">
-              {" "}
-              {step === 9 ? (
-                <span>&#10003;</span> // Display tick for Step 10
-              ) : (
-                step
-              )}
-            </div>
-            <div className="label">{label}</div>
+      <div>
+        {showMyProfile ? (
+          ""
+        ) : (
+          <div className="progress-indicator">
+            {steps.map(({ step, label }) => (
+              <div
+                key={step}
+                className={`step-indicator ${
+                  currentStep >= step + 1 ? "active" : ""
+                }`}
+              >
+                <div className="circle">
+                  {" "}
+                  {step === 9 ? (
+                    <span>&#10003;</span> // Display tick for Step 10
+                  ) : (
+                    step
+                  )}
+                </div>
+                <div className="label">{label}</div>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
     );
   };
@@ -955,12 +1185,12 @@ const FullWidthModal = ({
               <Form.Label>Select Company</Form.Label>
               <Form.Control
                 as="select"
-                value={formData.sellerCompanyName}
+                value={formData.sellerCompanyName || ""}
                 onChange={(e) => handleCompanySelect(e.target.value)}
               >
                 <option value="">Select a company</option>
                 {companyOptions.map((company, index) => (
-                  <option key={index} value={company}>
+                  <option key={index} value={company || ""}>
                     {company}
                   </option>
                 ))}
@@ -1031,7 +1261,7 @@ const FullWidthModal = ({
               <PhoneInput
                 international
                 defaultCountry={formData.sellerCountryCode} // Set default country if needed
-                value={formData.sellerPhone}
+                value={formData.sellerPhone || ""}
                 onChange={handlePhoneChange}
                 placeholder="Enter phone number"
               />
@@ -1070,12 +1300,12 @@ const FullWidthModal = ({
               <Form.Label>Select Buyer Company</Form.Label>
               <Form.Control
                 as="select"
-                value={selectedBuyerCompany}
+                value={selectedBuyerCompany || ""}
                 onChange={(e) => handleBuyerCompanySelect(e.target.value)}
               >
                 <option value="">Select a company</option>
                 {companyOptions.map((company, index) => (
-                  <option key={index} value={company}>
+                  <option key={index} value={company || ""}>
                     {company}
                   </option>
                 ))}
@@ -1124,7 +1354,7 @@ const FullWidthModal = ({
               <PhoneInput
                 international
                 defaultCountry={formData.buyerCountryCode} // Set default country if needed
-                value={formData.buyerPhone}
+                value={formData.buyerPhone || ""}
                 onChange={handleBuyerPhoneChange}
                 placeholder="Enter phone number"
               />
@@ -1211,6 +1441,45 @@ const FullWidthModal = ({
                 onChange={handleFormChange}
                 placeholder="Enter tolerance value"
               />
+            </Form.Group>
+
+            {/* <h6>Payment Terms</h6> */}
+            <Form.Group className="formgroupk mb-3" htmlFor="formPaymentMethod">
+              <Form.Label>Payment Method</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Payment Method (e.g., Wire Transfer, Letter of Credit)"
+                name="paymentMethod"
+                value={formData.paymentMethod || ""}
+                onChange={handleFormChange}
+              />
+            </Form.Group>
+            <Form.Group className="formgroupk mb-3" htmlFor="formPaymentTerms">
+              <Form.Label>Payment Terms</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Payment Terms (e.g., 50% advance, 50% upon delivery)"
+                name="paymentTerms"
+                value={formData.paymentTerms || ""}
+                onChange={handleFormChange}
+              />
+            </Form.Group>
+            <Form.Group className="formgroupk mb-3" controlId="formCurrency">
+              <Form.Label>Currency</Form.Label>
+              <Form.Select
+                name="currency"
+                value={formData.currency || ""}
+                onChange={handleFormChange}
+              >
+                <option value="" disabled>
+                  Select Currency
+                </option>
+                {currencies.map((currency) => (
+                  <option key={currency.code} value={currency.code}>
+                    {currency.code} - {currency.name}
+                  </option>
+                ))}
+              </Form.Select>
             </Form.Group>
           </>
         );
@@ -1410,7 +1679,7 @@ const FullWidthModal = ({
               <Form.Control
                 as="select"
                 name="shippingType"
-                value={formData.shippingType}
+                value={formData.shippingType || ""}
                 onChange={handleShippingTypeChange}
               >
                 <option value="">Select Shipping Type</option>
@@ -1424,7 +1693,7 @@ const FullWidthModal = ({
                 <Form.Control
                   type="text"
                   name="volume"
-                  value={formData.volume}
+                  value={formData.volume || ""}
                   onChange={handleChange}
                   placeholder="Enter Volume"
                 />
@@ -1436,7 +1705,7 @@ const FullWidthModal = ({
                 <Form.Control
                   as="select"
                   name="containerType"
-                  value={formData.containerType}
+                  value={formData.containerType || ""}
                   onChange={handleChange}
                 >
                   <option value="">Select Container Type</option>
@@ -1452,7 +1721,7 @@ const FullWidthModal = ({
               <Form.Control
                 as="select"
                 name="shippingMode"
-                value={formData.shippingMode}
+                value={formData.shippingMode || ""}
                 onChange={handleChange}
               >
                 <option value="">Select Shipping Mode</option>
@@ -1477,8 +1746,10 @@ const FullWidthModal = ({
                     <th>HS Code</th>
                     <th>Origin of Goods</th>
                     <th>Quantity</th>
-                    <th>Unit Price</th>
-                    <th>Total Price</th>
+                    <th>Net weight</th>
+                    <th>Gross weight</th>
+                    <th>Unit Price({formData.currency})</th>
+                    <th>Total Price({formData.currency})</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -1490,6 +1761,9 @@ const FullWidthModal = ({
                       <td>{product.hsCode}</td>
                       <td>{product.origin}</td>
                       <td>{product.quantity}</td>
+                      <td>{product.netweight}</td>
+                      <td>{product.grossweight}</td>
+
                       <td>{product.unitPrice}</td>
                       <td>{product.totalPrice}</td>
                       <td className="d-flex gap-3">
@@ -1513,16 +1787,16 @@ const FullWidthModal = ({
                   <tr>
                     <td>{productDetails.length + 1}</td>
                     <td>
-                      <div className="d-flex gap-2">
+                      <div className="d-flex ">
                         <Form.Select
                           aria-label="Default select"
                           onChange={handleSelect}
                           as="select"
-                          value={selectedProduct}
+                          value={selectedProduct || ""}
                         >
                           <option>Select a Product</option>
                           {products.map((product, index) => (
-                            <option key={index} value={product.ProductID}>
+                            <option key={index} value={product.ProductID || ""}>
                               {product.Name}
                             </option>
                           ))}
@@ -1581,16 +1855,36 @@ const FullWidthModal = ({
                     </td>
                     <td>
                       <Form.Control
-                        type="number"
+                        type="text"
                         placeholder="Quantity"
                         name="quantity"
                         value={newProduct.quantity || ""}
                         onChange={handleProductChange}
                       />
                     </td>
+
                     <td>
                       <Form.Control
-                        type="number"
+                        type="text"
+                        placeholder="Net weight"
+                        name="netweight"
+                        value={newProduct.netweight || ""}
+                        onChange={handleProductChange}
+                      />
+                    </td>
+
+                    <td>
+                      <Form.Control
+                        type="text"
+                        placeholder="Gross weight"
+                        name="grossweight"
+                        value={newProduct.grossweight || ""}
+                        onChange={handleProductChange}
+                      />
+                    </td>
+                    <td>
+                      <Form.Control
+                        type="text"
                         placeholder="Unit Price"
                         name="unitPrice"
                         value={newProduct.unitPrice || ""}
@@ -1605,13 +1899,36 @@ const FullWidthModal = ({
                 Add Product to List
               </Button>
               <div className="my-3 d-flex gap-3">
-                <div className="form-group d-flex gap-3 w-100">
+                <div className="form-group  gap-3 w-100">
+                  <label className=" col-form-label">Total Net Weight</label>
+                  <div className="w-100">
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={TotalNetWeight || ""}
+                      readOnly
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group  gap-3 w-100">
+                  <label className=" col-form-label">Total Gross Weight</label>
+                  <div className="w-100">
+                    <input
+                      type="text"
+                      className="form-control"
+                      value={TotalGrossWeight || ""}
+                      readOnly
+                    />
+                  </div>
+                </div>
+                <div className="form-group  gap-3 w-100">
                   <label className=" col-form-label">Subtotal</label>
                   <div className="w-100">
                     <input
-                      type="number"
+                      type="text"
                       className="form-control"
-                      value={subtotal}
+                      value={subtotal || ""}
                       readOnly
                     />
                   </div>
@@ -1629,37 +1946,38 @@ const FullWidthModal = ({
                 </div> */}
 
                 {/* Tax Percentage and Amount Fields */}
-                <div className="form-group d-flex gap-3 w-100">
+                <div className="form-group  gap-3 w-100">
                   <label className=" col-form-label">Tax</label>
-                  <div className="col-sm-5 taxFild">
-                    <input
-                      type="number"
-                      className="form-control"
-                      placeholder="Percentage"
-                      value={taxPercentage}
-                      onChange={handleTaxPercentageChange}
-                    />
-                    <span className="m-0 fs-11">%</span>
-                  </div>
-                  <div className="col-sm-5 taxFild">
-                    <input
-                      type="number"
-                      className="form-control"
-                      placeholder="Amount"
-                      value={tax}
-                      onChange={handleTaxChange}
-                    />
-                    <span className="m-0 fs-11">Amount</span>
+                  <div className="d-flex">
+                    <div className="col-sm-5 taxFild">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder=""
+                        value={taxPercentage || ""}
+                        onChange={handleTaxPercentageChange}
+                      />
+                      <span className="m-0 fs-11">%</span>
+                    </div>
+                    <div className="col-sm-5 taxFild ms-2">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder=""
+                        value={tax || ""}
+                        onChange={handleTaxChange}
+                      />
+                      <span className="m-0 fs-11">Amount</span>
+                    </div>
                   </div>
                 </div>
-
-                <div className="form-group d-flex gap-3 w-100">
+                <div className="form-group  gap-3 w-100">
                   <label className=" col-form-label">Total</label>
                   <div className="w-100">
                     <input
-                      type="number"
+                      type="text"
                       className="form-control"
-                      value={total}
+                      value={total || ""}
                       readOnly
                     />
                   </div>
@@ -1668,42 +1986,7 @@ const FullWidthModal = ({
             </div>
           </>
         );
-      case 7:
-        return (
-          <>
-            <h6>Payment Terms</h6>
-            <Form.Group className="formgroupk mb-3" htmlFor="formPaymentMethod">
-              <Form.Label>Payment Method</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Payment Method (e.g., Wire Transfer, Letter of Credit)"
-                name="paymentMethod"
-                value={formData.paymentMethod || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Group>
-            <Form.Group className="formgroupk mb-3" htmlFor="formPaymentTerms">
-              <Form.Label>Payment Terms</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Payment Terms (e.g., 50% advance, 50% upon delivery)"
-                name="paymentTerms"
-                value={formData.paymentTerms || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Group>
-            <Form.Group className="formgroupk mb-3" htmlFor="formCurrency">
-              <Form.Label>Currency</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Currency"
-                name="currency"
-                value={formData.currency || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Group>
-          </>
-        );
+
       case 8:
         return (
           <>
@@ -1848,9 +2131,12 @@ const FullWidthModal = ({
               <Form.Label>Company Name</Form.Label>
               <Form.Control
                 type="text"
+                name="BusinessName"
                 placeholder="Enter new company name"
-                value={newCompany}
-                onChange={(e) => setNewCompany(e.target.value)}
+                // value={newCompany || ""}
+                // onChange={(e) => setNewCompany(e.target.value)}
+                value={formData.BusinessName || null}
+                onChange={handleFormChange}
               />
             </Form.Group>
             <Form.Group className="formgroupk mb-3" controlId="formSellerLogo">
@@ -1858,15 +2144,17 @@ const FullWidthModal = ({
               <Form.Control
                 type="file"
                 accept="image/*"
-                onChange={(e) => handleLogoUpload(e, "sellerLogo")}
+                onChange={(e) => handleLogoUpload(e, "FileStorageName_Logo")}
               />
-              {formData.sellerLogo && (
-                <img
-                  src={URL.createObjectURL(formData.sellerLogo)}
-                  alt="Seller Logo"
-                  style={{ width: "100px", marginTop: "10px" }}
-                />
-              )}
+              <img
+                src={
+                  formData.FileStorageName_Logo instanceof File
+                    ? URL.createObjectURL(formData.FileStorageName_Logo)
+                    : formData.FileStorageName_Logo // Use as-is if it's a URL
+                }
+                alt="Seller Logo"
+                style={{ width: "100px", marginTop: "10px" }}
+              />
             </Form.Group>
             <Form.Group className="formgroupk mb-3" controlId="businessid">
               <Form.Label>Business ID</Form.Label>
@@ -1885,8 +2173,10 @@ const FullWidthModal = ({
               <Form.Control
                 type="text"
                 placeholder="Address"
-                name="sellerAddress"
-                value={formData.sellerAddress || ""}
+                name="Shipping_FullAddress"
+                // value={formData.sellerAddress || ""}
+                // onChange={handleFormChange}
+                value={formData.Shipping_FullAddress || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -1901,8 +2191,9 @@ const FullWidthModal = ({
                   <Form.Control
                     type="text"
                     placeholder="City, State, ZIP"
-                    name="sellerCityStateZIP"
-                    value={formData.sellerCityStateZIP || ""}
+                    name="LCity"
+                    // value={formData.sellerCityStateZIP || ""}
+                    value={formData.LCity || ""}
                     onChange={handleFormChange}
                   />
                 </div>
@@ -1912,8 +2203,10 @@ const FullWidthModal = ({
                   <Form.Control
                     type="text"
                     placeholder="Post Code"
-                    name="postcode"
-                    value={formData.postcode || ""}
+                    // name="postcode"
+                    // value={formData.postcode || ""}
+                    name="LPOBox"
+                    value={formData.LPOBox || ""}
                     onChange={handleFormChange}
                   />
                 </div>
@@ -1926,16 +2219,15 @@ const FullWidthModal = ({
               <Select
                 options={countries}
                 value={
-                  formData.sellerCountryCode
+                  formData.LCountry
                     ? countries.find(
                         (country) =>
-                          country.value === formData.sellerCountryCode
+                          // country.value === formData.sellerCountryCode
+                          country.value === formData.LCountry
                       )
                     : null
                 }
-                onChange={(option) =>
-                  handleCountrySelect(option, "sellerCountryCode")
-                }
+                onChange={(option) => handleCountrySelect(option, "LCountry")}
                 placeholder="Select a country"
               />
             </Form.Group>
@@ -1952,7 +2244,8 @@ const FullWidthModal = ({
               <PhoneInput
                 international
                 defaultCountry={formData.sellerCountryCode} // Set default country if needed
-                value={formData.sellerPhone}
+                // value={formData.sellerPhone || ""}
+                value={formData.BusinessPhone1 || ""}
                 onChange={handlePhoneChange}
                 placeholder="Enter phone number"
               />
@@ -1962,8 +2255,10 @@ const FullWidthModal = ({
               <Form.Control
                 type="email"
                 placeholder="Email Address"
-                name="sellerEmail"
-                value={formData.sellerEmail || ""}
+                // name="sellerEmail"
+                // value={formData.sellerEmail || ""}
+                name="BusinessEmail1"
+                value={formData.BusinessEmail1 || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -1972,13 +2267,14 @@ const FullWidthModal = ({
               <Form.Control
                 type="text"
                 placeholder="Website"
-                name="sellerWebsite"
-                value={formData.sellerWebsite || ""}
+                name="Website"
+                // value={formData.sellerWebsite || ""}
+                value={formData.Website || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
 
-            <Form.Group className="formgroupk mb-3" htmlFor="formSellerWebsite">
+            <Form.Group className="formgroupk mb-3" htmlFor="formSellervat">
               <Form.Label>EORI & VAT</Form.Label>
               <div className="d-flex gap-2">
                 <Form.Control
@@ -1998,6 +2294,143 @@ const FullWidthModal = ({
                 />
               </div>
             </Form.Group>
+            {/* new fields */}
+            <Form.Group
+              className="formgroupk mb-3"
+              htmlFor="formSellerAnnualRevenue"
+            >
+              <Form.Label>Annual Revenue</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Annual Revenue"
+                name="AnnualRevenue"
+                value={formData.AnnualRevenue || ""}
+                onChange={handleFormChange}
+              />
+            </Form.Group>
+
+            <Form.Group
+              className="formgroupk mb-3"
+              htmlFor="formSellerBusinessFax"
+            >
+              <Form.Label>Business Fax</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Business Fax"
+                name="BusinessFax"
+                value={formData.BusinessFax || ""}
+                onChange={handleFormChange}
+              />
+            </Form.Group>
+
+            <Form.Group
+              className="formgroupk mb-3"
+              htmlFor="formSellerBusinessRegNumber"
+            >
+              <Form.Label>Business RegNumber</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Business Fax"
+                name="Business RegNumber"
+                value={formData.BusinessRegNumber || ""}
+                onChange={handleFormChange}
+              />
+            </Form.Group>
+
+            <Form.Group
+              className="formgroupk mb-3"
+              htmlFor="formSellerBusinessTypeName"
+            >
+              <Form.Label>Business TypeName</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="BusinessTypeName"
+                name="BusinessTypeName"
+                value={formData.BusinessTypeName || ""}
+                onChange={handleFormChange}
+              />
+            </Form.Group>
+
+            <Form.Group
+              className="formgroupk mb-3"
+              htmlFor="formSellerEmployeesCount"
+            >
+              <Form.Label>Employees Count</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Employees Count"
+                name="EmployeesCount"
+                value={formData.EmployeesCount || ""}
+                onChange={handleFormChange}
+              />
+            </Form.Group>
+
+            <Form.Group
+              className="formgroupk mb-3"
+              htmlFor="formSellerIndustry"
+            >
+              <Form.Label>Industry</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Industry"
+                name="Industry"
+                value={formData.Industry || ""}
+                onChange={handleFormChange}
+              />
+            </Form.Group>
+
+            <Form.Group
+              className="formgroupk mb-3"
+              htmlFor="formSellerLBuildingName"
+            >
+              <Form.Label>LBuilding Name</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="LBuilding Name"
+                name="LBuildingName"
+                value={formData.LBuildingName || ""}
+                onChange={handleFormChange}
+              />
+            </Form.Group>
+
+            <Form.Group className="formgroupk mb-3" htmlFor="formSellerLLState">
+              <Form.Label>LState</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="LState"
+                name="LState"
+                value={formData.LState || ""}
+                onChange={handleFormChange}
+              />
+            </Form.Group>
+
+            <Form.Group
+              className="formgroupk mb-3"
+              htmlFor="formSellerLBilling_FullAddress"
+            >
+              <Form.Label>Billing_Full Address</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Billing_Full Address"
+                name="Billing_FullAddress"
+                value={formData.Billing_FullAddress || ""}
+                onChange={handleFormChange}
+              />
+            </Form.Group>
+
+            <Form.Group
+              className="formgroupk mb-3"
+              htmlFor="formSellerLAccountName"
+            >
+              <Form.Label>Account Name</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Account Name"
+                name="AccountName"
+                value={formData.AccountName || ""}
+                onChange={handleFormChange}
+              />
+            </Form.Group>
 
             <h6>Seller Bank Details</h6>
             <Form.Group
@@ -2008,8 +2441,8 @@ const FullWidthModal = ({
               <Form.Control
                 type="text"
                 placeholder="Bank Name"
-                name="sellerBankName"
-                value={formData.sellerBankName || ""}
+                name="BankName"
+                value={formData.BankName || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2021,8 +2454,8 @@ const FullWidthModal = ({
               <Form.Control
                 type="text"
                 placeholder="Account Number"
-                name="sellerAccountNumber"
-                value={formData.sellerAccountNumber || ""}
+                name="AccountNumber"
+                value={formData.AccountNumber || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2034,8 +2467,8 @@ const FullWidthModal = ({
               <Form.Control
                 type="text"
                 placeholder="SWIFT Code"
-                name="sellerSWIFTCode"
-                value={formData.sellerSWIFTCode || ""}
+                name="SWIFTNumber"
+                value={formData.SWIFTNumber || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2044,8 +2477,8 @@ const FullWidthModal = ({
               <Form.Control
                 type="text"
                 placeholder="IBAN"
-                name="sellerIBAN"
-                value={formData.sellerIBAN || ""}
+                name="IBAN"
+                value={formData.IBAN || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2078,7 +2511,7 @@ const FullWidthModal = ({
                     type="text"
                     placeholder="DAN#"
                     name="DAN"
-                    value={formData.DAN}
+                    value={formData.DAN || ""}
                     onChange={handleFormChange}
                   />
                 </Form.Group>
@@ -2098,7 +2531,7 @@ const FullWidthModal = ({
               <Form.Control
                 type="text"
                 placeholder="Enter new company name"
-                value={newCompany}
+                value={newCompany || ""}
                 onChange={(e) => setNewCompany(e.target.value)}
               />
             </Form.Group>
@@ -2109,13 +2542,16 @@ const FullWidthModal = ({
                 accept="image/*"
                 onChange={(e) => handleLogoUpload(e, "buyerLogo")}
               />
-              {formData.buyerLogo && (
-                <img
-                  src={URL.createObjectURL(formData.buyerLogo)}
-                  alt="Buyer Logo"
-                  style={{ width: "100px", marginTop: "10px" }}
-                />
-              )}
+
+              <img
+                src={
+                  formData.FileStorageName_Logo instanceof File
+                    ? URL.createObjectURL(formData.FileStorageName_Logo)
+                    : formData.FileStorageName_Logo // Use as-is if it's a URL
+                }
+                alt="Seller Logo"
+                style={{ width: "100px", marginTop: "10px" }}
+              />
             </Form.Group>
 
             <Form.Group className="formgroupk mb-3" controlId="businessid">
@@ -2192,7 +2628,7 @@ const FullWidthModal = ({
               <PhoneInput
                 international
                 defaultCountry={formData.buyerCountryCode} // Set default country if needed
-                value={formData.buyerPhone}
+                value={formData.buyerPhone || ""}
                 onChange={handleBuyerPhoneChange}
                 placeholder="Enter phone number"
               />
@@ -2330,12 +2766,12 @@ const FullWidthModal = ({
               <Form.Label>Select Company</Form.Label>
               <Form.Control
                 as="select"
-                value={formData.sellerCompanyName}
+                value={formData.sellerCompanyName || ""}
                 onChange={(e) => handleCompanySelect(e.target.value)}
               >
                 <option value="">Select a company</option>
                 {companyOptions.map((company, index) => (
-                  <option key={index} value={company}>
+                  <option key={index} value={company || ""}>
                     {company}
                   </option>
                 ))}
@@ -2352,7 +2788,7 @@ const FullWidthModal = ({
                   <Form.Control
                     type="text"
                     placeholder="Enter new company name"
-                    value={newCompany}
+                    value={newCompany || ""}
                     onChange={(e) => setNewCompany(e.target.value)}
                   />
                 </Form.Group>
@@ -2449,15 +2885,75 @@ const FullWidthModal = ({
           <>
             {renderFormFields()}
             {addsellercom ? (
-              <Button
-                variant="success addcombtn mt-auto mb-3"
-                onClick={handleAddCompany}
-              >
-                Submit
-              </Button>
+              <div className="w-100">
+                <Button
+                  variant="success addcombtn addbuyer mt-auto mb-3"
+                  onClick={handleAddCompany}
+                >
+                  {editingBusiness ? "Update Business" : "Add Business"}
+                </Button>
+                <div className="overflow-x-auto w-100">
+                  <h2 className="mb-3">Business List</h2>
+                  <table className="min-w-full border-collapse border border-gray-300 w-100">
+                    <thead>
+                      <tr className="bg-gray-200">
+                        <th className="border p-2 bg-greenC text-white text-center">
+                          Business Name
+                        </th>
+                        <th className="border p-2 bg-greenC text-white text-center">
+                          Email
+                        </th>
+                        <th className="border p-2 bg-greenC text-white text-center">
+                          Phone
+                        </th>
+                        <th className="border p-2 bg-greenC text-white text-center">
+                          Website
+                        </th>
+                        <th className="border p-2 bg-greenC text-white text-center">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {businesses.map((business) => (
+                        <tr key={business.id} className="border">
+                          <td className="border p-2">
+                            {business.BusinessName}
+                          </td>
+                          <td className="border p-2">
+                            {business.BusinessEmail1}
+                          </td>
+                          <td className="border p-2">
+                            {business.BusinessPhone1}
+                          </td>
+                          <td className="border p-2">{business.Website}</td>
+                          <td className="border p-2">
+                            <Button
+                              variant="none"
+                              size="sm"
+                              onClick={() => handleEditClick(business)}
+                            >
+                              <i className="bi bi-pencil-square text-success fs-5"></i>
+                            </Button>{" "}
+                            <Button
+                              variant="none"
+                              size="sm"
+                              onClick={() =>
+                                handleDeleteBusiness(business.BusinessID)
+                              }
+                            >
+                              <i className="bi bi-trash3-fill text-danger fs-5"></i>
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             ) : AddBuyercom ? (
               <Button
-                variant="success addcombtn mt-auto mb-3"
+                variant="success addcombtn addseller mt-auto mb-3"
                 onClick={handleAddCompany}
               >
                 Submit
