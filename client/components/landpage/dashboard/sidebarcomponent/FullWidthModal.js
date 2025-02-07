@@ -436,12 +436,6 @@ const FullWidthModal = ({
       console.error("Error fetching products:", error);
     }
   };
-
-  // Fetch products when the component mounts
-  useEffect(() => {
-    fetchProducts();
-    fetchBusinesses();
-  }, []);
   const fetchBusinesses = async () => {
     try {
       const response = await getBusinesses();
@@ -453,6 +447,12 @@ const FullWidthModal = ({
       );
     }
   };
+  // Fetch products when the component mounts
+  useEffect(() => {
+    fetchProducts();
+    fetchBusinesses();
+  }, []);
+
   // Handle delete business
   const handleDeleteBusiness = async (id) => {
     try {
@@ -640,14 +640,18 @@ const FullWidthModal = ({
     }
   }, [currentStep]);
   const onHidep = () => {
-    if (currentStep === 11) {
-      setCurrentStep(3);
-    } else {
-      setCurrentStep(2);
-    }
+    if (!businessbutton) {
+      if (currentStep === 11) {
+        setCurrentStep(3);
+      } else {
+        setCurrentStep(2);
+      }
 
-    setAddsellercom(false);
-    setAddBuyercom(false);
+      setAddsellercom(false);
+      setAddBuyercom(false);
+    } else {
+      onHide();
+    }
     if (isAddingNewForm) {
       // Prevent modal from closing if a new form is being added
       return;
@@ -679,10 +683,11 @@ const FullWidthModal = ({
         // Update existing business
         await updateBusiness(editingBusiness.BusinessID, formData);
         setEditingBusiness(null); // Clear editing mode
-        alert("Business update");
+        fetchBusinesses();
       } else {
         // Create new business
         await createBusiness(formData);
+        fetchBusinesses();
       }
 
       setResponse(res.data);
@@ -733,27 +738,29 @@ const FullWidthModal = ({
     } catch (err) {
       setError(err.response?.data || err.message);
     }
-    addCompany(newCompany);
-    if (selectedBuyerCompany === "addNew") {
-      setSelectedBuyerCompany(newCompany);
-      setCurrentStep(2);
-      setAddBuyercom(false);
-    } else {
-      setselectedSellerCompany(newCompany);
+    if (!businessbutton) {
+      addCompany(newCompany);
+      if (selectedBuyerCompany === "addNew") {
+        setSelectedBuyerCompany(newCompany);
+        setCurrentStep(2);
+        setAddBuyercom(false);
+      } else {
+        setselectedSellerCompany(newCompany);
+        setCurrentStep(2);
+        setAddsellercom(false);
+      }
+      // if (businessFormRef.current) {
+      //   businessFormRef.current.handleSubmit(); // Trigger the form submit in the child
+      //   console.log("Child form submitted");
+      // }
+      setError(null);
+      setResponse(null);
+
+      setNewCompany("");
       setCurrentStep(2);
       setAddsellercom(false);
+      setAddBuyercom(false);
     }
-    // if (businessFormRef.current) {
-    //   businessFormRef.current.handleSubmit(); // Trigger the form submit in the child
-    //   console.log("Child form submitted");
-    // }
-    setError(null);
-    setResponse(null);
-
-    setNewCompany("");
-    setCurrentStep(2);
-    setAddsellercom(false);
-    setAddBuyercom(false);
   };
 
   const handleEditClick = (business) => {
@@ -804,7 +811,9 @@ const FullWidthModal = ({
     const countryCode = selectedOption ? selectedOption.value : "";
     setFormData((prevData) => ({
       ...prevData,
-      sellerCountry: selectedOption.label, // Full country name
+      // sellerCountry: selectedOption.label,
+      LCountry: selectedOption.label,
+
       sellerCountryCode: countryCode,
     }));
   };
@@ -2146,7 +2155,7 @@ const FullWidthModal = ({
                 accept="image/*"
                 onChange={(e) => handleLogoUpload(e, "FileStorageName_Logo")}
               />
-              <img
+              {/* <img
                 src={
                   formData.FileStorageName_Logo instanceof File
                     ? URL.createObjectURL(formData.FileStorageName_Logo)
@@ -2154,7 +2163,7 @@ const FullWidthModal = ({
                 }
                 alt="Seller Logo"
                 style={{ width: "100px", marginTop: "10px" }}
-              />
+              /> */}
             </Form.Group>
             <Form.Group className="formgroupk mb-3" controlId="businessid">
               <Form.Label>Business ID</Form.Label>
@@ -2327,11 +2336,11 @@ const FullWidthModal = ({
               className="formgroupk mb-3"
               htmlFor="formSellerBusinessRegNumber"
             >
-              <Form.Label>Business RegNumber</Form.Label>
+              <Form.Label>Business Number</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Business Fax"
-                name="Business RegNumber"
+                placeholder="Business RegNumber"
+                name="BusinessRegNumber"
                 value={formData.BusinessRegNumber || ""}
                 onChange={handleFormChange}
               />
@@ -2379,59 +2388,6 @@ const FullWidthModal = ({
               />
             </Form.Group>
 
-            <Form.Group
-              className="formgroupk mb-3"
-              htmlFor="formSellerLBuildingName"
-            >
-              <Form.Label>LBuilding Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="LBuilding Name"
-                name="LBuildingName"
-                value={formData.LBuildingName || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Group>
-
-            <Form.Group className="formgroupk mb-3" htmlFor="formSellerLLState">
-              <Form.Label>LState</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="LState"
-                name="LState"
-                value={formData.LState || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Group>
-
-            <Form.Group
-              className="formgroupk mb-3"
-              htmlFor="formSellerLBilling_FullAddress"
-            >
-              <Form.Label>Billing_Full Address</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Billing_Full Address"
-                name="Billing_FullAddress"
-                value={formData.Billing_FullAddress || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Group>
-
-            <Form.Group
-              className="formgroupk mb-3"
-              htmlFor="formSellerLAccountName"
-            >
-              <Form.Label>Account Name</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Account Name"
-                name="AccountName"
-                value={formData.AccountName || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Group>
-
             <h6>Seller Bank Details</h6>
             <Form.Group
               className="formgroupk mb-3"
@@ -2443,6 +2399,19 @@ const FullWidthModal = ({
                 placeholder="Bank Name"
                 name="BankName"
                 value={formData.BankName || ""}
+                onChange={handleFormChange}
+              />
+            </Form.Group>
+            <Form.Group
+              className="formgroupk mb-3"
+              htmlFor="formSellerLAccountName"
+            >
+              <Form.Label>Account Name</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Account Name"
+                name="AccountName"
+                value={formData.AccountName || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2543,7 +2512,7 @@ const FullWidthModal = ({
                 onChange={(e) => handleLogoUpload(e, "buyerLogo")}
               />
 
-              <img
+              {/* <img
                 src={
                   formData.FileStorageName_Logo instanceof File
                     ? URL.createObjectURL(formData.FileStorageName_Logo)
@@ -2551,7 +2520,7 @@ const FullWidthModal = ({
                 }
                 alt="Seller Logo"
                 style={{ width: "100px", marginTop: "10px" }}
-              />
+              /> */}
             </Form.Group>
 
             <Form.Group className="formgroupk mb-3" controlId="businessid">
@@ -2751,7 +2720,7 @@ const FullWidthModal = ({
       centered
       className="mainmodelP"
     >
-      <div className="stepindi">{renderProgress()}</div>
+      <div className="stepindi">{!businessbutton && renderProgress()}</div>
       <Modal.Header closeButton>
         <Modal.Title>
           {addsellercom ? "" : AddBuyercom ? "" : selectedInvoiceType}
