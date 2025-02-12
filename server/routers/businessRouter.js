@@ -8,6 +8,7 @@ const {
   deleteBusiness,
 } = require("../controllers/businessController");
 
+console.log("getBusiness");
 // Routes for Business CRUD operations
 router.post("/create", createBusiness); // Create a business
 router.get("/", getBusinesses); // Get all businesses
