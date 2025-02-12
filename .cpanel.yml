@@ -1,0 +1,14 @@
+deployment:
+  branches:
+    - main # Specify the branch you want to track (e.g., 'main' or 'master')
+    - testbranch # Specify the branch you want to track (e.g., 'main' or 'master')
+
+  environments:
+    - production:
+        url: "https://i-scs.co.uk" # The URL of your site
+
+  repositories:
+    - https://github.com/kamaljameel/supply-chain-scs.git # Replace with your GitHub repository URL
+
+  post_deploy:
+    - git pull origin testbranch # Pull the latest changes from the 'main' branch after deployment
