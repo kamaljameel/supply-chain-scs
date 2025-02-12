@@ -96,7 +96,7 @@ const FullWidthModal = ({
   onHide,
   onSubmit,
   companyOptions,
-  addCompany,
+  // addCompany,
   selectedInvoiceType,
   businessbutton,
   showMyProfile,
@@ -164,6 +164,7 @@ const FullWidthModal = ({
     DAN: "",
     postcode: "",
     currency: "",
+
     AnnualRevenue: null,
     BusinessEmail1: null,
     BusinessEmail2: null,
@@ -571,12 +572,6 @@ const FullWidthModal = ({
     }
   }, [show]);
 
-  const handleCompanySelect = (value) => {
-    setselectedSellerCompany(value);
-
-    setCurrentStep(2);
-  };
-
   const [addsellercom, setAddsellercom] = useState(false);
   const [AddBuyercom, setAddBuyercom] = useState(false);
   const handleBuyerCompanySelect = (value) => {
@@ -658,7 +653,9 @@ const FullWidthModal = ({
     }
     onHide();
   };
-
+  const addCompany = (newCompany) => {
+    setBusinesses((prevOptions) => [...prevOptions, newCompany]);
+  };
   // Handle change in tax percentage
   const handleTaxPercentageChange = (e) => {
     const newPercentage = e.target.value;
@@ -684,62 +681,118 @@ const FullWidthModal = ({
         await updateBusiness(editingBusiness.BusinessID, formData);
         setEditingBusiness(null); // Clear editing mode
         fetchBusinesses();
+        setFormData({
+          AnnualRevenue: null,
+          BusinessEmail1: null,
+          BusinessEmail2: null,
+          BusinessFax: null,
+          BusinessName: "",
+          BusinessPhone1: null,
+          BusinessPhone2: null,
+          BusinessRegNumber: null,
+          BusinessTypeID: null,
+          BusinessTypeName: null,
+          EmployeesCount: null,
+          IndustryID: null,
+          Industry: null,
+          LBuildingName: null,
+          LCity: null,
+          LCountry: null,
+          LeadID: null,
+          Lead: null,
+          LPOBox: null,
+          LPostCode: null,
+          LState: null,
+          LStreetNumber: null,
+          LStreetType: null,
+          LSuburb: null,
+          LUnit_Level: null,
+          Remarks: null,
+          SBuildingName: null,
+          SCountry: null,
+          SPOBox: null,
+          SPostCode: null,
+          SState: null,
+          SStreetNumber: null,
+          SStreetType: null,
+          SSuburb: null,
+          SUnit_Level: null,
+          Website: null,
+          FileDisplayName_Logo: "",
+          FileStorageName_Logo: "",
+          FileURI_Logo: "",
+          FileSize: 0.0,
+          Billing_FullAddress: "",
+          Shipping_FullAddress: "",
+          BankName: null,
+          AccountName: null,
+          AccountNumber: null,
+          SWIFTNumber: null,
+          IBAN: null,
+        });
       } else {
         // Create new business
         await createBusiness(formData);
         fetchBusinesses();
+        setFormData({
+          AnnualRevenue: null,
+          BusinessEmail1: null,
+          BusinessEmail2: null,
+          BusinessFax: null,
+          BusinessName: "",
+          BusinessPhone1: null,
+          BusinessPhone2: null,
+          BusinessRegNumber: null,
+          BusinessTypeID: null,
+          BusinessTypeName: null,
+          EmployeesCount: null,
+          IndustryID: null,
+          Industry: null,
+          LBuildingName: null,
+          LCity: null,
+          LCountry: null,
+          LeadID: null,
+          Lead: null,
+          LPOBox: null,
+          LPostCode: null,
+          LState: null,
+          LStreetNumber: null,
+          LStreetType: null,
+          LSuburb: null,
+          LUnit_Level: null,
+          Remarks: null,
+          SBuildingName: null,
+          SCountry: null,
+          SPOBox: null,
+          SPostCode: null,
+          SState: null,
+          SStreetNumber: null,
+          SStreetType: null,
+          SSuburb: null,
+          SUnit_Level: null,
+          Website: null,
+          FileDisplayName_Logo: "",
+          FileStorageName_Logo: "",
+          FileURI_Logo: "",
+          FileSize: 0.0,
+          Billing_FullAddress: "",
+          Shipping_FullAddress: "",
+          BankName: null,
+          AccountName: null,
+          AccountNumber: null,
+          SWIFTNumber: null,
+          IBAN: null,
+        });
       }
 
       setResponse(res.data);
-      setFormData({
-        BusinessName: "",
-        BusinessEmail1: "",
-        BusinessEmail2: "",
-        BusinessFax: "",
-        BusinessPhone1: "",
-        BusinessPhone2: "",
-        BusinessRegNumber: "",
-        BusinessTypeID: "",
-        BusinessTypeName: "",
-        EmployeesCount: "",
-        IndustryID: "",
-        Industry: "",
-        Website: "",
-        BankName: "",
-        AccountName: "",
-        AccountNumber: "",
-        SWIFTNumber: "",
-        IBAN: "",
-        LBuildingName: "",
-        LCity: "",
-        LCountry: "",
-        LPOBox: "",
-        LPostCode: "",
-        LState: "",
-        LStreetNumber: "",
-        LStreetType: "",
-        LSuburb: "",
-        LUnit_Level: "",
-        SBuildingName: "",
-        SCountry: "",
-        SPOBox: "",
-        SPostCode: "",
-        SState: "",
-        SStreetNumber: "",
-        SStreetType: "",
-        SSuburb: "",
-        SUnit_Level: "",
-        FileDisplayName_Logo: "",
-        FileStorageName_Logo: "",
-        FileURI_Logo: "",
-        FileSize: 0.0,
-      });
+
       fetchBusinesses(); // Refresh list
     } catch (err) {
       setError(err.response?.data || err.message);
     }
     if (!businessbutton) {
-      addCompany(newCompany);
+      addCompany(formData.BusinessName);
       if (selectedBuyerCompany === "addNew") {
         setSelectedBuyerCompany(newCompany);
         setCurrentStep(2);
@@ -763,9 +816,37 @@ const FullWidthModal = ({
     }
   };
 
+  // const handleCompanySelect = (selectedBusinessID) => {
+  //   const selectedBusiness = businesses.find(
+  //     (business) => business.BusinessID === selectedBusinessID
+  //   );
+
+  //   if (selectedBusiness) {
+  //     handleEditClick(selectedBusiness); // Call handleEditClick with the selected business
+  //   } else {
+  //     setFormData(); // Reset form if no company is selected
+  //   }
+  // };
+  // const handleCompanySelect = (value) => {
+  //   setselectedSellerCompany(value);
+  //   // setEditingBusiness(value);
+  //   console.log("akbar", businesses);
+  //   setCurrentStep(2);
+  // };
   const handleEditClick = (business) => {
     setEditingBusiness(business);
     setFormData(business);
+    console.log("bsss", business);
+  };
+  const handleCompanySelect = (selectedBusinessName) => {
+    const selectedBusiness = businesses.find(
+      (business) => business.BusinessName === selectedBusinessName
+    );
+    if (selectedBusiness) {
+      handleEditClick(selectedBusiness); // Call handleEditClick with the selected business
+    } else {
+      setFormData({}); // Reset the form if no company is selected
+    }
   };
   // const handleFileChange = (file) => {
   //   // Define allowed file types
@@ -821,7 +902,7 @@ const FullWidthModal = ({
   const handlePhoneChange = (value) => {
     setFormData((prevData) => ({
       ...prevData,
-      sellerPhone: value,
+      BusinessPhone1: value,
     }));
   };
 
@@ -1194,13 +1275,13 @@ const FullWidthModal = ({
               <Form.Label>Select Company</Form.Label>
               <Form.Control
                 as="select"
-                value={formData.sellerCompanyName || ""}
+                value={formData.BusinessName || ""}
                 onChange={(e) => handleCompanySelect(e.target.value)}
               >
                 <option value="">Select a company</option>
-                {companyOptions.map((company, index) => (
-                  <option key={index} value={company || ""}>
-                    {company}
+                {businesses.map((company) => (
+                  <option key={company.BusinessID} value={company.BusinessName}>
+                    {company.BusinessName}
                   </option>
                 ))}
               </Form.Control>
@@ -1218,9 +1299,9 @@ const FullWidthModal = ({
               <Form.Label>Address</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Address"
-                name="sellerAddress"
-                value={formData.sellerAddress || ""}
+                placeholder="Addressdd"
+                name="Shipping_FullAddress"
+                value={formData.Shipping_FullAddress || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -1233,7 +1314,7 @@ const FullWidthModal = ({
                 type="text"
                 placeholder="City, State, ZIP"
                 name="sellerCityStateZIP"
-                value={formData.sellerCityStateZIP || ""}
+                value={formData.LCity || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -1251,16 +1332,15 @@ const FullWidthModal = ({
               <Select
                 options={countries}
                 value={
-                  formData.sellerCountryCode
+                  formData.LCountry
                     ? countries.find(
                         (country) =>
-                          country.value === formData.sellerCountryCode
+                          // country.value === formData.sellerCountryCode
+                          country.value === formData.LCountry
                       )
                     : null
                 }
-                onChange={(option) =>
-                  handleCountrySelect(option, "sellerCountryCode")
-                }
+                onChange={(option) => handleCountrySelect(option, "LCountry")}
                 placeholder="Select a country"
               />
             </Form.Group>
@@ -1270,7 +1350,7 @@ const FullWidthModal = ({
               <PhoneInput
                 international
                 defaultCountry={formData.sellerCountryCode} // Set default country if needed
-                value={formData.sellerPhone || ""}
+                value={formData.BusinessPhone1 || ""}
                 onChange={handlePhoneChange}
                 placeholder="Enter phone number"
               />
@@ -1280,8 +1360,8 @@ const FullWidthModal = ({
               <Form.Control
                 type="email"
                 placeholder="Email Address"
-                name="sellerEmail"
-                value={formData.sellerEmail || ""}
+                name="BusinessEmail1"
+                value={formData.BusinessEmail1 || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -1290,8 +1370,8 @@ const FullWidthModal = ({
               <Form.Control
                 type="text"
                 placeholder="Website"
-                name="sellerWebsite"
-                value={formData.sellerWebsite || ""}
+                name="Website"
+                value={formData.Website || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2144,7 +2224,7 @@ const FullWidthModal = ({
                 placeholder="Enter new company name"
                 // value={newCompany || ""}
                 // onChange={(e) => setNewCompany(e.target.value)}
-                value={formData.BusinessName || null}
+                value={formData.BusinessName || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2202,7 +2282,7 @@ const FullWidthModal = ({
                     placeholder="City, State, ZIP"
                     name="LCity"
                     // value={formData.sellerCityStateZIP || ""}
-                    value={formData.LCity || ""}
+                    value={formData.LCity || null}
                     onChange={handleFormChange}
                   />
                 </div>
@@ -2254,7 +2334,7 @@ const FullWidthModal = ({
                 international
                 defaultCountry={formData.sellerCountryCode} // Set default country if needed
                 // value={formData.sellerPhone || ""}
-                value={formData.BusinessPhone1 || ""}
+                value={formData.BusinessPhone1 || null}
                 onChange={handlePhoneChange}
                 placeholder="Enter phone number"
               />
@@ -2735,13 +2815,16 @@ const FullWidthModal = ({
               <Form.Label>Select Company</Form.Label>
               <Form.Control
                 as="select"
-                value={formData.sellerCompanyName || ""}
-                onChange={(e) => handleCompanySelect(e.target.value)}
+                value={formData.businessName}
+                onChange={(e) => handleCompanySelect(e.target.value)} // Pass the selected BusinessID
               >
                 <option value="">Select a company</option>
-                {companyOptions.map((company, index) => (
-                  <option key={index} value={company || ""}>
-                    {company}
+                {businesses.map((company) => (
+                  <option
+                    key={company.BusinessID}
+                    value={company.BusinessID} // Use BusinessID as the value
+                  >
+                    {company.BusinessName}
                   </option>
                 ))}
               </Form.Control>
@@ -2783,8 +2866,8 @@ const FullWidthModal = ({
               <Form.Control
                 type="text"
                 placeholder="Address"
-                name="sellerAddress"
-                value={formData.sellerAddress || ""}
+                name="Shipping_FullAddress"
+                value={formData.Shipping_FullAddress || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2876,8 +2959,12 @@ const FullWidthModal = ({
                           Phone
                         </th>
                         <th className="border p-2 bg-greenC text-white text-center">
+                          Country
+                        </th>
+                        <th className="border p-2 bg-greenC text-white text-center">
                           Website
                         </th>
+
                         <th className="border p-2 bg-greenC text-white text-center">
                           Actions
                         </th>
@@ -2895,7 +2982,10 @@ const FullWidthModal = ({
                           <td className="border p-2">
                             {business.BusinessPhone1}
                           </td>
+
+                          <td className="border p-2">{business.LCountry}</td>
                           <td className="border p-2">{business.Website}</td>
+
                           <td className="border p-2">
                             <Button
                               variant="none"
