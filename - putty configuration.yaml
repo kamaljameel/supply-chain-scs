@@ -1,0 +1,4 @@
+- putty configuration
+- ssh connection from laptop (git pull etc works from laptop terminal)
+- create pipeline for github "*.yml"
+- use ssh in the github pipeline to push build folder to the cpanel.

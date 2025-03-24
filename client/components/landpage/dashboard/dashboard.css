@@ -262,6 +262,9 @@ body {
 .bg-greenC {
   background-color: #2a9d8f;
 }
+.fs-d12 {
+  font-size: 12px;
+}
 @media (min-width: 992px) {
   .mainmodelP .modal-lg {
     max-width: 1200px !important;

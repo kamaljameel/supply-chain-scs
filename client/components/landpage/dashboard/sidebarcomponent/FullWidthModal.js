@@ -48,7 +48,7 @@ const initialState = {
     description: "",
     hsCode: "",
     origin: "",
-    quantity: "",
+    quantity: 1,
     unitPrice: "",
     totalPrice: 0,
     productID: 2,
@@ -179,8 +179,8 @@ const FullWidthModal = ({
     IndustryID: null,
     Industry: null,
     LBuildingName: null,
-    LCity: null,
-    LCountry: null,
+    LCity: "",
+    LCountry: "",
     LeadID: null,
     Lead: null,
     LPOBox: null,
@@ -212,6 +212,36 @@ const FullWidthModal = ({
     AccountNumber: null,
     SWIFTNumber: null,
     IBAN: null,
+    BankAddress: null,
+    isDeferredAccount: false,
+    DeferredAccountNumberReference: null,
+    Legal_Identifier_Label1: null,
+    Legal_Identifier_Number1: null,
+    Legal_Identifier_Label2: null,
+    Legal_Identifier_Number2: null,
+    Legal_Identifier_Label3: null,
+    Legal_Identifier_Number3: null,
+    Legal_Identifier_Label4: null,
+    Legal_Identifier_Number4: null,
+    Legal_Identifier_Label5: null,
+    Legal_Identifier_Number5: null,
+    buyerBusinessName: "",
+    buyerFullAddress: "",
+    buyerCityStateZIP: "",
+    buyerCountry: "",
+    buyerPhone: "",
+    buyerEmail: "",
+    buyerWebsite: "",
+    sellerBankName: "",
+    sellerAccountNumber: "",
+    sellerSWIFTCode: "",
+    sellerIBAN: "",
+    sellerBankAddress: "",
+    buyerBankName: "",
+    buyerAccountNumber: "",
+    buyerSWIFTCode: "",
+    buyerIBAN: "",
+    buyerBankAddress: "",
   });
   const [productDetails, setProductDetails] = useState([]);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -227,12 +257,13 @@ const FullWidthModal = ({
     description: "",
     hsCode: "",
     origin: "",
-    quantity: "",
+    quantity: 1,
     unitPrice: "",
     totalPrice: 0,
     ProductID: 0,
-    netweight: 0,
-    grossweight: 0,
+    netweight: "",
+    grossweight: "",
+    currency: "",
   });
 
   // currencies
@@ -299,12 +330,41 @@ const FullWidthModal = ({
     }
   };
 
-  const handleCheckboxChange = () => {
-    setShowDAN((prevShowDAN) => !prevShowDAN);
-    if (!showDAN) {
-      setFormData((prevData) => ({ ...prevData, DAN: "" })); // Clear DAN value when hiding
-    }
+  // const handleCheckboxChange = () => {
+  //   setShowDAN((prevShowDAN) => !prevShowDAN);
+  //   if (!showDAN) {
+  //     setFormData((prevData) => ({ ...prevData, DAN: "" })); // Clear DAN value when hiding
+  //   }
+  // };
+  // const handleCheckboxChange = (event) => {
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     isDeferredAccount: event.target.checked, // Updates the checkbox state
+  //   }));
+  // };
+
+  const handleCheckboxChange = (event) => {
+    const isChecked = event.target.checked;
+
+    console.log("Checkbox checked:", isChecked);
+
+    setShowDAN(isChecked);
+
+    setFormData((prevData) => {
+      const newState = {
+        ...prevData,
+        isDeferredAccount: isChecked,
+        DAN: isChecked ? prevData.DAN : "",
+      };
+      console.log("Updated formData:", newState);
+      return newState;
+    });
   };
+
+  useEffect(() => {
+    console.log("Updated formData in effect:", formData);
+  }, [formData]);
+
   // const extractTextFromPDF = async (file) => {
   //   const arrayBuffer = await file.arrayBuffer();
   //   const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
@@ -512,7 +572,7 @@ const FullWidthModal = ({
         description: "",
         hsCode: "",
         origin: "",
-        quantity: "",
+        quantity: 1,
         unitPrice: "",
         totalPrice: "",
         ProductID: selectedProductId,
@@ -538,12 +598,13 @@ const FullWidthModal = ({
 
         hsCode: selectedProduct.Code_SKU || "",
         origin: "",
-        quantity: "",
+        quantity: 1,
         unitPrice: "",
         totalPrice: "",
         ProductID: selectedProduct.ProductID,
         netweight: selectedProduct.Weight,
         grossweight: "",
+        currency: "",
       });
     } else {
       console.error(`Product with ID ${parsedProductId} not found.`);
@@ -696,8 +757,8 @@ const FullWidthModal = ({
           IndustryID: null,
           Industry: null,
           LBuildingName: null,
-          LCity: null,
-          LCountry: null,
+          LCity: "",
+          LCountry: "",
           LeadID: null,
           Lead: null,
           LPOBox: null,
@@ -729,6 +790,19 @@ const FullWidthModal = ({
           AccountNumber: null,
           SWIFTNumber: null,
           IBAN: null,
+          BankAddress: null,
+          isDeferredAccount: false,
+          DeferredAccountNumberReference: null,
+          Legal_Identifier_Label1: null,
+          Legal_Identifier_Number1: null,
+          Legal_Identifier_Label2: null,
+          Legal_Identifier_Number2: null,
+          Legal_Identifier_Label3: null,
+          Legal_Identifier_Number3: null,
+          Legal_Identifier_Label4: null,
+          Legal_Identifier_Number4: null,
+          Legal_Identifier_Label5: null,
+          Legal_Identifier_Number5: null,
         });
       } else {
         // Create new business
@@ -749,8 +823,8 @@ const FullWidthModal = ({
           IndustryID: null,
           Industry: null,
           LBuildingName: null,
-          LCity: null,
-          LCountry: null,
+          LCity: "",
+          LCountry: "",
           LeadID: null,
           Lead: null,
           LPOBox: null,
@@ -782,6 +856,19 @@ const FullWidthModal = ({
           AccountNumber: null,
           SWIFTNumber: null,
           IBAN: null,
+          BankAddress: null,
+          isDeferredAccount: false,
+          DeferredAccountNumberReference: null,
+          Legal_Identifier_Label1: null,
+          Legal_Identifier_Number1: null,
+          Legal_Identifier_Label2: null,
+          Legal_Identifier_Number2: null,
+          Legal_Identifier_Label3: null,
+          Legal_Identifier_Number3: null,
+          Legal_Identifier_Label4: null,
+          Legal_Identifier_Number4: null,
+          Legal_Identifier_Label5: null,
+          Legal_Identifier_Number5: null,
         });
       }
 
@@ -843,7 +930,50 @@ const FullWidthModal = ({
       (business) => business.BusinessName === selectedBusinessName
     );
     if (selectedBusiness) {
-      handleEditClick(selectedBusiness); // Call handleEditClick with the selected business
+      handleEditClick(selectedBusiness);
+      setFormData({
+        ...formData,
+        BusinessName: selectedBusiness.BusinessName,
+        Shipping_FullAddress: selectedBusiness.Shipping_FullAddress,
+        LCity: selectedBusiness.LCity,
+        LCountry: selectedBusiness.LCountry,
+        BusinessPhone1: selectedBusiness.BusinessPhone1,
+        BusinessEmail1: selectedBusiness.BusinessEmail1,
+        Website: selectedBusiness.Website,
+        sellerBankName: selectedBusiness.BankName,
+        sellerAccountNumber: selectedBusiness.AccountNumber,
+        sellerSWIFTCode: selectedBusiness.SWIFTNumber,
+        sellerIBAN: selectedBusiness.IBAN,
+        sellerBankAddress: selectedBusiness.BankAddress,
+      });
+      // Call handleEditClick with the selected business
+    } else {
+      setFormData({}); // Reset the form if no company is selected
+    }
+  };
+
+  const handleCompanySelectbuyer = (selectedBusinessName) => {
+    const selectedBusiness = businesses.find(
+      (business) => business.BusinessName === selectedBusinessName
+    );
+    if (selectedBusiness) {
+      handleEditClick(selectedBusiness);
+      setFormData({
+        ...formData,
+        buyerBusinessName: selectedBusiness.BusinessName,
+        buyerFullAddress: selectedBusiness.Shipping_FullAddress, // Populate with the same Shipping_FullAddress
+        buyerCityStateZIP: selectedBusiness.LCity,
+        buyerCountry: selectedBusiness.LCountry,
+        buyerPhone: selectedBusiness.BusinessPhone1,
+        buyerEmail: selectedBusiness.BusinessEmail1,
+        buyerWebsite: selectedBusiness.Website,
+        buyerBankName: selectedBusiness.BankName,
+        buyerAccountNumber: selectedBusiness.AccountNumber,
+        buyerSWIFTCode: selectedBusiness.SWIFTNumber,
+        buyerIBAN: selectedBusiness.IBAN,
+        buyerBankAddress: selectedBusiness.BankAddress,
+      });
+      // Call handleEditClick with the selected business
     } else {
       setFormData({}); // Reset the form if no company is selected
     }
@@ -945,15 +1075,35 @@ const FullWidthModal = ({
         updatedProduct.quantity * updatedProduct.unitPrice;
     }
 
+    // if (name === "quantity") {
+    //   const previousQuantity = parseFloat(newProduct.quantity) || 0;
+    //   const currentNetweight = parseFloat(newProduct.netweight) || 0;
+
+    //   // Calculate the change in quantity and adjust netweight
+    //   const quantityDifference = numericValue - previousQuantity;
+    //   updatedProduct.netweight = currentNetweight + quantityDifference;
+
+    //   // Update the quantity
+    //   updatedProduct.quantity = numericValue;
+    // }
     if (name === "quantity") {
-      const previousQuantity = parseFloat(newProduct.quantity) || 0;
-      const currentNetweight = parseFloat(newProduct.netweight) || 0;
+      // Ensure initial netweight is set and does not change
+      if (!newProduct.initialNetweight && newProduct.netweight) {
+        updatedProduct.initialNetweight = parseFloat(newProduct.netweight);
+      }
 
-      // Calculate the change in quantity and adjust netweight
-      const quantityDifference = numericValue - previousQuantity;
-      updatedProduct.netweight = currentNetweight + quantityDifference;
+      const initialNetweight =
+        parseFloat(newProduct.initialNetweight) ||
+        parseFloat(newProduct.netweight) ||
+        1;
 
-      // Update the quantity
+      // If quantity is empty or 0, keep the initial netweight
+      if (value === "" || numericValue === 0) {
+        updatedProduct.netweight = initialNetweight;
+      } else {
+        updatedProduct.netweight = numericValue * initialNetweight;
+      }
+
       updatedProduct.quantity = numericValue;
     }
     setNewProduct(updatedProduct);
@@ -972,7 +1122,7 @@ const FullWidthModal = ({
     setTotal(0);
     setTotalGrossWeight(0);
     setTotalNetWeight(0);
-    setTotalGrossWeight(0);
+
     setNewProduct({
       description: "",
       hsCode: "",
@@ -983,6 +1133,7 @@ const FullWidthModal = ({
       ProductID: 0,
       netweight: 0,
       grossweight: 0,
+      currency: "",
     });
     setSelectedProduct("");
   };
@@ -1182,8 +1333,8 @@ const FullWidthModal = ({
       TotalNetWeight,
       TotalGrossWeight,
       taxPercentage,
-      selectedSellerCompany,
-      selectedBuyerCompany,
+      selectedSellerCompany: formData.BusinessName,
+      selectedBuyerCompany: formData.buyerBusinessName,
       sellerLogo: formData.sellerLogo ? formData.sellerLogo.name : null,
       buyerLogo: formData.buyerLogo ? formData.buyerLogo.name : null,
     });
@@ -1271,10 +1422,15 @@ const FullWidthModal = ({
               <div className="p-3">{pdfText}</div>
             </Form.Group>
 
-            <Form.Group className="formgroupk h-150" htmlFor="companySelect">
+            <Form.Group
+              className="formgroupk h-150"
+              htmlFor="companySelect"
+              controlId="BusinessName"
+            >
               <Form.Label>Select Company</Form.Label>
               <Form.Control
                 as="select"
+                name="BusinessName"
                 value={formData.BusinessName || ""}
                 onChange={(e) => handleCompanySelect(e.target.value)}
               >
@@ -1371,7 +1527,7 @@ const FullWidthModal = ({
                 type="text"
                 placeholder="Website"
                 name="Website"
-                value={formData.Website || ""}
+                value={formData.Website || null}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -1386,7 +1542,7 @@ const FullWidthModal = ({
               className="formgroupk h-150"
               htmlFor="buyerCompanySelect"
             >
-              <Form.Label>Select Buyer Company</Form.Label>
+              {/* <Form.Label>Select Buyer Company</Form.Label>
               <Form.Control
                 as="select"
                 value={selectedBuyerCompany || ""}
@@ -1398,14 +1554,45 @@ const FullWidthModal = ({
                     {company}
                   </option>
                 ))}
-              </Form.Control>
-              <Button
+              </Form.Control> */}
+              <Form.Group
+                className="formgroupk w-100"
+                htmlFor="BusinessName"
+                controlId="BusinessName"
+              >
+                <Form.Label>Select Company</Form.Label>
+                <Form.Control
+                  as="select"
+                  name="buyerBusinessName"
+                  value={formData.buyerBusinessName || ""}
+                  onChange={(e) => handleCompanySelectbuyer(e.target.value)}
+                >
+                  <option value="">Select a company</option>
+                  {businesses.map((company) => (
+                    <option
+                      key={company.BusinessID}
+                      value={company.BusinessName}
+                    >
+                      {company.BusinessName}
+                    </option>
+                  ))}
+                </Form.Control>
+
+                <Button
+                  className="mt-3 px-0 bg-transparent text-primary text-decoration-underline border-0 pb-0"
+                  variant="primary"
+                  onClick={() => handleAddnewCompany("seller")}
+                >
+                  Add new Company
+                </Button>
+              </Form.Group>
+              {/* <Button
                 className="mt-3 px-0 bg-transparent text-primary text-decoration-underline border-0 pb-0"
                 variant="primary"
                 onClick={() => handleAddnewCompany("buyer")}
               >
                 Add new Company
-              </Button>
+              </Button> */}
             </Form.Group>
 
             <Form.Group
@@ -1427,9 +1614,9 @@ const FullWidthModal = ({
               <Select
                 options={countries}
                 value={
-                  formData.buyerCountryCode
+                  formData.buyerCountry
                     ? countries.find(
-                        (country) => country.value === formData.buyerCountryCode
+                        (country) => country.value === formData.buyerCountry
                       )
                     : null
                 }
@@ -1476,12 +1663,12 @@ const FullWidthModal = ({
               className="formgroupk mb-3  w-100"
               htmlFor="formBuyerAddress"
             >
-              <Form.Label>Address</Form.Label>
+              <Form.Label>Address ,</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Address"
-                name="buyerAddress"
-                value={formData.buyerAddress || ""}
+                name="buyerFullAddress"
+                value={formData.buyerFullAddress || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -1499,7 +1686,7 @@ const FullWidthModal = ({
                 name="inquiryLine"
                 value={formData.inquiryLine || ""}
                 onChange={handleFormChange}
-                readOnly
+                // readOnly
               />
             </Form.Group>
             <Form.Group className="formgroupk mb-3" htmlFor="formInvoiceDate">
@@ -1837,8 +2024,8 @@ const FullWidthModal = ({
                     <th>Quantity</th>
                     <th>Net weight</th>
                     <th>Gross weight</th>
-                    <th>Unit Price({formData.currency})</th>
-                    <th>Total Price({formData.currency})</th>
+                    <th>Unit Price({newProduct.currency})</th>
+                    <th>Total Price({newProduct.currency})</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -1979,6 +2166,25 @@ const FullWidthModal = ({
                         value={newProduct.unitPrice || ""}
                         onChange={handleProductChange}
                       />
+                      <Form.Group className="" controlId="formCurrency">
+                        <Form.Label className="fs-d12 w-100 text-start mb-0">
+                          Currency
+                        </Form.Label>
+                        <Form.Select
+                          name="currency"
+                          value={newProduct.currency || ""}
+                          onChange={handleProductChange}
+                        >
+                          <option value="" disabled>
+                            Select Currency
+                          </option>
+                          {currencies.map((currency) => (
+                            <option key={currency.code} value={currency.code}>
+                              {currency.code} - {currency.name}
+                            </option>
+                          ))}
+                        </Form.Select>
+                      </Form.Group>
                     </td>
                     <td>{newProduct.quantity * newProduct.unitPrice || 0}</td>
                   </tr>
@@ -2358,7 +2564,7 @@ const FullWidthModal = ({
                 placeholder="Website"
                 name="Website"
                 // value={formData.sellerWebsite || ""}
-                value={formData.Website || ""}
+                value={formData.Website || null}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2369,17 +2575,24 @@ const FullWidthModal = ({
                 <Form.Control
                   type="text"
                   placeholder="EORI #"
-                  name="EORI"
-                  value={formData.EORI || ""}
+                  name="Legal_Identifier_Label1"
+                  value={formData.Legal_Identifier_Label1 || ""}
                   onChange={handleFormChange}
                 />
 
                 <Form.Control
                   type="text"
                   placeholder="VAT #"
-                  name="sellerWebsite"
-                  // value={formData.sellerWebsite || ""}
-                  // onChange={handleFormChange}
+                  name="Legal_Identifier_Label2"
+                  value={formData.Legal_Identifier_Label2 || ""}
+                  onChange={handleFormChange}
+                />
+                <Form.Control
+                  type="text"
+                  placeholder="REX Number"
+                  name="Legal_Identifier_Label3"
+                  value={formData.Legal_Identifier_Label3 || ""}
+                  onChange={handleFormChange}
                 />
               </div>
             </Form.Group>
@@ -2540,7 +2753,8 @@ const FullWidthModal = ({
                 type="text"
                 placeholder="Bank Address"
                 name="sellerBankAddress"
-                value={formData.sellerBankAddress || ""}
+                // value={formData.sellerBankAddress || ""}
+                value={formData.BankAddress || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2549,8 +2763,8 @@ const FullWidthModal = ({
               <Form.Check
                 type="checkbox"
                 label="Is Deferment Account?"
+                checked={formData.isDeferredAccount}
                 onChange={handleCheckboxChange}
-                checked={showDAN}
               />
 
               {showDAN && (
@@ -2698,7 +2912,7 @@ const FullWidthModal = ({
                 type="text"
                 placeholder="Website"
                 name="buyerWebsite"
-                value={formData.buyerWebsite || ""}
+                value={formData.buyerWebsite || null}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2964,6 +3178,9 @@ const FullWidthModal = ({
                         <th className="border p-2 bg-greenC text-white text-center">
                           Website
                         </th>
+                        <th className="border p-2 bg-greenC text-white text-center">
+                          isDeferredAccount
+                        </th>
 
                         <th className="border p-2 bg-greenC text-white text-center">
                           Actions
@@ -2985,6 +3202,9 @@ const FullWidthModal = ({
 
                           <td className="border p-2">{business.LCountry}</td>
                           <td className="border p-2">{business.Website}</td>
+                          <td className="border p-2">
+                            {business.isDeferredAccount ? "true" : "false"}
+                          </td>
 
                           <td className="border p-2">
                             <Button

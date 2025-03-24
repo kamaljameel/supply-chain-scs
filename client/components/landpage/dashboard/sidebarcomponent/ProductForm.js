@@ -60,12 +60,46 @@ export default function ProductForm({
   }, []);
 
   // Initialize form for editing
+  // useEffect(() => {
+  //   if (productToEdit) {
+  //     const [length, width, height] =
+  //       productToEdit.Dimensions.split("x").map(Number);
+  //     const [netweight, grossweight] =
+  //       productToEdit.Weight.split("x").map(Number);
+  //     setProduct({
+  //       productName: productToEdit.Name || "",
+  //       productDescription: productToEdit.Description,
+  //       hsCode: productToEdit.Code_SKU,
+  //       customDescription: productToEdit.customDescription,
+  //       unitOfMeasurement: productToEdit.unitOfMeasurement,
+  //       size: productToEdit.size,
+  //       length: length,
+  //       width: width,
+  //       height: height,
+  //       netweight: netweight,
+  //       grossweight: grossweight || "",
+  //       price: productToEdit.Price,
+  //       productCategoryId: productToEdit.ProductCategoryID,
+  //       // weight: productToEdit.weight,
+  //     });
+  //   }
+  //   console.log("edipp333", productToEdit);
+  // }, [productToEdit]);
   useEffect(() => {
     if (productToEdit) {
-      const [length, width, height] =
-        productToEdit.Dimensions.split("x").map(Number);
-      const [netweight, grossweight] =
-        productToEdit.Weight.split("x").map(Number);
+      // Ensure Dimensions and Weight are strings before splitting
+      const dimensions =
+        typeof productToEdit.Dimensions === "string"
+          ? productToEdit.Dimensions.split("x").map(Number)
+          : [0, 0, 0];
+      const weights =
+        typeof productToEdit.Weight === "string"
+          ? productToEdit.Weight.split("x").map(Number)
+          : [0, 0];
+
+      const [length, width, height] = dimensions;
+      const [netweight, grossweight] = weights;
+
       setProduct({
         productName: productToEdit.Name || "",
         productDescription: productToEdit.Description,
@@ -73,16 +107,16 @@ export default function ProductForm({
         customDescription: productToEdit.customDescription,
         unitOfMeasurement: productToEdit.unitOfMeasurement,
         size: productToEdit.size,
-        length: length,
-        width: width,
-        height: height,
-        netweight: netweight,
+        length,
+        width,
+        height,
+        netweight,
         grossweight: grossweight || "",
         price: productToEdit.Price,
         productCategoryId: productToEdit.ProductCategoryID,
-        // weight: productToEdit.weight,
       });
     }
+
     console.log("edipp333", productToEdit);
   }, [productToEdit]);
 
@@ -199,7 +233,11 @@ export default function ProductForm({
       productCategoryId: productToEdit2.ProductCategoryID || "",
       // weight: productToEdit2.weight || "",
       netweight: productToEdit2.Weight,
-      grossweight: productToEdit2.Weight?.split("x")[1] || "",
+      // grossweight: productToEdit2.Weight?.split("x")[1] || "",
+      grossweight:
+        typeof productToEdit2.Weight === "string"
+          ? productToEdit2.Weight.split("x")[1] || ""
+          : "",
     });
     // setallProducts((prev) => prev.filter((_, i) => i !== index));
     console.log("ghfgh", productToEdit2);

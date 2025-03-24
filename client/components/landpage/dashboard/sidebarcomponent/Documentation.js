@@ -132,7 +132,7 @@ const Documentation = () => {
 
     doc.setFontSize(12);
     doc.text(`Company: ${data.selectedBuyerCompany || "N/A"}`, 14, 50);
-    doc.text(`Address: ${data.buyerAddress || "N/A"}`, 14, 55);
+    doc.text(`Address: ${data.buyerFullAddress || "N/A"}`, 14, 55);
     doc.text(`City/State/ZIP: ${data.buyerCityStateZIP || "N/A"}`, 14, 60);
     doc.text(`Email: ${data.buyerEmail || "N/A"}`, 14, 65);
     doc.text(`Phone: ${data.buyerPhone || "N/A"}`, 14, 70);
@@ -144,7 +144,7 @@ const Documentation = () => {
     doc.setFontSize(12);
     doc.text(`Bank Name: ${data.buyerBankName || "N/A"}`, 14, 90);
     doc.text(`Account Number: ${data.buyerAccountNumber || "N/A"}`, 14, 95);
-    doc.text(`SWIFT Code: ${data.buyerSwiftCode || "N/A"}`, 14, 100);
+    doc.text(`SWIFT Code: ${data.buyerSWIFTCode || "N/A"}`, 14, 100);
     doc.text(`IBAN: ${data.buyerIBAN || "N/A"}`, 14, 105);
     doc.text(`Bank Address: ${data.buyerBankAddress || "N/A"}`, 14, 110);
 
@@ -155,11 +155,11 @@ const Documentation = () => {
 
     doc.setFontSize(12);
     doc.text(`Company: ${data.selectedSellerCompany || "N/A"}`, rightX, 50);
-    doc.text(`Address: ${data.sellerAddress || "N/A"}`, rightX, 55);
-    doc.text(`City/State/ZIP: ${data.sellerCityStateZIP || "N/A"}`, rightX, 60);
-    doc.text(`Email: ${data.sellerEmail || "N/A"}`, rightX, 65);
-    doc.text(`Phone: ${data.sellerPhone || "N/A"}`, rightX, 70);
-    doc.text(`Website: ${data.sellerWebsite || "N/A"}`, rightX, 75);
+    doc.text(`Address: ${data.Shipping_FullAddress || "N/A"}`, rightX, 55);
+    doc.text(`City/State/ZIP: ${data.LCity || "N/A"}`, rightX, 60);
+    doc.text(`Email: ${data.BusinessEmail1 || "N/A"}`, rightX, 65);
+    doc.text(`Phone: ${data.BusinessPhone1 || "N/A"}`, rightX, 70);
+    doc.text(`Website: ${data.Website || "N/A"}`, rightX, 75);
 
     // Seller Bank Details
     doc.setFontSize(16);
@@ -171,7 +171,7 @@ const Documentation = () => {
       rightX,
       95
     );
-    doc.text(`SWIFT Code: ${data.sellerSwiftCode || "N/A"}`, rightX, 100);
+    doc.text(`SWIFT Code: ${data.sellerSWIFTCode || "N/A"}`, rightX, 100);
     doc.text(`IBAN: ${data.sellerIBAN || "N/A"}`, rightX, 105);
     doc.text(`Bank Address: ${data.sellerBankAddress || "N/A"}`, rightX, 110);
 
