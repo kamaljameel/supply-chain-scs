@@ -198,11 +198,7 @@ exports.deleteProductFromExternalApi = async (req, res) => {
     console.log("Sending DELETE request to:", externalApiUrl);
 
     // Set up headers for the external API request
-    const headers = {
-      "x-api-key": "7d771e41bb5c449582122749df6bc0a3",
-      "audience-key": "cd055e6fe492453c93f1f25c04a6cc60",
-      Authorization: `bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjdkNzcxZTQxYmI1YzQ0OTU4MjEyMjc0OWRmNmJjMGEzIn0.eyJhcGlfQXBwVXNlcklEIjoiOTFmZjdiYTItODBiNC00MDU3LWJkZDQtZWZkMDc3MjY2MDA4Iiwic2Vzc2lvbnVzZXJpZCI6IjQiLCJUZW5hbnREb21haW4iOiJ0ZG9tYWluMDIiLCJleHAiOjE3MzEwMjIyNTIsImlzcyI6Imh0dHBzOi8vd3d3LmFiaXNvbGNybS5jb20uYXUiLCJhdWQiOiJjZDA1NWU2ZmU0OTI0NTNjOTNmMWYyNWMwNGE2Y2M2MCJ9.IbE0YEp8jFavI5sk_nmd4OrHj9zN3O9DssXEhWcwzfA`, // Make sure the token is correct and not expired
-    };
+    const headers = API_HEADERS;
 
     // Call the external API to delete the product
     try {

@@ -19,12 +19,14 @@ import {
   getBusinesses,
   deleteBusiness,
   updateBusiness,
+  editInquiryApi,
 } from "@/utils/apiRoutes";
 import ProductForm from "./ProductForm";
 import Select from "react-select";
 import PhoneInput, { parsePhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import countryList from "react-select-country-list";
+import PortOfLoadingSelect from "./lists/PortOfLoadingSelect";
 // import BusinessForm from "../BusinessForm";
 
 // import mammoth from "mammoth"; // For .doc and .docx handling
@@ -120,7 +122,7 @@ const FullWidthModal = ({
     buyerCountry: "",
     buyerCountryCode: "",
     portOfLoadingCountry: "",
-    portOfLoading: "",
+    portOfLoading: null,
     portOfDischargeCountry: "",
     portOfDischarge: "",
     sellerLogo: null,
@@ -236,12 +238,12 @@ const FullWidthModal = ({
     sellerAccountNumber: "",
     sellerSWIFTCode: "",
     sellerIBAN: "",
-    sellerBankAddress: "",
+    sellerBankAddress: null,
     buyerBankName: "",
     buyerAccountNumber: "",
     buyerSWIFTCode: "",
     buyerIBAN: "",
-    buyerBankAddress: "",
+    buyerBankAddress: null,
   });
   const [productDetails, setProductDetails] = useState([]);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -486,11 +488,12 @@ const FullWidthModal = ({
     try {
       const response = await axios.get(addProductApi, {
         headers: {
-          Authorization: `bearer ${abisolToken2}`,
+          Authorization: `Bearer ${abisolToken}`, // ✅ This is the missing part
+          "Content-Type": "application/json", // Optional if using JSON
         },
       });
       setProducts(response.data);
-      console.log("ddddttt", response.data);
+      console.log("getproducts", response.data);
       setpid(null);
       setSelectedProduct("");
     } catch (error) {
@@ -1196,7 +1199,11 @@ const FullWidthModal = ({
         orderPreferenceDRSID: null, // Add this if you have any dynamic value for it
       };
 
-      const response = await axios.post(addProductToListApi, payload);
+      const response = await axios.post(addProductToListApi, payload, {
+        headers: {
+          Authorization: `bearer ${abisolToken2}`,
+        },
+      });
       console.log("API Response product to list:", response.data);
       console.log("test19", newProduct);
     } catch (error) {
@@ -1256,10 +1263,15 @@ const FullWidthModal = ({
 
   const nextStep = async () => {
     if (currentStep === 4) {
-      console.log("steppp 444");
+      console.log("step 4");
       // Call the API when navigating to step 3
       try {
-        const response = await axios.post(inquiryApi, formData);
+        const response = await axios.post(inquiryApi, formData, {
+          headers: {
+            Authorization: `Bearer ${abisolToken}`, // ✅ This is the missing part
+            "Content-Type": "application/json", // Optional if using JSON
+          },
+        });
         console.log("API response:", response.data);
         alert("Inquiry successfully created");
         setInquireyId(response.data.InquiryID);
@@ -1297,13 +1309,64 @@ const FullWidthModal = ({
   //   }, 2000);
   // };
 
-  const handleSubmit = (e) => {
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+
+  //   // Create a new FormData object for file upload
+  //   const formDataWithFile = new FormData();
+
+  //   // Append the file (sellerLogo) to FormData
+  //   if (formData.sellerLogo) {
+  //     formDataWithFile.append("sellerLogo", formData.sellerLogo);
+  //   }
+  //   if (formData.buyerLogo) {
+  //     formDataWithFile.append("buyerLogo", formData.buyerLogo);
+  //   }
+
+  //   // Append other form data fields to FormData
+  //   Object.keys(formData).forEach((key) => {
+  //     if (key !== "sellerLogo" && key !== "buyerLogo") {
+  //       formDataWithFile.append(key, formData[key]);
+  //     }
+  //   });
+
+  //   // Append subtotal, tax, and total to FormData
+  //   formDataWithFile.append("subtotal", subtotal);
+  //   formDataWithFile.append("tax", tax);
+  //   formDataWithFile.append("total", total);
+
+  //   // If you're submitting the data as an object, do that here
+  //   onSubmit({
+  //     ...formData,
+  //     productDetails,
+  //     subtotal,
+  //     tax,
+  //     total,
+  //     TotalNetWeight,
+  //     TotalGrossWeight,
+  //     taxPercentage,
+  //     selectedSellerCompany: formData.BusinessName,
+  //     selectedBuyerCompany: formData.buyerBusinessName,
+  //     sellerLogo: formData.sellerLogo ? formData.sellerLogo.name : null,
+  //     buyerLogo: formData.buyerLogo ? formData.buyerLogo.name : null,
+  //   });
+
+  //   // Reset the form after submission
+  //   dispatch({ type: "RESET_FORM" });
+  //   setCurrentStep(1);
+  //   setTimeout(() => {
+  //     setFormData({});
+  //     setProductDetails([]); // Reset productDetails
+  //     setselectedSellerCompany(null); // Reset selectedSellerCompany
+  //     setSelectedBuyerCompany(null); // Reset selectedBuyerCompany
+  //   }, 2000);
+  // };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Create a new FormData object for file upload
     const formDataWithFile = new FormData();
 
-    // Append the file (sellerLogo) to FormData
     if (formData.sellerLogo) {
       formDataWithFile.append("sellerLogo", formData.sellerLogo);
     }
@@ -1311,42 +1374,113 @@ const FullWidthModal = ({
       formDataWithFile.append("buyerLogo", formData.buyerLogo);
     }
 
-    // Append other form data fields to FormData
     Object.keys(formData).forEach((key) => {
       if (key !== "sellerLogo" && key !== "buyerLogo") {
         formDataWithFile.append(key, formData[key]);
       }
     });
 
-    // Append subtotal, tax, and total to FormData
     formDataWithFile.append("subtotal", subtotal);
     formDataWithFile.append("tax", tax);
     formDataWithFile.append("total", total);
 
-    // If you're submitting the data as an object, do that here
-    onSubmit({
-      ...formData,
-      productDetails,
-      subtotal,
-      tax,
-      total,
-      TotalNetWeight,
-      TotalGrossWeight,
-      taxPercentage,
-      selectedSellerCompany: formData.BusinessName,
-      selectedBuyerCompany: formData.buyerBusinessName,
-      sellerLogo: formData.sellerLogo ? formData.sellerLogo.name : null,
-      buyerLogo: formData.buyerLogo ? formData.buyerLogo.name : null,
-    });
+    try {
+      // Step 1: Call your submit function
+      const result = await onSubmit({
+        ...formData,
+        productDetails,
+        subtotal,
+        tax,
+        total,
+        TotalNetWeight,
+        TotalGrossWeight,
+        taxPercentage,
+        selectedSellerCompany: formData.BusinessName,
+        selectedBuyerCompany: formData.buyerBusinessName,
+        sellerLogo: formData.sellerLogo ? formData.sellerLogo.name : null,
+        buyerLogo: formData.buyerLogo ? formData.buyerLogo.name : null,
+      });
 
-    // Reset the form after submission
+      // Step 2: Set or get inquiry ID
+      let currentInquiryId = inquieryId;
+
+      if (!currentInquiryId && result?.InquiryID) {
+        currentInquiryId = result.InquiryID;
+        setInquireyId(result.InquiryID);
+      }
+
+      if (!currentInquiryId) {
+        console.error("Inquiry ID not found for edit.");
+        return;
+      }
+
+      // Step 3: Call Edit API
+      const editPayload = {
+        ...formData,
+        productDetails,
+        subtotal,
+        tax,
+        total,
+        TotalNetWeight,
+        TotalGrossWeight,
+        taxPercentage,
+        selectedSellerCompany: formData.BusinessName || null,
+        selectedBuyerCompany: formData.buyerBusinessName || null,
+
+        inquiryLine: formData.inquiryLine || "",
+        BusinessName: formData.BusinessName || null,
+        contactID: null,
+        convertStatusID: 1,
+        description: null,
+        engageStatusID: 2,
+        estimatedDeliveryDate: null,
+        estimatedRevenue: null,
+        estimatedRevenueString: null,
+        ExpectedShipmentDate: formData.shipmentDate || null,
+        PaymentMethodDRSName: formData.paymentMethod || null,
+        PaymentTermDRSName: formData.paymentTerms || null,
+        inquiryStatusID: 2,
+        interestedInID: 2,
+        leadID: null,
+        nextFollowupDate: null,
+        priorityID: 2,
+        probabilityID: 2,
+        qualifyStatusID: 2,
+        isDisabled: false,
+
+        varianceTermDRSID: formData.varianceTermId || null,
+        shippingTermDRSID: formData.shippingTypeId || null,
+        shippingMethodDRSID: formData.shippingModeId || null,
+        portOfLoadingDRSID: formData.portOfLoading || null,
+        portOfDischargeDRSID: formData.portOfDischarge || null,
+        paymentTermDRSID: formData.paymentTermId || null,
+        paymentMethodDRSID: formData.paymentMethodId || null,
+        expectedShipmentDate: formData.shipmentDate || null,
+        countryofOrigin_CountryID: formData.countryOfOriginId || null,
+        countryofDestination_CountryID: formData.countryOfDestinationId || null,
+        PortOfDischargeDRSName: formData.portOfDischargeName || null,
+        ShippingTermDRSName: formData.shippingType || null,
+        ShippingMethodDRSName: formData.shippingMode || null,
+        // transactionCurrencyID: formData.currencyId || null,
+      };
+
+      const editRes = await editInquiryApi(currentInquiryId, editPayload);
+      console.log("Edit success:", editRes.data);
+    } catch (error) {
+      console.error(
+        "Error during submit or edit:",
+        error?.response?.data || error.message
+      );
+    }
+
+    // Reset everything
     dispatch({ type: "RESET_FORM" });
     setCurrentStep(1);
     setTimeout(() => {
       setFormData({});
-      setProductDetails([]); // Reset productDetails
-      setselectedSellerCompany(null); // Reset selectedSellerCompany
-      setSelectedBuyerCompany(null); // Reset selectedBuyerCompany
+      setProductDetails([]);
+      setselectedSellerCompany(null);
+      setSelectedBuyerCompany(null);
     }, 2000);
   };
 
@@ -1455,7 +1589,7 @@ const FullWidthModal = ({
               <Form.Label>Address</Form.Label>
               <Form.Control
                 type="text"
-                placeholder="Addressdd"
+                placeholder="Address"
                 name="Shipping_FullAddress"
                 value={formData.Shipping_FullAddress || ""}
                 onChange={handleFormChange}
@@ -1469,8 +1603,8 @@ const FullWidthModal = ({
               <Form.Control
                 type="text"
                 placeholder="City, State, ZIP"
-                name="sellerCityStateZIP"
-                value={formData.LCity || ""}
+                name="Lcity"
+                value={formData.LCity || null}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -1795,7 +1929,6 @@ const FullWidthModal = ({
             {formData.portOfLoadingCountry && (
               <Form.Group className="formgroupk" htmlFor="formPortOfLoading">
                 <Form.Label>Port of Loading</Form.Label>
-
                 {/* <Select
                   value={(
                     portOptions[formData.portOfLoadingCountry] || []
@@ -1805,7 +1938,6 @@ const FullWidthModal = ({
                   }
                   options={portOptions[formData.portOfLoadingCountry] || []}
                 /> */}
-
                 {/* <Select
                   value={(
                     portOptions[
@@ -1831,13 +1963,19 @@ const FullWidthModal = ({
                     ] || []
                   }
                 /> */}
-                <Form.Control
+                {/* <Form.Control
                   type="text"
                   placeholder="Enter Port of Loading"
                   name="portOfLoading"
                   value={formData.portOfLoading || ""}
                   onChange={handleFormChange}
-                />
+                /> */}
+                <div className="portofLoad d-flex">
+                  <PortOfLoadingSelect
+                    formData={formData}
+                    setFormData={setFormData}
+                  />
+                </div>
               </Form.Group>
             )}
             <Form.Group
@@ -2344,7 +2482,7 @@ const FullWidthModal = ({
                 type="text"
                 placeholder="Bank Address"
                 name="sellerBankAddress"
-                value={formData.sellerBankAddress || ""}
+                value={formData.sellerBankAddress || null}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2409,7 +2547,7 @@ const FullWidthModal = ({
                 type="text"
                 placeholder="Bank Address"
                 name="buyerBankAddress"
-                value={formData.buyerBankAddress || ""}
+                value={formData.buyerBankAddress || null}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2752,9 +2890,9 @@ const FullWidthModal = ({
               <Form.Control
                 type="text"
                 placeholder="Bank Address"
-                name="sellerBankAddress"
+                name="bankaddress"
                 // value={formData.sellerBankAddress || ""}
-                value={formData.BankAddress || ""}
+                value={formData.BankAddress || null}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2993,7 +3131,7 @@ const FullWidthModal = ({
                 type="text"
                 placeholder="Bank Address"
                 name="buyerBankAddress"
-                value={formData.buyerBankAddress || ""}
+                value={formData.buyerBankAddress || null}
                 onChange={handleFormChange}
               />
             </Form.Group>

@@ -5,6 +5,11 @@ const API_BASE_URL = `${host}/api/business`;
 const api = axios.create({
   baseURL: API_BASE_URL,
 });
+
+const API_BASE_URL_inquiry = `${host}/api/inquiry`;
+const apiInquiry = axios.create({
+  baseURL: API_BASE_URL_inquiry, // ✅ Corrected key
+});
 // Function to get token from localStorage
 const getAuthHeaders = () => {
   const token = localStorage.getItem("abisolToken");
@@ -30,6 +35,13 @@ export const updateBusiness = async (id, updatedData) => {
 export const deleteBusiness = async (id) => {
   return api.delete(`/${id}`, { headers: getAuthHeaders() });
 };
+
+export const editInquiryApi = async (inquiryId, updatedData) => {
+  return apiInquiry.put(`/edit/${inquiryId}`, updatedData, {
+    headers: getAuthHeaders(),
+  });
+};
+
 // export const studentapi = `${host}/api/student`;
 export const contactApi = `${host}/api/contact`;
 export const signupApi = `${host}/api/signup`;

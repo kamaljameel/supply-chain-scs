@@ -1,0 +1,38 @@
+name: 🚀 Deploy to Namecheap Hosting via SSH
+
+on:
+  push:
+    branches:
+      - main # or your default branch
+
+jobs:
+  deploy:
+    name: Deploy via SSH
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ISCS_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p 22 ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy via SSH
+        run: |
+          ssh -p 22 ${{ secrets.USER }}@${{ secrets.HOST }} << 'EOF'
+            cd ~/filmanger/api
+            git pull origin main
+            npm install
+            npm run build # or npm start if using production mode
+            pm2 restart api # If you use pm2
+
+            cd ~/filmanger/frontend
+            git pull origin main
+            npm install
+            npm run build
+            pm2 restart frontend # If you use pm2 for frontend
+          EOF

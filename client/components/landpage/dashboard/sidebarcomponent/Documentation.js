@@ -1,15 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal, Form, Breadcrumb } from "react-bootstrap";
 import FullWidthModal from "./FullWidthModal";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-
+import axios from "axios";
 const Documentation = () => {
   const [showFullWidthModal, setShowFullWidthModal] = useState(false);
   const [selectedInvoiceType, setSelectedInvoiceType] = useState("");
   const [submittedData, setSubmittedData] = useState({});
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
-
+  const [uploadedPdfs, setUploadedPdfs] = useState([]);
+  const [pdfs, setPdfs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [companyOptions, setCompanyOptions] = useState([
     "Company A",
     "Company B",
@@ -23,6 +26,20 @@ const Documentation = () => {
     "Commercial Invoice",
   ]);
 
+  useEffect(() => {
+    // Fetch the list of PDFs using Axios
+    axios
+      .get("http://localhost:3001/api/pdfs/all")
+      .then((response) => {
+        setPdfs(response.data.files);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching PDFs:", err);
+        setError("Failed to fetch PDFs.");
+        setLoading(false);
+      });
+  }, []);
   const handleCloseInvoiceModal = () => {
     setShowInvoiceModal(false);
     SetInvoiceConevert(false);
@@ -115,7 +132,7 @@ const Documentation = () => {
   //   doc.save("submitted_data.pdf");
   // };
 
-  const generatePDF = (data) => {
+  const generatePDF = async (data) => {
     const doc = new jsPDF();
 
     // Title
@@ -251,9 +268,58 @@ const Documentation = () => {
     termsArray.forEach((line, index) => {
       doc.text(line, 14, termsStartY + index * lineHeight);
     });
+    // Convert to Blob and upload to API
+    try {
+      const pdfBlob = doc.output("blob");
+      const formData = new FormData();
+      formData.append("pdf", pdfBlob, "submitted_data.pdf");
 
+      const response = await axios.post(
+        "http://localhost:3001/api/pdfs/upload",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      alert(response.data.message);
+      // fetchUploadedPDFs();
+    } catch (error) {
+      console.error("Error uploading PDF:", error);
+      alert("Failed to upload PDF");
+    }
     // Save the PDF
+    // doc.save("submitted_data.pdf");
+    return doc;
+  };
+  const handleDownloadPDF = () => {
+    const doc = generatePDF(submittedData);
     doc.save("submitted_data.pdf");
+  };
+
+  const handleSendEmail = async () => {
+    const doc = generatePDF(submittedData);
+    const pdfBlob = doc.output("blob");
+
+    const formData = new FormData();
+    formData.append("pdf", pdfBlob, "submitted_data.pdf");
+    formData.append("email", "kamaljameel14@gmail.com");
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3001/api/send-email",
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      alert(response.data.message);
+    } catch (error) {
+      console.error("Error sending email:", error);
+
+      alert("Failed to send email");
+    }
   };
 
   const handleFullWidthModalSubmit = (data) => {
@@ -315,6 +381,34 @@ const Documentation = () => {
               <div className="p-2">Submitted 7</div>
             </div>
           </div>
+        </div>
+
+        <Button variant="primary" onClick={handleDownloadPDF}>
+          Download PDF
+        </Button>
+        <Button variant="success" onClick={handleSendEmail} className="ml-2">
+          Send PDF via Email
+        </Button>
+        <div>
+          <h2 className="text-xl font-semibold mb-4">All Uploaded PDFs</h2>
+          {pdfs.length === 0 ? (
+            <p>No PDFs found.</p>
+          ) : (
+            <ul className="space-y-2">
+              {pdfs.map((pdf, index) => (
+                <li key={index}>
+                  <a
+                    href={pdf.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline"
+                  >
+                    {pdf.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
       <Modal
@@ -413,12 +507,12 @@ const Documentation = () => {
         addCompany={addCompany}
         selectedInvoiceType={selectedInvoiceType}
       />
-      {/* {submittedData && (
+      {submittedData && (
         <div>
           <h3>Submitted Data</h3>
           <pre>{JSON.stringify(submittedData, null, 2)}</pre>
         </div>
-      )} */}
+      )}
     </>
   );
 };

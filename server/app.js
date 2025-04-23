@@ -15,7 +15,10 @@ const productRoutes = require("./routers/products");
 const inquiryRoutes = require("./routers/inquiry");
 const profileRoutes = require("./routers/userRoutes");
 const businessRoutes = require("./routers/businessRouter");
-
+const emailRoutes = require("./routers/emailRoutes");
+const pdfRoutes = require("./routers/pdfRoutes");
+const portRoutes = require("./routers/portOfLoading");
+const path = require("path");
 const app = express();
 require("dotenv").config();
 
@@ -52,8 +55,12 @@ app.use("/api/products", productRoutes);
 app.use("/api/inquiry", inquiryRoutes);
 app.use("/api/userRoutes", profileRoutes);
 app.use("/api/business", businessRoutes);
+app.use("/api", emailRoutes);
+app.use("/api/pdfs", pdfRoutes);
+app.use("/api/portOfLoading", portRoutes);
 // busness inquiry
 app.use("/api/business-inquiries", businessInquiryRoutes);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

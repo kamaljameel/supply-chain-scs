@@ -311,7 +311,7 @@ export default function ProductForm({
           />
           <input
             name="productDescription"
-            placeholder="Product Description"
+            placeholder="Tariff Description"
             value={product.productDescription}
             onChange={handleChange}
             required
@@ -325,7 +325,7 @@ export default function ProductForm({
           />
           <input
             name="customDescription"
-            placeholder="Custom Description"
+            placeholder="General Description"
             value={product.customDescription}
             onChange={handleChange}
             required
