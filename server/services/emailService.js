@@ -7,10 +7,18 @@ const transporter = nodemailer.createTransport({
   secure: true, // Use SSL
   auth: {
     user: "info@i-scs.co.uk",
-    pass: "LahoreSupplyChain@123",
+    pass: "LahoreSupply@123",
   },
 });
-
+// Looking to send emails in production? Check out our Email API/SMTP product!
+// var transporter = nodemailer.createTransport({
+//   host: "sandbox.smtp.mailtrap.io",
+//   port: 2525,
+//   auth: {
+//     user: "8e328a1d70450f",
+//     pass: "ae7055397aeff3",
+//   },
+// });
 // Function to send email
 exports.sendEmail = async ({ to, subject, html }) => {
   try {

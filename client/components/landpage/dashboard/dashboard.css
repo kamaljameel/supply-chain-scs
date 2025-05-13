@@ -265,6 +265,9 @@ body {
 .fs-d12 {
   font-size: 12px;
 }
+.w-40 {
+  width: 40%;
+}
 @media (min-width: 992px) {
   .mainmodelP .modal-lg {
     max-width: 1200px !important;

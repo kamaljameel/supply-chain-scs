@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import styles from "./dashboard.css"; // Assuming you have a CSS module for styling
 import Navbar from "@/components/landpage/Navbar";
 import Footer from "@/components/landpage/Footer";
-import { loginApi } from "@/utils/apiRoutes"; // Adjust path based on your project structure
+import { loginApi } from "@/utils/apiRoutes";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -271,7 +271,6 @@ const Dashboard = () => {
             </div>
             <div className="userdata">
               <Link href="/profile" className="text-white">
-                {" "}
                 <i className="bi bi-person-circle me-2"></i>
                 {user.FirstName} {user.LastName}
               </Link>

@@ -33,7 +33,8 @@ exports.createBusinessInquiry = async (req, res) => {
     url: "https://api.abisolcrm.com.au/v1/CreateLead",
     headers: {
       // "x-api-key": "75c8f08c5ae14bac9a0ec3f2d1c06b0e",
-      "x-api-key": "7d771e41bb5c449582122749df6bc0a3",
+      // "x-api-key": "7d771e41bb5c449582122749df6bc0a3",
+      "x-api-key": process.env.X_API_KEY,
       "Content-Type": "application/json",
     },
     data: data,
@@ -70,6 +71,11 @@ exports.createBusinessInquiry = async (req, res) => {
       subject: "New Business Inquiry",
       html: emailContent,
     });
+    // await sendEmail({
+    //   to: `kamaljameel14@gmail.com`,
+    //   subject: "New Business Inquiry",
+    //   html: emailContent,
+    // });
 
     res.status(201).json({ inquiry, externalResponse: response.data });
   } catch (error) {
