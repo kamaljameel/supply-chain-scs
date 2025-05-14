@@ -271,7 +271,6 @@ const Dashboard = () => {
             </div>
             <div className="userdata">
               <Link href="/profile" className="text-white">
-                {" "}
                 <i className="bi bi-person-circle me-2"></i>
                 {user.FirstName} {user.LastName}
               </Link>

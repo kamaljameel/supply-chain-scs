@@ -1,5 +1,6 @@
 import React, { useReducer, useEffect, useState, useRef } from "react";
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   Modal,
   Form,
@@ -7,6 +8,7 @@ import {
   Table,
   ProgressBar,
   Alert,
+  Spinner,
 } from "react-bootstrap";
 import axios from "axios";
 // import * as pdfjsLib from "pdfjs-dist/webpack"; // Change this import to webpack
@@ -27,6 +29,14 @@ import PhoneInput, { parsePhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import countryList from "react-select-country-list";
 import PortOfLoadingSelect from "./lists/PortOfLoadingSelect";
+import PortOfDischargeSelect from "./lists/PortOfDischargeSelect";
+
+import PaymentMethodSelect from "./lists/PaymentMethodSelect";
+import PaymentTermsSelect from "./lists/PaymentTermsSelect";
+import VarianceTermsSelect from "./lists/VarianceTermsSelect";
+import ShippingTermsSelect from "./lists/ShippingTermsSelect";
+import ShippingMethodSelect from "./lists/ShippingMethodSelect";
+
 // import BusinessForm from "../BusinessForm";
 
 // import mammoth from "mammoth"; // For .doc and .docx handling
@@ -110,6 +120,8 @@ const FullWidthModal = ({
   const [pdfText, setPdfText] = useState("");
   const [inquieryId, setInquireyId] = useState(null);
   const [showDAN, setShowDAN] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   // const businessFormRef = useRef();
   const [businesses, setBusinesses] = useState([]);
   const [editingBusiness, setEditingBusiness] = useState(null);
@@ -124,7 +136,7 @@ const FullWidthModal = ({
     portOfLoadingCountry: "",
     portOfLoading: null,
     portOfDischargeCountry: "",
-    portOfDischarge: "",
+    portOfDischarge: null,
     sellerLogo: null,
     buyerLogo: null,
     sellerDocument: null,
@@ -135,6 +147,7 @@ const FullWidthModal = ({
     tenantDomain: null,
     recordTitle: null,
     inquiryLine: "",
+    invoiceDate: "",
     inquiryID: 0,
     businessID: null,
     businessName: null,
@@ -166,7 +179,11 @@ const FullWidthModal = ({
     DAN: "",
     postcode: "",
     currency: "",
-
+    paymentTerms: null,
+    varianceTerms: null,
+    shippingTerms: null,
+    paymentMethod: null,
+    shippingMethod: null,
     AnnualRevenue: null,
     BusinessEmail1: null,
     BusinessEmail2: null,
@@ -181,7 +198,7 @@ const FullWidthModal = ({
     IndustryID: null,
     Industry: null,
     LBuildingName: null,
-    LCity: "",
+    LCity: null,
     LCountry: "",
     LeadID: null,
     Lead: null,
@@ -244,6 +261,8 @@ const FullWidthModal = ({
     buyerSWIFTCode: "",
     buyerIBAN: "",
     buyerBankAddress: null,
+    shippingMode: "",
+    carrier: "",
   });
   const [productDetails, setProductDetails] = useState([]);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -760,7 +779,7 @@ const FullWidthModal = ({
           IndustryID: null,
           Industry: null,
           LBuildingName: null,
-          LCity: "",
+          LCity: null,
           LCountry: "",
           LeadID: null,
           Lead: null,
@@ -826,7 +845,7 @@ const FullWidthModal = ({
           IndustryID: null,
           Industry: null,
           LBuildingName: null,
-          LCity: "",
+          LCity: null,
           LCountry: "",
           LeadID: null,
           Lead: null,
@@ -1263,8 +1282,9 @@ const FullWidthModal = ({
 
   const nextStep = async () => {
     if (currentStep === 4) {
-      console.log("step 4");
+      // console.log("step 4");
       // Call the API when navigating to step 3
+      setLoading(true);
       try {
         const response = await axios.post(inquiryApi, formData, {
           headers: {
@@ -1273,14 +1293,18 @@ const FullWidthModal = ({
           },
         });
         console.log("API response:", response.data);
-        alert("Inquiry successfully created");
+
+        toast.success("Inquiry successfully created");
         setInquireyId(response.data.InquiryID);
       } catch (error) {
         console.error(
           "Error calling the API:",
           error?.response?.data || error.message
         );
-        alert("Failed to submit inquiry.");
+
+        toast.error("Failed to submit inquiry.");
+      } finally {
+        setLoading(false); // Hide spinner
       }
     }
 
@@ -1429,6 +1453,7 @@ const FullWidthModal = ({
 
         inquiryLine: formData.inquiryLine || "",
         BusinessName: formData.BusinessName || null,
+        BusinessID: formData.businessID || null,
         contactID: null,
         convertStatusID: 1,
         description: null,
@@ -1448,19 +1473,19 @@ const FullWidthModal = ({
         qualifyStatusID: 2,
         isDisabled: false,
 
-        varianceTermDRSID: formData.varianceTermId || null,
-        shippingTermDRSID: formData.shippingTypeId || null,
-        shippingMethodDRSID: formData.shippingModeId || null,
+        varianceTermDRSID: formData.varianceTerms || null,
+        shippingTermDRSID: formData.shippingTerms || null,
+        shippingMethodDRSID: formData.shippingMethod || null,
         portOfLoadingDRSID: formData.portOfLoading || null,
         portOfDischargeDRSID: formData.portOfDischarge || null,
-        paymentTermDRSID: formData.paymentTermId || null,
-        paymentMethodDRSID: formData.paymentMethodId || null,
+        paymentTermDRSID: formData.paymentTerms || null,
+        paymentMethodDRSID: formData.paymentMethod || null,
         expectedShipmentDate: formData.shipmentDate || null,
         countryofOrigin_CountryID: formData.countryOfOriginId || null,
         countryofDestination_CountryID: formData.countryOfDestinationId || null,
-        PortOfDischargeDRSName: formData.portOfDischargeName || null,
-        ShippingTermDRSName: formData.shippingType || null,
-        ShippingMethodDRSName: formData.shippingMode || null,
+
+        // ShippingTermDRSName: formData.shippingTermsName || null,
+        // ShippingMethodDRSName: formData.shippingMethodName || null,
         // transactionCurrencyID: formData.currencyId || null,
       };
 
@@ -1812,85 +1837,157 @@ const FullWidthModal = ({
         return (
           <>
             <h6>Invoice Details</h6>
-            <Form.Group className="formgroupk mb-3" htmlFor="formInvoiceNumber">
-              <Form.Label>Invoice Number</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Invoice Number"
-                name="inquiryLine"
-                value={formData.inquiryLine || ""}
-                onChange={handleFormChange}
-                // readOnly
-              />
-            </Form.Group>
-            <Form.Group className="formgroupk mb-3" htmlFor="formInvoiceDate">
-              <Form.Label>Invoice Date</Form.Label>
-              <Form.Control
-                type="date"
-                name="invoiceDate"
-                value={formData.invoiceDate || ""}
-                onChange={handleFormChange}
-                readOnly
-              />
-            </Form.Group>
-            <Form.Group className="formgroupk mb-3" htmlFor="formDueDate">
-              <Form.Label>Due Date</Form.Label>
-              <Form.Control
-                type="date"
-                name="dueDate"
-                value={formData.dueDate || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Group>
-            <Form.Group className="formgroupk mb-3" controlId="formTolerance">
-              <Form.Label>Tolerance ± %</Form.Label>
+            <div className=" position-relative w-100">
+              {/* Form content with reduced opacity when loading */}
+              <div
+                style={{
+                  opacity: loading ? 0.4 : 1,
+                  pointerEvents: loading ? "none" : "auto",
+                }}
+                className="w-100 d-flex flex-wrap gap-3"
+              >
+                <Form.Group
+                  className="formgroupk mb-3"
+                  htmlFor="formInvoiceNumber"
+                >
+                  <Form.Label>Invoice Number</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Invoice Number"
+                    name="inquiryLine"
+                    value={formData.inquiryLine || ""}
+                    onChange={handleFormChange}
+                    // readOnly
+                  />
+                </Form.Group>
+                <Form.Group
+                  className="formgroupk mb-3"
+                  htmlFor="formInvoiceDate"
+                >
+                  <Form.Label>Invoice Date</Form.Label>
+                  <Form.Control
+                    type="date"
+                    name="invoiceDate"
+                    value={formData.invoiceDate || ""}
+                    onChange={handleFormChange}
+                    readOnly
+                  />
+                </Form.Group>
+                <Form.Group className="formgroupk mb-3" htmlFor="formDueDate">
+                  <Form.Label>Due Date</Form.Label>
+                  <Form.Control
+                    type="date"
+                    name="dueDate"
+                    value={formData.dueDate || ""}
+                    onChange={handleFormChange}
+                  />
+                </Form.Group>
+                <Form.Group
+                  className="formgroupk mb-3"
+                  controlId="formTolerance"
+                >
+                  {/* <Form.Label>Tolerance ± %</Form.Label>
               <Form.Control
                 type="number"
                 name="tolerance"
                 value={formData.tolerance || ""}
                 onChange={handleFormChange}
                 placeholder="Enter tolerance value"
-              />
-            </Form.Group>
+              /> */}
+                  <div className="portofLoad d-flex align-items-end justify-content-between">
+                    <VarianceTermsSelect
+                      formData={formData}
+                      setFormData={setFormData}
+                    />
+                  </div>
+                </Form.Group>
 
-            {/* <h6>Payment Terms</h6> */}
-            <Form.Group className="formgroupk mb-3" htmlFor="formPaymentMethod">
-              <Form.Label>Payment Method</Form.Label>
+                {/* <h6>Payment Terms</h6> */}
+                <Form.Group
+                  className="formgroupk mb-3"
+                  htmlFor="formPaymentMethod"
+                >
+                  {/* <Form.Label>Payment Method</Form.Label>
               <Form.Control
                 type="text"
                 placeholder="Payment Method (e.g., Wire Transfer, Letter of Credit)"
                 name="paymentMethod"
                 value={formData.paymentMethod || ""}
                 onChange={handleFormChange}
-              />
-            </Form.Group>
-            <Form.Group className="formgroupk mb-3" htmlFor="formPaymentTerms">
-              <Form.Label>Payment Terms</Form.Label>
-              <Form.Control
+              /> */}
+
+                  <div className="portofLoad d-flex align-items-end justify-content-between">
+                    <PaymentMethodSelect
+                      formData={formData}
+                      setFormData={setFormData}
+                    />
+                  </div>
+                </Form.Group>
+                <Form.Group
+                  className="formgroupk mb-3"
+                  htmlFor="formPaymentTerms"
+                >
+                  {/* <Form.Control
                 type="text"
                 placeholder="Payment Terms (e.g., 50% advance, 50% upon delivery)"
                 name="paymentTerms"
-                value={formData.paymentTerms || ""}
+                value={formData.paymentTerms || null}
                 onChange={handleFormChange}
-              />
-            </Form.Group>
-            <Form.Group className="formgroupk mb-3" controlId="formCurrency">
-              <Form.Label>Currency</Form.Label>
-              <Form.Select
-                name="currency"
-                value={formData.currency || ""}
-                onChange={handleFormChange}
-              >
-                <option value="" disabled>
-                  Select Currency
-                </option>
-                {currencies.map((currency) => (
-                  <option key={currency.code} value={currency.code}>
-                    {currency.code} - {currency.name}
-                  </option>
-                ))}
-              </Form.Select>
-            </Form.Group>
+              /> */}
+                  <div className="portofLoad d-flex align-items-end justify-content-between">
+                    <PaymentTermsSelect
+                      formData={formData}
+                      setFormData={setFormData}
+                    />
+                  </div>
+                </Form.Group>
+                <Form.Group
+                  className="formgroupk mb-3"
+                  controlId="formCurrency"
+                >
+                  <Form.Label>Currency</Form.Label>
+                  <Form.Select
+                    name="currency"
+                    value={formData.currency || ""}
+                    onChange={handleFormChange}
+                  >
+                    <option value="" disabled>
+                      Select Currency
+                    </option>
+                    {currencies.map((currency) => (
+                      <option key={currency.code} value={currency.code}>
+                        {currency.code} - {currency.name}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </div>
+
+              {/* Centered spinner overlay */}
+              {loading && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgba(255,255,255,0.5)", // soft white overlay
+                    zIndex: 10,
+                    borderRadius: "8px",
+                  }}
+                >
+                  <Spinner
+                    animation="grow"
+                    variant="info"
+                    style={{ width: "10rem", height: "10rem" }}
+                  />
+                </div>
+              )}
+            </div>
           </>
         );
       case 5:
@@ -1928,7 +2025,6 @@ const FullWidthModal = ({
             </Form.Group>
             {formData.portOfLoadingCountry && (
               <Form.Group className="formgroupk" htmlFor="formPortOfLoading">
-                <Form.Label>Port of Loading</Form.Label>
                 {/* <Select
                   value={(
                     portOptions[formData.portOfLoadingCountry] || []
@@ -1970,7 +2066,7 @@ const FullWidthModal = ({
                   value={formData.portOfLoading || ""}
                   onChange={handleFormChange}
                 /> */}
-                <div className="portofLoad d-flex">
+                <div className="portofLoad d-flex justify-content-between align-items-end">
                   <PortOfLoadingSelect
                     formData={formData}
                     setFormData={setFormData}
@@ -2009,8 +2105,6 @@ const FullWidthModal = ({
             </Form.Group>
             {formData.portOfDischargeCountry && (
               <Form.Group className="formgroupk" htmlFor="formPortOfDischarge">
-                <Form.Label>Port of Discharge</Form.Label>
-
                 {/* <Select
                   value={(
                     portOptions[formData.portOfDischargeCountry] || []
@@ -2045,17 +2139,23 @@ const FullWidthModal = ({
                     ] || []
                   }
                 /> */}
-                <Form.Control
+                {/* <Form.Control
                   type="text"
                   placeholder="Enter Port of Discharge"
                   name="portOfDischarge"
-                  value={formData.portOfDischarge || ""}
+                  value={formData.portOfDischarge || null}
                   onChange={handleFormChange}
-                />
+                /> */}
+                <div className="portofLoad d-flex align-items-end justify-content-between">
+                  <PortOfDischargeSelect
+                    formData={formData}
+                    setFormData={setFormData}
+                  />
+                </div>
               </Form.Group>
             )}
             <Form.Group className="formgroupk mb-3" htmlFor="formIncoterms">
-              <Form.Label>Incoterms</Form.Label>
+              {/* <Form.Label>Incoterms</Form.Label>
 
               <Form.Select
                 aria-label="Incoterms"
@@ -2075,7 +2175,14 @@ const FullWidthModal = ({
                 <option value="FOB">FOB</option>
                 <option value="CFR">CFR</option>
                 <option value="CIF">CIF</option>
-              </Form.Select>
+              </Form.Select> */}
+
+              <div className="portofLoad d-flex align-items-end justify-content-between">
+                <ShippingTermsSelect
+                  formData={formData}
+                  setFormData={setFormData}
+                />
+              </div>
             </Form.Group>
 
             <Form.Group className="formgroupk mb-3" htmlFor="formCarrier">
@@ -2089,7 +2196,7 @@ const FullWidthModal = ({
               />
             </Form.Group>
             <Form.Group className="formgroupk" htmlFor="formShippingType">
-              <Form.Label>Shipping Type</Form.Label>
+              {/* <Form.Label>Shipping Type</Form.Label>
               <Form.Control
                 as="select"
                 name="shippingType"
@@ -2099,7 +2206,13 @@ const FullWidthModal = ({
                 <option value="">Select Shipping Type</option>
                 <option value="LCL">LCL (Less than Container Load)</option>
                 <option value="FCL">FCL (Full Container Load)</option>
-              </Form.Control>
+              </Form.Control> */}
+              <div className="portofLoad d-flex align-items-end justify-content-between">
+                <ShippingMethodSelect
+                  formData={formData}
+                  setFormData={setFormData}
+                />
+              </div>
             </Form.Group>
             {formData.shippingType === "LCL" && (
               <Form.Group className="formgroupk" htmlFor="formVolume">
@@ -2162,8 +2275,8 @@ const FullWidthModal = ({
                     <th>Quantity</th>
                     <th>Net weight</th>
                     <th>Gross weight</th>
-                    <th>Unit Price({newProduct.currency})</th>
-                    <th>Total Price({newProduct.currency})</th>
+                    <th>Unit Price({formData.currency})</th>
+                    <th>Total Price({formData.currency})</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -2304,7 +2417,7 @@ const FullWidthModal = ({
                         value={newProduct.unitPrice || ""}
                         onChange={handleProductChange}
                       />
-                      <Form.Group className="" controlId="formCurrency">
+                      {/* <Form.Group className="" controlId="formCurrency">
                         <Form.Label className="fs-d12 w-100 text-start mb-0">
                           Currency
                         </Form.Label>
@@ -2322,7 +2435,7 @@ const FullWidthModal = ({
                             </option>
                           ))}
                         </Form.Select>
-                      </Form.Group>
+                      </Form.Group> */}
                     </td>
                     <td>{newProduct.quantity * newProduct.unitPrice || 0}</td>
                   </tr>
@@ -2420,7 +2533,7 @@ const FullWidthModal = ({
           </>
         );
 
-      case 8:
+      case 7:
         return (
           <>
             <h6>Seller Bank Details</h6>
@@ -2488,7 +2601,7 @@ const FullWidthModal = ({
             </Form.Group>
           </>
         );
-      case 9:
+      case 8:
         return (
           <>
             <h6>Buyer Bank Details</h6>
@@ -3386,7 +3499,7 @@ const FullWidthModal = ({
                     Previous
                   </Button>
                 )}
-                {currentStep < 9 ? (
+                {currentStep < 8 ? (
                   <Button variant="primary" onClick={nextStep}>
                     Next
                   </Button>
@@ -3399,6 +3512,7 @@ const FullWidthModal = ({
             )}
           </>
         )}
+        <ToastContainer />
       </Modal.Body>
     </Modal>
   );

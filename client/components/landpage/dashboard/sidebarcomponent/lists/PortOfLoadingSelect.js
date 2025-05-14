@@ -1,51 +1,8 @@
-// import { useEffect, useState } from "react";
-// import Form from "react-bootstrap/Form";
-// import axios from "axios";
-
-// const PortOfLoadingSelect = ({ formData, setFormData }) => {
-//   const [ports, setPorts] = useState([]);
-
-//   useEffect(() => {
-//     axios
-//       .get("http://localhost:3001/api/portOfLoading")
-//       .then((res) => setPorts(res.data))
-//       .catch((err) => console.error("Failed to load ports", err));
-//   }, []);
-
-//   const handlePortChange = (e) => {
-//     const selectedId = e.target.value;
-//     setFormData((prev) => ({
-//       ...prev,
-//       portOfLoading: selectedId, // Store the ID
-//     }));
-//   };
-
-//   return (
-//     <Form.Group>
-//       <Form.Label>Port of Loading</Form.Label>
-//       <Form.Select
-//         name="portOfLoading"
-//         value={formData.portOfLoading || ""}
-//         onChange={handlePortChange}
-//       >
-//         <option value="">-- Select Port --</option>
-//         {ports.map((port) => (
-//           <option key={port.ID} value={port.ID}>
-//             {port.Name}
-//           </option>
-//         ))}
-//       </Form.Select>
-//     </Form.Group>
-//   );
-// };
-
-// export default PortOfLoadingSelect;
-
 import { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import axios from "axios";
-
+import { portOfLoadingApi } from "@/utils/apiRoutes";
 const PortOfLoadingSelect = ({ formData, setFormData }) => {
   const [ports, setPorts] = useState([]);
   const [newPortName, setNewPortName] = useState("");
@@ -65,7 +22,7 @@ const PortOfLoadingSelect = ({ formData, setFormData }) => {
 
   const fetchPorts = () => {
     axios
-      .get("http://localhost:3001/api/portOfLoading", {
+      .get(portOfLoadingApi, {
         headers: {
           Authorization: `Bearer ${abisolToken}`, // Use the token here
         },
@@ -95,54 +52,6 @@ const PortOfLoadingSelect = ({ formData, setFormData }) => {
     setNewPortName(e.target.value);
   };
 
-  // Add a new port via the API
-  // const handleAddPort = async () => {
-  //   const trimmedPortName = newPortName.trim();
-  //   if (!trimmedPortName) {
-  //     return alert("Enter a port name first.");
-  //   }
-
-  //   // Prevent duplicate ports
-  //   const portExists = ports.some(
-  //     (p) => p.Name.toLowerCase() === trimmedPortName.toLowerCase()
-  //   );
-  //   if (portExists) {
-  //     return alert("Port already exists.");
-  //   }
-
-  //   setLoading(true);
-  //   try {
-  //     // Make the API request to add the new port
-  //     const response = await axios.post(
-  //       "http://localhost:3001/api/portOfLoading/add",
-  //       {
-  //         Name: trimmedPortName,
-  //         // Additional fields like isDisabled, Serialno can be added here if needed
-  //       },
-  //       {
-  //         headers: {
-  //           Authorization: `Bearer ${abisolToken}`, // Ensure the token is added to the header
-  //         },
-  //       }
-  //     );
-
-  //     const newPort = response.data;
-  //     setNewPortName(""); // Clear the input field
-
-  //     // Refresh the ports
-  //     fetchPorts();
-
-  //     // Set the newly created port as selected
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       portOfLoading: newPort.ID,
-  //       portOfLoadingName: newPort.Name,
-  //     }));
-  //   } catch (err) {
-  //     console.error("Failed to add port", err);
-  //   }
-  //   setLoading(false);
-  // };
   const handleAddPort = async () => {
     const trimmedPortName = newPortName.trim();
     if (!trimmedPortName) {
@@ -160,14 +69,11 @@ const PortOfLoadingSelect = ({ formData, setFormData }) => {
     setLoading(true);
     try {
       // Step 1: Fetch existing ports to calculate Serialno
-      const existingPortsRes = await axios.get(
-        "http://localhost:3001/api/portOfLoading",
-        {
-          headers: {
-            Authorization: `Bearer ${abisolToken}`,
-          },
-        }
-      );
+      const existingPortsRes = await axios.get(portOfLoadingApi, {
+        headers: {
+          Authorization: `Bearer ${abisolToken}`,
+        },
+      });
 
       const existingPorts = existingPortsRes.data || [];
 
@@ -179,7 +85,7 @@ const PortOfLoadingSelect = ({ formData, setFormData }) => {
 
       // Step 2: Add the new port
       const response = await axios.post(
-        "http://localhost:3001/api/portOfLoading/add",
+        `${portOfLoadingApi}/add`,
         {
           Name: trimmedPortName,
           isDisabled: false,
@@ -213,7 +119,7 @@ const PortOfLoadingSelect = ({ formData, setFormData }) => {
 
   return (
     <>
-      <Form.Group className="mb-3">
+      <Form.Group className="w-40">
         <Form.Label>Select Port of Loading</Form.Label>
         <Form.Select
           name="portOfLoading"
@@ -229,7 +135,7 @@ const PortOfLoadingSelect = ({ formData, setFormData }) => {
         </Form.Select>
       </Form.Group>
 
-      <Form.Group className="mb-3">
+      <Form.Group className="w-40">
         <Form.Label>Add New Port of Loading</Form.Label>
         <Form.Control
           type="text"
@@ -239,10 +145,11 @@ const PortOfLoadingSelect = ({ formData, setFormData }) => {
           disabled={loading}
         />
       </Form.Group>
-
-      <Button variant="primary" onClick={handleAddPort} disabled={loading}>
-        {loading ? "Adding..." : "Add Port"}
-      </Button>
+      <div>
+        <Button variant="primary" onClick={handleAddPort} disabled={loading}>
+          {loading ? "Adding..." : "Add Port"}
+        </Button>
+      </div>
     </>
   );
 };

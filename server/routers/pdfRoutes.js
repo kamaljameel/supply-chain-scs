@@ -15,6 +15,9 @@ router.post("/upload", upload.single("pdf"), pdfController.uploadPDF);
 // Get all PDFs for a user
 router.get("/user/:userId", pdfController.getPDFsByUser);
 
+// get all pdfs
+router.get("/all", pdfController.getAllPDFs);
+
 // Get a single PDF by ID
 router.get("/:id", pdfController.getPDFById);
 

@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { Button, Modal, Form, Breadcrumb } from "react-bootstrap";
 import FullWidthModal from "./FullWidthModal";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import axios from "axios";
+
+import { pdfsApi, sendpdfToEmailApi } from "@/utils/apiRoutes";
 const Documentation = () => {
   const [showFullWidthModal, setShowFullWidthModal] = useState(false);
   const [selectedInvoiceType, setSelectedInvoiceType] = useState("");
@@ -29,7 +33,7 @@ const Documentation = () => {
   useEffect(() => {
     // Fetch the list of PDFs using Axios
     axios
-      .get("http://localhost:3001/api/pdfs/all")
+      .get(`${pdfsApi}/all`)
       .then((response) => {
         setPdfs(response.data.files);
         setLoading(false);
@@ -132,85 +136,259 @@ const Documentation = () => {
   //   doc.save("submitted_data.pdf");
   // };
 
+  // const generatePDF = async (data) => {
+  //   const doc = new jsPDF();
+
+  //   // Title
+  //   doc.setFontSize(18);
+  //   // doc.text("Submitted Data", 14, 22);
+
+  //   // Document Type
+  //   doc.setFontSize(14);
+  //   doc.text(`Document Type: ${data.DocumentType}`, 14, 30);
+
+  //   // Buyer Information (Left Column)
+  //   doc.setFontSize(16);
+  //   doc.text("Buyer Information", 14, 40);
+
+  //   doc.setFontSize(12);
+  //   doc.text(`Company: ${data.selectedBuyerCompany || "N/A"}`, 14, 50);
+  //   doc.text(`Address: ${data.buyerFullAddress || "N/A"}`, 14, 55);
+  //   doc.text(`City/State/ZIP: ${data.buyerCityStateZIP || "N/A"}`, 14, 60);
+  //   doc.text(`Email: ${data.buyerEmail || "N/A"}`, 14, 65);
+  //   doc.text(`Phone: ${data.buyerPhone || "N/A"}`, 14, 70);
+  //   doc.text(`Contact Person: ${data.buyerContactPerson || "N/A"}`, 14, 75);
+
+  //   // Buyer Bank Details
+  //   doc.setFontSize(16);
+  //   doc.text("Buyer Bank Details", 14, 85);
+  //   doc.setFontSize(12);
+  //   doc.text(`Bank Name: ${data.buyerBankName || "N/A"}`, 14, 90);
+  //   doc.text(`Account Number: ${data.buyerAccountNumber || "N/A"}`, 14, 95);
+  //   doc.text(`SWIFT Code: ${data.buyerSWIFTCode || "N/A"}`, 14, 100);
+  //   doc.text(`IBAN: ${data.buyerIBAN || "N/A"}`, 14, 105);
+  //   doc.text(`Bank Address: ${data.buyerBankAddress || "N/A"}`, 14, 110);
+
+  //   // Seller Information (Right Column)
+  //   const rightX = 105; // X-coordinate for the right column
+  //   doc.setFontSize(16);
+  //   doc.text("Seller Information", rightX, 40);
+
+  //   doc.setFontSize(12);
+  //   doc.text(`Company: ${data.selectedSellerCompany || "N/A"}`, rightX, 50);
+  //   doc.text(`Address: ${data.Shipping_FullAddress || "N/A"}`, rightX, 55);
+  //   doc.text(`City/State/ZIP: ${data.LCity || "N/A"}`, rightX, 60);
+  //   doc.text(`Email: ${data.BusinessEmail1 || "N/A"}`, rightX, 65);
+  //   doc.text(`Phone: ${data.BusinessPhone1 || "N/A"}`, rightX, 70);
+  //   doc.text(`Website: ${data.Website || "N/A"}`, rightX, 75);
+
+  //   // Seller Bank Details
+  //   doc.setFontSize(16);
+  //   doc.text("Seller Bank Details", rightX, 85);
+  //   doc.setFontSize(12);
+  //   doc.text(`Bank Name: ${data.sellerBankName || "N/A"}`, rightX, 90);
+  //   doc.text(
+  //     `Account Number: ${data.sellerAccountNumber || "N/A"}`,
+  //     rightX,
+  //     95
+  //   );
+  //   doc.text(`SWIFT Code: ${data.sellerSWIFTCode || "N/A"}`, rightX, 100);
+  //   doc.text(`IBAN: ${data.sellerIBAN || "N/A"}`, rightX, 105);
+  //   doc.text(`Bank Address: ${data.sellerBankAddress || "N/A"}`, rightX, 110);
+
+  //   // Shipping Information
+  //   doc.setFontSize(16);
+  //   doc.text("Shipping Information", 14, 125);
+  //   doc.setFontSize(12);
+  //   doc.text(`Shipping Terms: ${data.shippingTerms || "N/A"}`, 14, 130);
+  //   // if (data.shippingType === "LCL") {
+  //   //   doc.text(`Volume: ${data.volume || "N/A"}`, 14, 135);
+  //   // } else if (data.shippingType === "FCL") {
+  //   //   doc.text(`Container Type: ${data.containerType || "N/A"}`, 14, 135);
+  //   // }
+  //   doc.text(`Shipping Method: ${data.shippingMethod || "N/A"}`, 14, 140);
+  //   doc.text(`Payment Terms: ${data.paymentTerms || "N/A"}`, 14, 141);
+  //   doc.text(`Payment Method: ${data.paymentMethod || "N/A"}`, 14, 142);
+  //   doc.text(`Variance Terms: ${data.varianceTerms || "N/A"}`, 14, 143);
+  //   doc.text(
+  //     `Port Of dLoading Country: ${data.portOfLoadingCountry || "N/A"}`,
+  //     14,
+  //     144
+  //   );
+  //   doc.text(
+  //     `port Of Loading: ${data.portOfLoading || "N/A"}`,
+  //     14,
+  //     145
+  //   );
+
+  //   // Product Details
+  //   if (data.productDetails && data.productDetails.length > 0) {
+  //     doc.setFontSize(14);
+  //     doc.text("Product Details:", 14, 150);
+
+  //     doc.autoTable({
+  //       startY: 155,
+  //       head: [
+  //         [
+  //           "Item No.",
+  //           "Description",
+  //           "HS Code",
+  //           "Origin of Goods",
+  //           "Quantity",
+  //           "Unit Price",
+  //           "Total Price",
+  //         ],
+  //       ],
+  //       body: data.productDetails.map((product, index) => [
+  //         index + 1,
+  //         product.description || "N/A",
+  //         product.hsCode || "N/A",
+  //         product.origin || "N/A",
+  //         product.quantity || 0,
+  //         product.unitPrice || 0,
+  //         product.totalPrice || 0,
+  //       ]),
+  //     });
+  //   }
+
+  //   // Table for tax, subtotal, and totals
+  //   if (data) {
+  //     doc.autoTable({
+  //       startY: doc.previousAutoTable ? doc.previousAutoTable.finalY + 10 : 155,
+  //       head: [["Tax in %", "Tax in amount", "Subtotal", "Total"]],
+  //       body: [
+  //         [
+  //           data.taxPercentage || 0,
+  //           data.tax || 0,
+  //           data.subtotal || 0,
+  //           data.total || 0,
+  //         ],
+  //       ],
+  //     });
+  //   }
+
+  //   // Terms and Conditions
+  //   const startY = doc.previousAutoTable
+  //     ? doc.previousAutoTable.finalY + 20
+  //     : 175;
+  //   doc.setFontSize(14);
+  //   doc.text("Terms and Conditions:", 14, startY);
+
+  //   const termsText =
+  //     "1. Payment must be made within the due date.\n" +
+  //     "2. The seller is not responsible for any delay caused by the carrier.\n" +
+  //     "3. The buyer must inspect the goods upon receipt and notify the seller within 7 days of any discrepancies.\n" +
+  //     "4. All disputes will be settled in accordance with the laws of the seller's country.";
+  //   const termsStartY = startY + 5;
+  //   const lineHeight = 6;
+  //   const termsArray = doc.splitTextToSize(termsText, 180); // Wrap text to fit within page width
+  //   termsArray.forEach((line, index) => {
+  //     doc.text(line, 14, termsStartY + index * lineHeight);
+  //   });
+  //   // Convert to Blob and upload to API
+  //   try {
+  //     const pdfBlob = doc.output("blob");
+  //     const formData = new FormData();
+  //     formData.append("pdf", pdfBlob, "submitted_data.pdf");
+
+  //     const response = await axios.post(`${pdfsApi}/upload`, formData, {
+  //       headers: { "Content-Type": "multipart/form-data" },
+  //     });
+
+  //     alert(response.data.message);
+  //     // fetchUploadedPDFs();
+  //   } catch (error) {
+  //     console.error("Error uploading PDF:", error);
+  //     alert("Failed to upload PDF");
+  //   }
+  //   // Save the PDF
+  //   // doc.save("submitted_data.pdf");
+  //   return doc;
+  // };
+
   const generatePDF = async (data) => {
-    const doc = new jsPDF();
+    const doc = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+    });
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-    // Title
-    doc.setFontSize(18);
-    // doc.text("Submitted Data", 14, 22);
+    // Title - Centered Document Type
+    doc.setFontSize(20);
+    const documentTypeText = `${data.DocumentType}`;
+    const documentTypeWidth =
+      (doc.getStringUnitWidth(documentTypeText) * doc.internal.getFontSize()) /
+      doc.internal.scaleFactor;
+    const documentTypeX = (pageWidth - documentTypeWidth) / 2;
+    doc.text(documentTypeText, documentTypeX, 22);
 
-    // Document Type
-    doc.setFontSize(14);
-    doc.text(`Document Type: ${data.DocumentType}`, 14, 30);
+    // Invoice Number (Left) and Invoice Date (Right)
+    doc.setFontSize(11);
+    doc.text(`Invoice Number: ${data.inquiryLine || "N/A"}`, 11, 32);
 
-    // Buyer Information (Left Column)
-    doc.setFontSize(16);
-    doc.text("Buyer Information", 14, 40);
+    // Invoice Date on the right side
+    const invoiceDateText = `Invoice Date: ${
+      data.invoiceDate || new Date().toLocaleDateString()
+    }`;
+    const invoiceDateWidth =
+      (doc.getStringUnitWidth(invoiceDateText) * doc.internal.getFontSize()) /
+      doc.internal.scaleFactor;
+    const invoiceDateX = pageWidth - 11 - invoiceDateWidth;
+    doc.text(invoiceDateText, invoiceDateX, 32);
 
+    // Seller Information (Left Column)
     doc.setFontSize(12);
-    doc.text(`Company: ${data.selectedBuyerCompany || "N/A"}`, 14, 50);
-    doc.text(`Address: ${data.buyerFullAddress || "N/A"}`, 14, 55);
-    doc.text(`City/State/ZIP: ${data.buyerCityStateZIP || "N/A"}`, 14, 60);
-    doc.text(`Email: ${data.buyerEmail || "N/A"}`, 14, 65);
-    doc.text(`Phone: ${data.buyerPhone || "N/A"}`, 14, 70);
-    doc.text(`Contact Person: ${data.buyerContactPerson || "N/A"}`, 14, 75);
+    doc.text("Seller Information", 11, 45);
 
-    // Buyer Bank Details
-    doc.setFontSize(16);
-    doc.text("Buyer Bank Details", 14, 85);
+    // Add separator line below Seller Information title
+    doc.setLineWidth(0.5);
+    doc.line(11, 50, 95, 50);
+
+    doc.setFontSize(11);
+    doc.text(`Company: ${data.selectedSellerCompany || "N/A"}`, 11, 55);
+    doc.text(`Address: ${data.Shipping_FullAddress || "N/A"}`, 11, 62);
+    doc.text(`City/State/ZIP: ${data.LCity || "N/A"}`, 11, 69);
+    doc.text(`Country: ${data.LCountry || "N/A"}`, 11, 76);
+    doc.text(`Email: ${data.BusinessEmail1 || "N/A"}`, 11, 83);
+    doc.text(`Phone: ${data.BusinessPhone1 || "N/A"}`, 11, 90);
+    doc.text(`Website: ${data.Website || "N/A"}`, 11, 97);
+
+    // Buyer Information (Right Column)
+    const rightX = 125; // X-coordinate for the right column
     doc.setFontSize(12);
-    doc.text(`Bank Name: ${data.buyerBankName || "N/A"}`, 14, 90);
-    doc.text(`Account Number: ${data.buyerAccountNumber || "N/A"}`, 14, 95);
-    doc.text(`SWIFT Code: ${data.buyerSWIFTCode || "N/A"}`, 14, 100);
-    doc.text(`IBAN: ${data.buyerIBAN || "N/A"}`, 14, 105);
-    doc.text(`Bank Address: ${data.buyerBankAddress || "N/A"}`, 14, 110);
+    doc.text("Buyer Information", rightX, 45);
 
-    // Seller Information (Right Column)
-    const rightX = 105; // X-coordinate for the right column
-    doc.setFontSize(16);
-    doc.text("Seller Information", rightX, 40);
+    // Add separator line below Buyer Information title
+    doc.setLineWidth(0.5);
+    doc.line(rightX, 50, pageWidth - 11, 50);
 
-    doc.setFontSize(12);
-    doc.text(`Company: ${data.selectedSellerCompany || "N/A"}`, rightX, 50);
-    doc.text(`Address: ${data.Shipping_FullAddress || "N/A"}`, rightX, 55);
-    doc.text(`City/State/ZIP: ${data.LCity || "N/A"}`, rightX, 60);
-    doc.text(`Email: ${data.BusinessEmail1 || "N/A"}`, rightX, 65);
-    doc.text(`Phone: ${data.BusinessPhone1 || "N/A"}`, rightX, 70);
-    doc.text(`Website: ${data.Website || "N/A"}`, rightX, 75);
-
-    // Seller Bank Details
-    doc.setFontSize(16);
-    doc.text("Seller Bank Details", rightX, 85);
-    doc.setFontSize(12);
-    doc.text(`Bank Name: ${data.sellerBankName || "N/A"}`, rightX, 90);
+    doc.setFontSize(11);
+    doc.text(`Company: ${data.selectedBuyerCompany || "N/A"}`, rightX, 55);
+    doc.text(`Address: ${data.buyerFullAddress || "N/A"}`, rightX, 62);
+    doc.text(`City/State/ZIP: ${data.buyerCityStateZIP || "N/A"}`, rightX, 69);
+    doc.text(`Country: ${data.buyerCountry || "N/A"}`, rightX, 76);
+    doc.text(`Email: ${data.buyerEmail || "N/A"}`, rightX, 83);
+    doc.text(`Phone: ${data.buyerPhone || "N/A"}`, rightX, 90);
+    doc.text(`Website: ${data.buyerWebsite || "N/A"}`, rightX, 97);
     doc.text(
-      `Account Number: ${data.sellerAccountNumber || "N/A"}`,
+      `Contact Person: ${data.buyerContactPerson || "N/A"}`,
       rightX,
-      95
+      104
     );
-    doc.text(`SWIFT Code: ${data.sellerSWIFTCode || "N/A"}`, rightX, 100);
-    doc.text(`IBAN: ${data.sellerIBAN || "N/A"}`, rightX, 105);
-    doc.text(`Bank Address: ${data.sellerBankAddress || "N/A"}`, rightX, 110);
-
-    // Shipping Information
-    doc.setFontSize(16);
-    doc.text("Shipping Information", 14, 125);
-    doc.setFontSize(12);
-    doc.text(`Shipping Type: ${data.shippingType || "N/A"}`, 14, 130);
-    if (data.shippingType === "LCL") {
-      doc.text(`Volume: ${data.volume || "N/A"}`, 14, 135);
-    } else if (data.shippingType === "FCL") {
-      doc.text(`Container Type: ${data.containerType || "N/A"}`, 14, 135);
-    }
-    doc.text(`Shipping Mode: ${data.shippingMode || "N/A"}`, 14, 140);
 
     // Product Details
+    let productDetailsY = 117;
     if (data.productDetails && data.productDetails.length > 0) {
-      doc.setFontSize(14);
-      doc.text("Product Details:", 14, 150);
+      doc.setFontSize(12);
+      doc.text("Product Details", 11, productDetailsY);
+
+      // Add separator line below Product Details title
+      doc.setLineWidth(0.5);
+      doc.line(11, productDetailsY + 5, pageWidth - 11, productDetailsY + 5);
 
       doc.autoTable({
-        startY: 155,
+        startY: productDetailsY + 10,
         head: [
           [
             "Item No.",
@@ -237,7 +415,9 @@ const Documentation = () => {
     // Table for tax, subtotal, and totals
     if (data) {
       doc.autoTable({
-        startY: doc.previousAutoTable ? doc.previousAutoTable.finalY + 10 : 155,
+        startY: doc.previousAutoTable
+          ? doc.previousAutoTable.finalY + 10
+          : productDetailsY + 15,
         head: [["Tax in %", "Tax in amount", "Subtotal", "Total"]],
         body: [
           [
@@ -250,50 +430,212 @@ const Documentation = () => {
       });
     }
 
-    // Terms and Conditions
-    const startY = doc.previousAutoTable
-      ? doc.previousAutoTable.finalY + 20
-      : 175;
-    doc.setFontSize(14);
-    doc.text("Terms and Conditions:", 14, startY);
+    // Shipping Information - Below product details in two columns
+    let shippingY = doc.previousAutoTable
+      ? doc.previousAutoTable.finalY + 15
+      : 170;
 
+    // Check if shipping information would go off the page
+    if (shippingY + 60 > doc.internal.pageSize.getHeight() - 20) {
+      doc.addPage();
+      shippingY = 20; // Reset to top of new page with some margin
+    }
+
+    // Shipping Information Header
+    doc.setFontSize(12);
+    doc.text("Shipping Information", 11, shippingY);
+
+    // Add separator line below Shipping Information title
+    doc.setLineWidth(0.5);
+    doc.line(11, shippingY + 5, pageWidth - 11, shippingY + 5);
+
+    // Left column of shipping details
+    const leftColX = 11;
+    const rightColX = 105;
+    doc.setFontSize(11);
+
+    // Left column shipping details
+    doc.text(
+      `Shipment Date: ${data.shipmentDate || "N/A"}`,
+      leftColX,
+      shippingY + 10
+    );
+    doc.text(
+      `Shipping Mode: ${data.shippingMode || "N/A"}`,
+      leftColX,
+      shippingY + 17
+    );
+    doc.text(`Carrier: ${data.carrier || "N/A"}`, leftColX, shippingY + 24);
+    doc.text(
+      `Shipping Terms: ${data.shippingTermsName || "N/A"}`,
+      leftColX,
+      shippingY + 31
+    );
+    doc.text(
+      `Shipping Method: ${data.shippingMethodName || "N/A"}`,
+      leftColX,
+      shippingY + 38
+    );
+    doc.text(
+      `Payment Terms: ${data.paymentTermsName || "N/A"}`,
+      leftColX,
+      shippingY + 45
+    );
+
+    // Right column shipping details
+    doc.text(
+      `Payment Method: ${data.paymentMethodName || "N/A"}`,
+      rightColX,
+      shippingY + 10
+    );
+    doc.text(
+      `Variance Terms: ${data.varianceTermsName || "N/A"}`,
+      rightColX,
+      shippingY + 17
+    );
+    doc.text(
+      `Port Of Loading Country: ${data.portOfLoadingCountry || "N/A"}`,
+      rightColX,
+      shippingY + 24
+    );
+    doc.text(
+      `Port Of Loading: ${data.portOfLoadingName || "N/A"}`,
+      rightColX,
+      shippingY + 31
+    );
+    doc.text(
+      `Port Of Discharge Country: ${data.portOfDischargeCountry || "N/A"}`,
+      rightColX,
+      shippingY + 38
+    );
+    doc.text(
+      `Port Of Discharge: ${data.portOfDischargeName || "N/A"}`,
+      rightColX,
+      shippingY + 45
+    );
+
+    // Bank Details - Below shipping information
+    let bankDetailsY = shippingY + 60;
+
+    // Check if bank details would go off the page
+    if (bankDetailsY + 70 > doc.internal.pageSize.getHeight() - 20) {
+      doc.addPage();
+      bankDetailsY = 20; // Reset to top of new page with some margin
+    }
+
+    // Bank Details Header with clear separation
+    doc.setFontSize(12);
+    doc.text("Bank Details", pageWidth / 2 - 15, bankDetailsY);
+
+    // Add a separator line below the header
+    doc.setLineWidth(0.5);
+    doc.line(11, bankDetailsY + 5, pageWidth - 11, bankDetailsY + 5);
+
+    // Seller Bank Details - Left Column
+    doc.setFontSize(11);
+    doc.text("Seller Bank Details", leftColX, bankDetailsY + 15);
+    doc.setFontSize(11);
+    doc.text(
+      `Bank Name: ${data.sellerBankName || "N/A"}`,
+      leftColX,
+      bankDetailsY + 25
+    );
+    doc.text(
+      `Account Number: ${data.sellerAccountNumber || "N/A"}`,
+      leftColX,
+      bankDetailsY + 32
+    );
+    doc.text(
+      `SWIFT Code: ${data.sellerSWIFTCode || "N/A"}`,
+      leftColX,
+      bankDetailsY + 39
+    );
+    doc.text(`IBAN: ${data.sellerIBAN || "N/A"}`, leftColX, bankDetailsY + 46);
+    doc.text(
+      `Bank Address: ${data.sellerBankAddress || "N/A"}`,
+      leftColX,
+      bankDetailsY + 53
+    );
+
+    // Buyer Bank Details - Right Column
+    doc.setFontSize(11);
+    doc.text("Buyer Bank Details", rightColX, bankDetailsY + 15);
+    doc.setFontSize(11);
+    doc.text(
+      `Bank Name: ${data.buyerBankName || "N/A"}`,
+      rightColX,
+      bankDetailsY + 25
+    );
+    doc.text(
+      `Account Number: ${data.buyerAccountNumber || "N/A"}`,
+      rightColX,
+      bankDetailsY + 32
+    );
+    doc.text(
+      `SWIFT Code: ${data.buyerSWIFTCode || "N/A"}`,
+      rightColX,
+      bankDetailsY + 39
+    );
+    doc.text(`IBAN: ${data.buyerIBAN || "N/A"}`, rightColX, bankDetailsY + 46);
+    doc.text(
+      `Bank Address: ${data.buyerBankAddress || "N/A"}`,
+      rightColX,
+      bankDetailsY + 53
+    );
+
+    // Terms and Conditions - Below bank details
+    const termsY = bankDetailsY + 65;
+
+    // Check if Terms would go off the page
+    if (termsY + 40 > doc.internal.pageSize.getHeight() - 10) {
+      doc.addPage();
+      var termsStartY = 20; // Start at top of new page with margin
+    } else {
+      var termsStartY = termsY;
+    }
+
+    // Terms and Conditions Header with clean separation
+    doc.setFontSize(12);
+    doc.text("Terms and Conditions", 11, termsStartY);
+
+    // Add a separator line below the header
+    doc.setLineWidth(0.5);
+    doc.line(11, termsStartY + 5, pageWidth - 11, termsStartY + 5);
+
+    // Terms and Conditions content
     const termsText =
       "1. Payment must be made within the due date.\n" +
       "2. The seller is not responsible for any delay caused by the carrier.\n" +
       "3. The buyer must inspect the goods upon receipt and notify the seller within 7 days of any discrepancies.\n" +
       "4. All disputes will be settled in accordance with the laws of the seller's country.";
-    const termsStartY = startY + 5;
-    const lineHeight = 6;
+    const lineHeight = 8; // Good spacing for terms
     const termsArray = doc.splitTextToSize(termsText, 180); // Wrap text to fit within page width
     termsArray.forEach((line, index) => {
-      doc.text(line, 14, termsStartY + index * lineHeight);
+      doc.text(line, 11, termsStartY + 15 + index * lineHeight);
     });
+
     // Convert to Blob and upload to API
     try {
       const pdfBlob = doc.output("blob");
       const formData = new FormData();
       formData.append("pdf", pdfBlob, "submitted_data.pdf");
 
-      const response = await axios.post(
-        "http://localhost:3001/api/pdfs/upload",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      const response = await axios.post(`${pdfsApi}/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
-      alert(response.data.message);
+      toast.success(response.data.message);
       // fetchUploadedPDFs();
     } catch (error) {
       console.error("Error uploading PDF:", error);
-      alert("Failed to upload PDF");
+
+      toast.error("Failed to upload PDF");
     }
-    // Save the PDF
-    // doc.save("submitted_data.pdf");
+
     return doc;
   };
-  const handleDownloadPDF = () => {
-    const doc = generatePDF(submittedData);
+  const handleDownloadPDF = async () => {
+    const doc = await generatePDF(submittedData);
     doc.save("submitted_data.pdf");
   };
 
@@ -307,18 +649,18 @@ const Documentation = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3001/api/send-email",
+        `${sendpdfToEmailApi}/send-email`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
 
-      alert(response.data.message);
+      toast.success(response.data.message);
     } catch (error) {
       console.error("Error sending email:", error);
 
-      alert("Failed to send email");
+      toast.success("Failed to send email");
     }
   };
 
@@ -499,6 +841,7 @@ const Documentation = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      <ToastContainer />
       <FullWidthModal
         show={showFullWidthModal}
         onHide={handleFullWidthModalClose}
@@ -509,8 +852,8 @@ const Documentation = () => {
       />
       {submittedData && (
         <div>
-          <h3>Submitted Data</h3>
-          <pre>{JSON.stringify(submittedData, null, 2)}</pre>
+          {/* <h3>Submitted Data</h3>
+          <pre>{JSON.stringify(submittedData, null, 2)}</pre> */}
         </div>
       )}
     </>
