@@ -36,7 +36,82 @@ router.post("/submit", async (req, res) => {
     });
   }
 });
+// ✅ Get All Inquiries
+router.get("/", async (req, res) => {
+  const apiUrl = "https://api.abisolcrm.com.au/v1/Inquiry";
+  const apiHeaders = getApiHeaders(req);
 
+  try {
+    const response = await axios.get(apiUrl, { headers: apiHeaders });
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error("Fetch Error:", error?.response?.data || error.message);
+    res.status(500).json({
+      error: "Failed to fetch inquiries",
+      details: error?.response?.data || error.message,
+    });
+  }
+});
+
+// ✅ Update Inquiry by ID
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  const apiUrl = `https://api.abisolcrm.com.au/v1/Inquiry/${id}`;
+  const apiHeaders = getApiHeaders(req);
+
+  try {
+    const response = await axios.put(apiUrl, req.body, {
+      headers: apiHeaders,
+    });
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error("Update Error:", error?.response?.data || error.message);
+    res.status(500).json({
+      error: "Failed to update inquiry",
+      details: error?.response?.data || error.message,
+    });
+  }
+});
+// ✅ Get Single Inquiry by ID
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  const apiUrl = `https://api.abisolcrm.com.au/v1/Inquiry/${id}`;
+  const apiHeaders = getApiHeaders(req);
+
+  try {
+    const response = await axios.get(apiUrl, {
+      headers: apiHeaders,
+    });
+    res.status(200).json(response.data);
+  } catch (error) {
+    console.error(
+      "Fetch Single Inquiry Error:",
+      error?.response?.data || error.message
+    );
+    res.status(500).json({
+      error: "Failed to fetch single inquiry",
+      details: error?.response?.data || error.message,
+    });
+  }
+});
+
+// ✅ Delete Inquiry by ID
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  const apiUrl = `https://api.abisolcrm.com.au/v1/Inquiry/${id}`;
+  const apiHeaders = getApiHeaders(req);
+
+  try {
+    const response = await axios.delete(apiUrl, { headers: apiHeaders });
+    res.status(200).json({ message: "Inquiry deleted", data: response.data });
+  } catch (error) {
+    console.error("Delete Error:", error?.response?.data || error.message);
+    res.status(500).json({
+      error: "Failed to delete inquiry",
+      details: error?.response?.data || error.message,
+    });
+  }
+});
 // POST route to forward inquiry to secondary API
 router.post("/add-product-to-list", async (req, res) => {
   const secondaryApiUrl = "https://api.abisolcrm.com.au/v1/InquiryProductLine"; // Replace this URL if it is different

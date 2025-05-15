@@ -8,6 +8,8 @@ import "jspdf-autotable";
 import axios from "axios";
 
 import { pdfsApi, sendpdfToEmailApi } from "@/utils/apiRoutes";
+import InquiriesTable from "./InquiriesTable";
+
 const Documentation = () => {
   const [showFullWidthModal, setShowFullWidthModal] = useState(false);
   const [selectedInvoiceType, setSelectedInvoiceType] = useState("");
@@ -29,7 +31,17 @@ const Documentation = () => {
     "Performa Invoice",
     "Commercial Invoice",
   ]);
+  const [editInquiry, setEditInquiry] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
+  const handleEditClick = (inquiry) => {
+    setEditInquiry(inquiry);
+    console.log("ahmad", inquiry);
+  };
+
+  const triggerRefresh = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
   useEffect(() => {
     // Fetch the list of PDFs using Axios
     axios
@@ -60,6 +72,11 @@ const Documentation = () => {
     setShowInvoiceModal(false);
   };
 
+  useEffect(() => {
+    if (editInquiry) {
+      setShowFullWidthModal(true);
+    }
+  }, [editInquiry]);
   const handleInvoiceTypeSelect = (e) => {
     const value = e.target.value;
     if (value === "Performa Invoice") {
@@ -752,6 +769,10 @@ const Documentation = () => {
             </ul>
           )}
         </div>
+        <InquiriesTable
+          onEditClick={handleEditClick}
+          refreshTrigger={refreshKey}
+        />
       </div>
       <Modal
         show={showInvoiceModal}
@@ -849,6 +870,8 @@ const Documentation = () => {
         companyOptions={companyOptions}
         addCompany={addCompany}
         selectedInvoiceType={selectedInvoiceType}
+        inquiry={editInquiry}
+        onUpdated={triggerRefresh}
       />
       {submittedData && (
         <div>

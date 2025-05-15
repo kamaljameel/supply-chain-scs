@@ -112,6 +112,8 @@ const FullWidthModal = ({
   selectedInvoiceType,
   businessbutton,
   showMyProfile,
+  inquiry,
+  onUpdated,
 }) => {
   const [currentStep, setCurrentStep] = useState(2);
   const [selectedSellerCompany, setselectedSellerCompany] = useState("");
@@ -136,7 +138,7 @@ const FullWidthModal = ({
     portOfLoadingCountry: "",
     portOfLoading: null,
     portOfDischargeCountry: "",
-    portOfDischarge: null,
+    portOfDischarge: inquiry?.portOfDischarge || null,
     sellerLogo: null,
     buyerLogo: null,
     sellerDocument: null,
@@ -146,9 +148,9 @@ const FullWidthModal = ({
     email: "",
     tenantDomain: null,
     recordTitle: null,
-    inquiryLine: "",
+    inquiryLine: inquiry?.InquiryLine || "",
     invoiceDate: "",
-    inquiryID: 0,
+    inquiryID: inquiry?.inquiryID || 0,
     businessID: null,
     businessName: null,
     contactID: null,
@@ -262,7 +264,7 @@ const FullWidthModal = ({
     buyerIBAN: "",
     buyerBankAddress: null,
     shippingMode: "",
-    carrier: "",
+    carrier: inquiry?.Carrier || "",
   });
   const [productDetails, setProductDetails] = useState([]);
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -1031,6 +1033,21 @@ const FullWidthModal = ({
   //   }
   // };
 
+  useEffect(() => {
+    if (inquiry && inquiry.InquiryID) {
+      setFormData({
+        ...inquiry,
+        BusinessName:
+          inquiry.selectedSellerCompany || inquiry.BusinessName || "",
+        buyerBusinessName:
+          inquiry.selectedBuyerCompany || inquiry.buyerBusinessName || "",
+        carrier: inquiry?.Carrier || "",
+      });
+
+      setInquireyId(inquiry.InquiryID); // ✅ use this for edit
+    }
+  }, [inquiry]);
+
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     dispatch({
@@ -1281,30 +1298,66 @@ const FullWidthModal = ({
   // };
 
   const nextStep = async () => {
+    // if (currentStep === 4) {
+    //   // console.log("step 4");
+    //   // Call the API when navigating to step 3
+    //   setLoading(true);
+    //   try {
+    //     const response = await axios.post(inquiryApi, formData, {
+    //       headers: {
+    //         Authorization: `Bearer ${abisolToken}`, // ✅ This is the missing part
+    //         "Content-Type": "application/json", // Optional if using JSON
+    //       },
+    //     });
+    //     console.log("API response:", response.data);
+
+    //     toast.success("Inquiry successfully created");
+    //     setInquireyId(response.data.InquiryID);
+    //   } catch (error) {
+    //     console.error(
+    //       "Error calling the API:",
+    //       error?.response?.data || error.message
+    //     );
+
+    //     toast.error("Failed to submit inquiry.");
+    //   } finally {
+    //     setLoading(false); // Hide spinner
+    //   }
+    // }
+
     if (currentStep === 4) {
-      // console.log("step 4");
-      // Call the API when navigating to step 3
       setLoading(true);
+
       try {
-        const response = await axios.post(inquiryApi, formData, {
-          headers: {
-            Authorization: `Bearer ${abisolToken}`, // ✅ This is the missing part
-            "Content-Type": "application/json", // Optional if using JSON
-          },
-        });
-        console.log("API response:", response.data);
+        if (inquieryId) {
+          // ✅ EDIT: InquiryID exists, so update instead of creating
+          await axios.put(
+            `http://localhost:3001/api/Inquiry/${inquieryId}`,
+            formData,
+            {
+              headers: {
+                Authorization: `Bearer ${abisolToken}`,
+              },
+            }
+          );
+          toast.success("Inquiry updated successfully");
+        } else {
+          // ✅ CREATE: InquiryID does not exist, so create new
+          const response = await axios.post(inquiryApi, formData, {
+            headers: {
+              Authorization: `Bearer ${abisolToken}`,
+              "Content-Type": "application/json",
+            },
+          });
 
-        toast.success("Inquiry successfully created");
-        setInquireyId(response.data.InquiryID);
+          setInquireyId(response.data.InquiryID); // Save the new ID
+          toast.success("Inquiry successfully created");
+        }
       } catch (error) {
-        console.error(
-          "Error calling the API:",
-          error?.response?.data || error.message
-        );
-
+        console.error("API error:", error?.response?.data || error.message);
         toast.error("Failed to submit inquiry.");
       } finally {
-        setLoading(false); // Hide spinner
+        setLoading(false);
       }
     }
 
@@ -1491,16 +1544,33 @@ const FullWidthModal = ({
 
       const editRes = await editInquiryApi(currentInquiryId, editPayload);
       console.log("Edit success:", editRes.data);
+      alert("Updated successfully");
+      onUpdated();
     } catch (error) {
       console.error(
         "Error during submit or edit:",
         error?.response?.data || error.message
       );
     }
-
+    // try {
+    //   await axios.put(
+    //     `http://localhost:3001/api/Inquiry/${inquiry.InquiryID}`,
+    //     formData,
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${abisolToken}`,
+    //       },
+    //     }
+    //   );
+    //   alert("Updated successfully");
+    //   onUpdated();
+    // } catch (error) {
+    //   alert("Failed to update");
+    // }
     // Reset everything
     dispatch({ type: "RESET_FORM" });
     setCurrentStep(1);
+    setInquireyId(null);
     setTimeout(() => {
       setFormData({});
       setProductDetails([]);
@@ -2191,7 +2261,7 @@ const FullWidthModal = ({
                 type="text"
                 placeholder="Carrier Name"
                 name="carrier"
-                value={formData.carrier || ""}
+                value={formData.carrier || inquiry?.Carrier || ""}
                 onChange={handleFormChange}
               />
             </Form.Group>
