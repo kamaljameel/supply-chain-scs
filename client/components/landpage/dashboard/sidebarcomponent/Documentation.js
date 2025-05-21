@@ -42,20 +42,20 @@ const Documentation = () => {
   const triggerRefresh = () => {
     setRefreshKey((prev) => prev + 1);
   };
-  useEffect(() => {
-    // Fetch the list of PDFs using Axios
-    axios
-      .get(`${pdfsApi}/all`)
-      .then((response) => {
-        setPdfs(response.data.files);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching PDFs:", err);
-        setError("Failed to fetch PDFs.");
-        setLoading(false);
-      });
-  }, []);
+  // useEffect(() => {
+  //   // Fetch the list of PDFs using Axios
+  //   axios
+  //     .get(`${pdfsApi}/all`)
+  //     .then((response) => {
+  //       setPdfs(response.data.files);
+  //       setLoading(false);
+  //     })
+  //     .catch((err) => {
+  //       console.error("Error fetching PDFs:", err);
+  //       setError("Failed to fetch PDFs.");
+  //       setLoading(false);
+  //     });
+  // }, []);
   const handleCloseInvoiceModal = () => {
     setShowInvoiceModal(false);
     SetInvoiceConevert(false);
@@ -750,7 +750,7 @@ const Documentation = () => {
         </Button>
         <div>
           <h2 className="text-xl font-semibold mb-4">All Uploaded PDFs</h2>
-          {pdfs.length === 0 ? (
+          {/* {pdfs.length === 0 ? (
             <p>No PDFs found.</p>
           ) : (
             <ul className="space-y-2">
@@ -767,7 +767,7 @@ const Documentation = () => {
                 </li>
               ))}
             </ul>
-          )}
+          )} */}
         </div>
         <InquiriesTable
           onEditClick={handleEditClick}
