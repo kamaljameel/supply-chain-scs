@@ -31,7 +31,6 @@ jobs:
           port: ${{ secrets.SSH_PORT || '22' }}
           source: "supply-chain-scs/client/.next, supply-chain-scs/client/public, supply-chain-scs/client/package.json"
           target: "/home/iscspczw/supply-chain-app-dev"
-          exclude: ".env,.env.local,.env.production"
 
       # ---------- BACKEND ----------
       - name: Install & Build Backend (Node.js)
@@ -50,7 +49,6 @@ jobs:
           port: ${{ secrets.SSH_PORT || '22' }}
           source: "supply-chain-scs/server/*"
           target: "/home/iscspczw/supply-chain-api"
-          exclude: ".env,.env.local,.env.production"
 
       - name: ✅ Done
         run: echo "Deployment complete!"
