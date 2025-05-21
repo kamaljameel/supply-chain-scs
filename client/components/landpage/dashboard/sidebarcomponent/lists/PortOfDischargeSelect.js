@@ -120,7 +120,7 @@ const PortOfDischargeSelect = ({ formData, setFormData }) => {
 
   return (
     <>
-      <Form.Group className="w-40">
+      {/* <Form.Group className="w-40">
         <Form.Label>Select Port of Discharge</Form.Label>
         <Form.Select
           name="portOfDischarge"
@@ -134,6 +134,25 @@ const PortOfDischargeSelect = ({ formData, setFormData }) => {
             </option>
           ))}
         </Form.Select>
+      </Form.Group> */}
+      <Form.Group className="w-40">
+        <Form.Label>Select Port of Discharge</Form.Label>
+        {ports.length > 0 ? (
+          <Form.Select
+            name="portOfDischarge"
+            value={formData.portOfDischarge || ""}
+            onChange={handleSelectChange}
+          >
+            <option value="">-- Select Port --</option>
+            {ports.map((port) => (
+              <option key={port.ID} value={port.ID}>
+                {port.Name}
+              </option>
+            ))}
+          </Form.Select>
+        ) : (
+          <p>Loading ports...</p>
+        )}
       </Form.Group>
 
       <Form.Group className="w-40">

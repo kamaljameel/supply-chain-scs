@@ -2,10 +2,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import DataTable from "datatables.net-react";
-import DataTablesCore from "datatables.net-dt";
-// import "datatables.net-dt/css/jquery.dataTables.css";
-import "datatables.net-select-dt";
-import "datatables.net-responsive-dt";
+import DataTablesCore from "datatables.net-bs5"; // Bootstrap 5 theme
+// import "datatables.net-select-bs5";
+// import "datatables.net-responsive-bs5";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 DataTable.use(DataTablesCore);
 
@@ -79,33 +81,57 @@ const InquiriesTable = ({ onEditClick, refreshTrigger }) => {
 
   // Formatting data for the table with edit and delete actions
   const formattedData = data.map((item) => [
-    item.InquiryID, // InquiryID for display
-    item.InquiryLine, // InquiryLine for display
-    item.InquiryID, // InquiryID is also used for action buttons
+    item.InquiryID,
+    item.InquiryLine,
+    item.ExpectedShipmentDate,
+    item.Carrier,
+    item.RevenueCurrency,
+    item.InquiryID,
   ]);
 
   return (
-    <div className="table-responsive">
+    <div className="table-container shadow-sm rounded p-3 bg-white mt-4">
+      <h5 className="mb-3">Inquiry List</h5>
       <DataTable
+        className="table table-striped table-hover table-bordered text-center align-middle"
         data={formattedData}
         columns={[
           { title: "Inquiry ID" },
           { title: "Inquiry Line" },
+          { title: "Expected Shipping Date" },
+          { title: "Carrier" },
+          { title: "Currency" },
           {
             title: "Actions",
             orderable: false,
             createdCell: (td, cellData, rowData) => {
-              const id = rowData[0]; // rowData[0] is InquiryID
+              const id = rowData[0];
               td.innerHTML = `
-                <button class="btn btn-sm btn-primary edit-btn">Edit</button>
-                <button class="btn btn-sm btn-danger delete-btn">Delete</button>
-              `;
-              // Attach event listeners directly to the buttons
+            <div class="d-flex">
+            <button class="btn btn-sm btn-outline-primary me-2 edit-btn">
+              <i class="bi bi-pencil-square"></i> Edit
+            </button>
+            <button class="btn btn-sm btn-outline-danger delete-btn">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+            </div>
+          `;
               td.querySelector(".edit-btn").onclick = () => handleEdit(id);
               td.querySelector(".delete-btn").onclick = () => handleDelete(id);
             },
           },
         ]}
+        options={{
+          paging: true,
+          pageLength: 5,
+          lengthMenu: [5, 10, 25, 50],
+          responsive: true,
+          language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search inquiries...",
+            lengthMenu: "Show _MENU_ entries",
+          },
+        }}
       />
     </div>
   );
