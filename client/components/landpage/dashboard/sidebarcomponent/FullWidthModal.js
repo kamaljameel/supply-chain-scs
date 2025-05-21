@@ -138,7 +138,7 @@ const FullWidthModal = ({
     portOfLoadingCountry: "",
     portOfLoading: null,
     portOfDischargeCountry: "",
-    portOfDischarge: inquiry?.portOfDischarge || null,
+    portOfDischarge: null,
     sellerLogo: null,
     buyerLogo: null,
     sellerDocument: null,
@@ -1042,6 +1042,9 @@ const FullWidthModal = ({
         buyerBusinessName:
           inquiry.selectedBuyerCompany || inquiry.buyerBusinessName || "",
         carrier: inquiry?.Carrier || "",
+        portOfDischargeCountry: inquiry.portOfDischargeCountry || "",
+        portOfDischarge: inquiry.portOfDischarge || "", // 🟢 must match existing port ID
+        // portOfDischargeName: inquiry.portOfDischargeName || "",
       });
 
       setInquireyId(inquiry.InquiryID); // ✅ use this for edit
@@ -1067,6 +1070,15 @@ const FullWidthModal = ({
       sellerCountryCode: countryCode,
     }));
   };
+  //   const handleCountrySelect = (selectedOption, fieldName = "LCountry") => {
+  //   if (!selectedOption) return;
+
+  //   setFormData((prevData) => ({
+  //     ...prevData,
+  //     [fieldName]: selectedOption.value, // Store the country code (value) instead of label
+  //     [`${fieldName}Label`]: selectedOption.label, // Store the label separately if needed
+  //   }));
+  // };
 
   const handlePhoneChange = (value) => {
     setFormData((prevData) => ({
@@ -1715,13 +1727,14 @@ const FullWidthModal = ({
                 placeholder="Select a country"
               /> */}
               <Select
+                className="countryinput"
                 options={countries}
                 value={
                   formData.LCountry
                     ? countries.find(
                         (country) =>
                           // country.value === formData.sellerCountryCode
-                          country.value === formData.LCountry
+                          country.label === formData.LCountry
                       )
                     : null
                 }
@@ -1845,7 +1858,7 @@ const FullWidthModal = ({
                 value={
                   formData.buyerCountry
                     ? countries.find(
-                        (country) => country.value === formData.buyerCountry
+                        (country) => country.label === formData.buyerCountry
                       )
                     : null
                 }
@@ -2839,7 +2852,7 @@ const FullWidthModal = ({
                     ? countries.find(
                         (country) =>
                           // country.value === formData.sellerCountryCode
-                          country.value === formData.LCountry
+                          country.label === formData.LCountry
                       )
                     : null
                 }
@@ -3198,7 +3211,7 @@ const FullWidthModal = ({
                 value={
                   formData.buyerCountryCode
                     ? countries.find(
-                        (country) => country.value === formData.buyerCountryCode
+                        (country) => country.label === formData.buyerCountryCode
                       )
                     : null
                 }

@@ -55,6 +55,15 @@ export const resetPasswordApi = `${host}/api/reset-password`;
 export const addProductApi = `${host}/api/products`;
 export const inquiryApi = `${host}/api/inquiry/submit`;
 export const profileApi = `${host}/api/userRoutes/profile`;
+export const portOfLoadingApi = `${host}/api/portOfLoading`;
+export const portOfDischargeApi = `${host}/api/portOfDischarge`;
+export const paymentTermsApi = `${host}/api/paymentTerms`;
+export const paymentMethodApi = `${host}/api/paymentMethod`;
+export const varianceTermsApi = `${host}/api/varianceTerms`;
+export const shippingTermsApi = `${host}/api/shippingTerms`;
+export const shippingMethodApi = `${host}/api/shippingMethod`;
+export const pdfsApi = `${host}/api/pdfs`;
+export const sendpdfToEmailApi = `${host}/api`;
 
 export const addProductToListApi = `${host}/api/inquiry/add-product-to-list`;
 

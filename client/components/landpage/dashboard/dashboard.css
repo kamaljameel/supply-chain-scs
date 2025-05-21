@@ -273,3 +273,47 @@ body {
     max-width: 1200px !important;
   }
 }
+.css-1dimb5e-singleValue {
+  margin-left: 10px !important;
+}
+/*  */
+.table-container {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.06);
+}
+
+.dataTables_wrapper .dataTables_length label,
+.dataTables_wrapper .dataTables_filter label {
+  font-weight: 500;
+  color: #333;
+}
+
+.dataTables_wrapper .dataTables_length select,
+.dataTables_wrapper .dataTables_filter input {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-left: 0.5rem;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  padding: 0.25rem 0.75rem;
+  margin: 0 2px;
+  border-radius: 6px;
+  background-color: #f1f1f1;
+  color: #007bff !important;
+  transition: background-color 0.2s;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background-color: #007bff;
+  color: white !important;
+  border: none;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background-color: #0056b3;
+  color: white !important;
+}

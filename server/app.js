@@ -58,7 +58,7 @@ app.use("/api/forgot-password", forgotpassword);
 app.use("/api/reset-password", resetpassword);
 app.use("/api/verify-email", verifyemail);
 app.use("/api/products", productRoutes);
-app.use("/api/inquiry", inquiryRoutes);
+
 app.use("/api/userRoutes", profileRoutes);
 app.use("/api/business", businessRoutes);
 app.use("/api", emailRoutes);
@@ -70,7 +70,7 @@ app.use("/api/paymentMethod", paymentMethodRoutes);
 app.use("/api/varianceTerms", varianceTermsRoutes);
 app.use("/api/shippingTerms", shippingTermsRoutes);
 app.use("/api/shippingMethod", shippingMethodRoutes);
-
+app.use("/api/inquiry", inquiryRoutes);
 // busness inquiry
 app.use("/api/business-inquiries", businessInquiryRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
