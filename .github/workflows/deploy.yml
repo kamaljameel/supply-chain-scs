@@ -14,7 +14,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # ----------------- FRONTEND -----------------
+      # ---------- FRONTEND ----------
       - name: Install & Build Frontend (Next.js)
         run: |
           cd client
@@ -29,15 +29,16 @@ jobs:
           username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.SSH_PORT || '22' }}
-          source: "supply-chain/.next, supply-chain/public, supply-chain/package.json"
-          target: '/home/iscspczw/supply-chain-app-dev'
+          source: "supply-chain-scs/client/.next, supply-chain-scs/client/public, supply-chain-scs/client/package.json"
+          target: "/home/iscspczw/supply-chain-app-dev"
+          exclude: ".env,.env.local,.env.production"
 
-      # ----------------- BACKEND -----------------
+      # ---------- BACKEND ----------
       - name: Install & Build Backend (Node.js)
         run: |
           cd server
           npm install
-          npm run build || true  # Optional, skip if no build step
+          npm run build || true
           cd ..
 
       - name: Upload Backend to Server
@@ -47,8 +48,9 @@ jobs:
           username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.SSH_PORT || '22' }}
-          source: "iscs-api/*"
-          target:'/home/iscspczw/supply-chain-api'
+          source: "supply-chain-scs/server/*"
+          target: "/home/iscspczw/supply-chain-api"
+          exclude: ".env,.env.local,.env.production"
 
       - name: ✅ Done
-        run: echo "Deployment to ${{ steps.env.outputs.env }} complete."
+        run: echo "Deployment complete!"
