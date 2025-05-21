@@ -27,7 +27,7 @@ jobs:
           host: ${{ secrets.DEV_HOST }}
           username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
-          port: ${{ secrets.SSH_PORT || '22' }}
+          port: ${{ secrets.SSH_PORT }}
           source: "client/.next/**,client/public/**,client/package.json"
           target: "/home/iscspczw/supply-chain-app-dev"
           strip_components: 1 # ensures files are not placed under /client/
