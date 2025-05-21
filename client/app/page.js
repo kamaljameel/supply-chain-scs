@@ -45,7 +45,7 @@ export default function Home() {
           <Hero4 />
         </Carousel.Item>
       </Carousel>
-      <h2>test</h2>
+      <h2>test cicd</h2>
       <About />
       {/* <Facts/> */}
       <div className="container-fluid">
