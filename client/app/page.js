@@ -31,7 +31,6 @@ export default function Home() {
   return (
     <>
       <Navbar />
-
       <Carousel fade className="homeslider mt-4">
         <Carousel.Item>
           <Hero />
@@ -46,7 +45,7 @@ export default function Home() {
           <Hero4 />
         </Carousel.Item>
       </Carousel>
-
+      <h2>test</h2>
       <About />
       {/* <Facts/> */}
       <div className="container-fluid">
@@ -59,18 +58,12 @@ export default function Home() {
           ))}
         </div>
       </div>
-
       <Whychoose />
-
       {/* <Pricing /> */}
-
       {/* <Contact /> */}
       <BusinessInquiryForm />
-
       {/* <OurTeam/> */}
-
       {/* <Testimonial/> */}
-
       <Footer />
     </>
   );
