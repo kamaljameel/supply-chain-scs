@@ -24,7 +24,9 @@ const About = () => {
             className="col-lg-6 about-text wow fadeInUp"
             data-wow-delay="0.3s"
           >
-            <h6 className="text-secondary text-uppercase mb-3">About Us</h6>
+            <h6 className="text-secondary text-uppercase mb-3">
+              About Us test
+            </h6>
             <h1 className="mb-5">Transporting Trust, Delivering Excellence</h1>
             <p className="mb-5">
               At ISCS, we navigate the complexities of modern supply chains with
