@@ -11,44 +11,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: 📥 Checkout Code
         uses: actions/checkout@v3
 
       # ---------- FRONTEND ----------
-      - name: Install & Build Frontend (Next.js)
+      - name: 🛠️ Install & Build Frontend (Next.js)
+        working-directory: ./client
         run: |
-          cd client
           npm install
           npm run build
-          cd ..
 
-      - name: Upload Frontend to Server
+      - name: 📦 Upload Frontend to Server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.DEV_HOST }}
           username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.SSH_PORT || '22' }}
-          source: "client/.next client/public client/package.json"
+          source: "client/.next/**,client/public/**,client/package.json"
           target: "/home/iscspczw/supply-chain-app-dev"
+          strip_components: 1 # ensures files are not placed under /client/
 
       # ---------- BACKEND ----------
-      - name: Install & Build Backend (Node.js)
+      - name: 🛠️ Install & Build Backend (Node.js)
+        working-directory: ./server
         run: |
-          cd server
           npm install
-          npm run build || true
-          cd ..
+          npm run build || true  # if build is optional
 
-      - name: Upload Backend to Server
+      - name: 📦 Upload Backend to Server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: ${{ secrets.DEV_HOST }}
           username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.SSH_PORT || '22' }}
-          source: "server/*"
+          source: "server/**"
           target: "/home/iscspczw/supply-chain-api"
+          strip_components: 1
 
       - name: ✅ Done
         run: echo "Deployment complete!"
