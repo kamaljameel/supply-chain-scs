@@ -14,15 +14,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set Environment
-        id: env
-        run: |
-          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "env=prod" >> $GITHUB_OUTPUT
-          else
-            echo "env=dev" >> $GITHUB_OUTPUT
-          fi
-
       # ----------------- FRONTEND -----------------
       - name: Install & Build Frontend (Next.js)
         run: |
@@ -34,12 +25,12 @@ jobs:
       - name: Upload Frontend to Server
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ steps.env.outputs.env == 'prod' && secrets.PROD_HOST || secrets.DEV_HOST }}
-          username: ${{ steps.env.outputs.env == 'prod' && secrets.PROD_USER || secrets.DEV_USER }}
-          key: ${{ steps.env.outputs.env == 'prod' && secrets.PROD_SSH_KEY || secrets.DEV_SSH_KEY }}
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.SSH_PORT || '22' }}
           source: "supply-chain/.next, supply-chain/public, supply-chain/package.json"
-          target: ${{ steps.env.outputs.env == 'prod' && '/home/iscspczw/supply-chain-app-dev' || '/home/iscspczw/supply-chain-app-dev' }}
+          target: '/home/iscspczw/supply-chain-app-dev'
 
       # ----------------- BACKEND -----------------
       - name: Install & Build Backend (Node.js)
@@ -52,12 +43,12 @@ jobs:
       - name: Upload Backend to Server
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ steps.env.outputs.env == 'prod' && secrets.PROD_HOST || secrets.DEV_HOST }}
-          username: ${{ steps.env.outputs.env == 'prod' && secrets.PROD_USER || secrets.DEV_USER }}
-          key: ${{ steps.env.outputs.env == 'prod' && secrets.PROD_SSH_KEY || secrets.DEV_SSH_KEY }}
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.SSH_PORT || '22' }}
           source: "iscs-api/*"
-          target: ${{ steps.env.outputs.env == 'prod' && '/home/iscspczw/supply-chain-api' || '/home/iscspczw/supply-chain-api' }}
+          target:'/home/iscspczw/supply-chain-api'
 
       - name: ✅ Done
         run: echo "Deployment to ${{ steps.env.outputs.env }} complete."
