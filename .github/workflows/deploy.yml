@@ -70,12 +70,6 @@ jobs:
         uses: actions/checkout@v3
 
       # ---------- FRONTEND ----------
-      - name: 🛠️ Install & Build Frontend (Next.js)
-        working-directory: ./client
-        run: |
-
-          npm run build
-
       - name: 📦 Upload Frontend to Server
         uses: appleboy/scp-action@v0.1.4
         with:
@@ -86,15 +80,19 @@ jobs:
           source: "client/**"
           target: ${{ github.ref == 'refs/heads/main' && '/home/iscspczw/supply-chain-app' || '/home/iscspczw/supply-chain-app-dev' }}
           strip_components: 1
-          scp_ignore: true
+
+      - name: 🚀 Run Frontend Build on Server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ${{ github.ref == 'refs/heads/main' && '/home/iscspczw/supply-chain-app' || '/home/iscspczw/supply-chain-app-dev' }}
+            npm run build
 
       # ---------- BACKEND ----------
-      - name: 🛠️ Install & Build Backend (Node.js)
-        working-directory: ./server
-        run: |
-
-          npm run build || true
-
       - name: 📦 Upload Backend to Server
         uses: appleboy/scp-action@v0.1.4
         with:
@@ -105,7 +103,17 @@ jobs:
           source: "server/**"
           target: ${{ github.ref == 'refs/heads/main' && '/home/iscspczw/iscs-api' || '/home/iscspczw/supply-chain-api' }}
           strip_components: 1
-          scp_ignore: true
+
+      - name: 🚀 Run Backend Build on Server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ${{ github.ref == 'refs/heads/main' && '/home/iscspczw/iscs-api' || '/home/iscspczw/supply-chain-api' }}
+            npm run build
 
       - name: ✅ Done
         run: echo "Deployment complete!"
