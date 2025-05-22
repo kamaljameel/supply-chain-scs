@@ -73,7 +73,7 @@ jobs:
       - name: 🛠️ Install & Build Frontend (Next.js)
         working-directory: ./client
         run: |
-          npm install
+
           npm run build
 
       - name: 📦 Upload Frontend to Server
@@ -92,7 +92,7 @@ jobs:
       - name: 🛠️ Install & Build Backend (Node.js)
         working-directory: ./server
         run: |
-          npm install
+
           npm run build || true
 
       - name: 📦 Upload Backend to Server
