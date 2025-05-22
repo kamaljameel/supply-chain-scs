@@ -1,3 +1,58 @@
+# name: Deploy Frontend & Backend to Namecheap
+
+# on:
+#   push:
+#     branches:
+#       - main
+#       - development
+
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: 📥 Checkout Code
+#         uses: actions/checkout@v3
+
+#       # ---------- FRONTEND ----------
+#       - name: 🛠️ Install & Build Frontend (Next.js)
+#         working-directory: ./client
+#         run: |
+#           npm install
+#           npm run build
+
+#       - name: 📦 Upload Frontend to Server
+#         uses: appleboy/scp-action@v0.1.4
+#         with:
+#           host: ${{ secrets.DEV_HOST }}
+#           username: ${{ secrets.DEV_USER }}
+#           key: ${{ secrets.DEV_SSH_KEY }}
+#           port: ${{ secrets.SSH_PORT }}
+#           source: "client/**"
+#           target: "/home/iscspczw/supply-chain-app-dev"
+#           strip_components: 1 # ensures files are not placed under /client/
+
+#       # ---------- BACKEND ----------
+#       - name: 🛠️ Install & Build Backend (Node.js)
+#         working-directory: ./server
+#         run: |
+#           npm install
+#           npm run build || true  # if build is optional
+
+#       - name: 📦 Upload Backend to Server
+#         uses: appleboy/scp-action@v0.1.4
+#         with:
+#           host: ${{ secrets.DEV_HOST }}
+#           username: ${{ secrets.DEV_USER }}
+#           key: ${{ secrets.DEV_SSH_KEY }}
+#           port: ${{ secrets.SSH_PORT || '22' }}
+#           source: "server/**"
+#           target: "/home/iscspczw/supply-chain-api"
+#           strip_components: 1
+
+#       - name: ✅ Done
+#         run: echo "Deployment complete!"
+
 name: Deploy Frontend & Backend to Namecheap
 
 on:
@@ -29,15 +84,16 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           source: "client/**"
-          target: "/home/iscspczw/supply-chain-app-dev"
-          strip_components: 1 # ensures files are not placed under /client/
+          target: ${{ github.ref == 'refs/heads/main' && '/home/iscspczw/supply-chain-app' || '/home/iscspczw/supply-chain-app-dev' }}
+          strip_components: 1
+          scp_ignore: true
 
       # ---------- BACKEND ----------
       - name: 🛠️ Install & Build Backend (Node.js)
         working-directory: ./server
         run: |
           npm install
-          npm run build || true  # if build is optional
+          npm run build || true
 
       - name: 📦 Upload Backend to Server
         uses: appleboy/scp-action@v0.1.4
@@ -45,10 +101,11 @@ jobs:
           host: ${{ secrets.DEV_HOST }}
           username: ${{ secrets.DEV_USER }}
           key: ${{ secrets.DEV_SSH_KEY }}
-          port: ${{ secrets.SSH_PORT || '22' }}
+          port: ${{ secrets.SSH_PORT }}
           source: "server/**"
-          target: "/home/iscspczw/supply-chain-api"
+          target: ${{ github.ref == 'refs/heads/main' && '/home/iscspczw/iscs-api' || '/home/iscspczw/supply-chain-api' }}
           strip_components: 1
+          scp_ignore: true
 
       - name: ✅ Done
         run: echo "Deployment complete!"
