@@ -31,7 +31,6 @@ export default function Home() {
   return (
     <>
       <Navbar />
-
       <Carousel fade className="homeslider mt-4">
         <Carousel.Item>
           <Hero />
@@ -59,18 +58,12 @@ export default function Home() {
           ))}
         </div>
       </div>
-
       <Whychoose />
-
       {/* <Pricing /> */}
-
       {/* <Contact /> */}
       <BusinessInquiryForm />
-
       {/* <OurTeam/> */}
-
       {/* <Testimonial/> */}
-
       <Footer />
     </>
   );

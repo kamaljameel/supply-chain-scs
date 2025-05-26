@@ -1,38 +1,117 @@
-name: 🚀 Deploy to Namecheap Hosting via SSH
+# name: Deploy Frontend & Backend to Namecheap
+
+# on:
+#   push:
+#     branches:
+#       - main
+#       - development
+
+# jobs:
+#   build-and-deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: 📥 Checkout Code
+#         uses: actions/checkout@v3
+
+#       # ---------- FRONTEND ----------
+#       - name: 🛠️ Install & Build Frontend (Next.js)
+#         working-directory: ./client
+#         run: |
+#           npm install
+#           npm run build
+
+#       - name: 📦 Upload Frontend to Server
+#         uses: appleboy/scp-action@v0.1.4
+#         with:
+#           host: ${{ secrets.DEV_HOST }}
+#           username: ${{ secrets.DEV_USER }}
+#           key: ${{ secrets.DEV_SSH_KEY }}
+#           port: ${{ secrets.SSH_PORT }}
+#           source: "client/**"
+#           target: "/home/iscspczw/supply-chain-app-dev"
+#           strip_components: 1 # ensures files are not placed under /client/
+
+#       # ---------- BACKEND ----------
+#       - name: 🛠️ Install & Build Backend (Node.js)
+#         working-directory: ./server
+#         run: |
+#           npm install
+#           npm run build || true  # if build is optional
+
+#       - name: 📦 Upload Backend to Server
+#         uses: appleboy/scp-action@v0.1.4
+#         with:
+#           host: ${{ secrets.DEV_HOST }}
+#           username: ${{ secrets.DEV_USER }}
+#           key: ${{ secrets.DEV_SSH_KEY }}
+#           port: ${{ secrets.SSH_PORT || '22' }}
+#           source: "server/**"
+#           target: "/home/iscspczw/supply-chain-api"
+#           strip_components: 1
+
+#       - name: ✅ Done
+#         run: echo "Deployment complete!"
+
+name: Deploy Frontend & Backend to Namecheap
 
 on:
   push:
     branches:
-      - main # or your default branch
+      - main
+      - development
 
 jobs:
-  deploy:
-    name: Deploy via SSH
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: 📥 Checkout Code
         uses: actions/checkout@v3
 
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.ISCS_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p 22 ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+      # ---------- FRONTEND ----------
+      - name: 📦 Upload Frontend to Server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "client/**"
+          target: ${{ github.ref == 'refs/heads/main' && '/home/iscspczw/supply-chain-app' || '/home/iscspczw/supply-chain-app-dev' }}
+          strip_components: 1
 
-      - name: Deploy via SSH
-        run: |
-          ssh -p 22 ${{ secrets.USER }}@${{ secrets.HOST }} << 'EOF'
-            cd ~/filmanger/api
-            git pull origin main
-            npm install
-            npm run build # or npm start if using production mode
-            pm2 restart api # If you use pm2
+      - name: 🚀 Run Frontend Build on Server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ${{ github.ref == 'refs/heads/main' && '/home/iscspczw/supply-chain-app' || '/home/iscspczw/supply-chain-app-dev' }}
 
-            cd ~/filmanger/frontend
-            git pull origin main
-            npm install
-            npm run build
-            pm2 restart frontend # If you use pm2 for frontend
-          EOF
+      # ---------- BACKEND ----------
+      - name: 📦 Upload Backend to Server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "server/**"
+          target: ${{ github.ref == 'refs/heads/main' && '/home/iscspczw/iscs_api' || '/home/iscspczw/supply-chain-api' }}
+          strip_components: 1
+
+      - name: 🚀 Run Backend Build on Server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ${{ secrets.DEV_USER }}
+          key: ${{ secrets.DEV_SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            cd ${{ github.ref == 'refs/heads/main' && '/home/iscspczw/iscs_api' || '/home/iscspczw/supply-chain-api' }}
+
+      - name: ✅ Done
+        run: echo "Deployment complete!"
