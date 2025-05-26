@@ -100,7 +100,7 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           source: "server/**"
-          target: ${{ github.ref == 'refs/heads/main' && '/home/iscspczw/iscs-api' || '/home/iscspczw/supply-chain-api' }}
+          target: ${{ github.ref == 'refs/heads/main' && '/home/iscspczw/iscs_api' || '/home/iscspczw/supply-chain-api' }}
           strip_components: 1
 
       - name: 🚀 Run Backend Build on Server
@@ -111,7 +111,7 @@ jobs:
           key: ${{ secrets.DEV_SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            cd ${{ github.ref == 'refs/heads/main' && '/home/iscspczw/iscs-api' || '/home/iscspczw/supply-chain-api' }}
+            cd ${{ github.ref == 'refs/heads/main' && '/home/iscspczw/iscs_api' || '/home/iscspczw/supply-chain-api' }}
 
       - name: ✅ Done
         run: echo "Deployment complete!"
