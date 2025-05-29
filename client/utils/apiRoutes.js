@@ -35,11 +35,22 @@ export const updateBusiness = async (id, updatedData) => {
 export const deleteBusiness = async (id) => {
   return api.delete(`/${id}`, { headers: getAuthHeaders() });
 };
+// inquires
+export const getInquiries = async () => {
+  return apiInquiry.get("/", { headers: getAuthHeaders() });
+};
 
 export const editInquiryApi = async (inquiryId, updatedData) => {
   return apiInquiry.put(`/edit/${inquiryId}`, updatedData, {
     headers: getAuthHeaders(),
   });
+};
+export const getInquiryById = async (id) => {
+  return apiInquiry.get(`/${id}`, { headers: getAuthHeaders() });
+};
+
+export const deleteInquiry = async (id) => {
+  return apiInquiry.delete(`/${id}`, { headers: getAuthHeaders() });
 };
 
 // export const studentapi = `${host}/api/student`;
@@ -74,5 +85,6 @@ export const deletProductApi = `${host}/api/products`;
 
 export const deletExternalProductApi = (productId) =>
   `${host}/api/products/${productId}`;
+// export const ApiINQUIRY = `${host}/api/inquiry`;
 
 // export const tariffcodeApi = `${host}/api/commodity/${query}`;

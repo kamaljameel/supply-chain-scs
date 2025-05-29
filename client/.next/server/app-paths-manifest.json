@@ -1,18 +1,18 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/contact2/page": "app/contact2/page.js",
-  "/login/page": "app/login/page.js",
   "/api/openai/route": "app/api/openai/route.js",
-  "/page": "app/page.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/login/page": "app/login/page.js",
   "/about/page": "app/about/page.js",
+  "/page": "app/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/contact2/page": "app/contact2/page.js",
   "/contact/page": "app/contact/page.js",
   "/forgotpassword/page": "app/forgotpassword/page.js",
-  "/profile/page": "app/profile/page.js",
-  "/signup/page": "app/signup/page.js",
+  "/services/[slug]/page": "app/services/[slug]/page.js",
   "/services/page": "app/services/page.js",
   "/resetpassword/page": "app/resetpassword/page.js",
-  "/verifyemail/page": "app/verifyemail/page.js",
-  "/services/[slug]/page": "app/services/[slug]/page.js",
-  "/users/view/page": "app/users/view/page.js"
+  "/users/view/page": "app/users/view/page.js",
+  "/signup/page": "app/signup/page.js",
+  "/verifyemail/page": "app/verifyemail/page.js"
 }

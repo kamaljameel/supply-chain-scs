@@ -150,7 +150,7 @@ const FullWidthModal = ({
     recordTitle: null,
     inquiryLine: inquiry?.InquiryLine || "",
     invoiceDate: "",
-    inquiryID: inquiry?.inquiryID || 0,
+    inquiryID: inquiry?.InquiryID || 0,
     businessID: null,
     businessName: null,
     contactID: null,
@@ -162,7 +162,7 @@ const FullWidthModal = ({
     estimatedDeliveryDate: null,
     estimatedRevenue: null,
     estimatedRevenueString: null,
-    revenueCurrency: null,
+    // RevenueCurrency: null,
     inquiryStatusID: null,
     inquiryStatusName: null,
     interestedInID: null,
@@ -180,7 +180,7 @@ const FullWidthModal = ({
     EORI: "",
     DAN: "",
     postcode: "",
-    currency: "",
+    RevenueCurrency: inquiry?.RevenueCurrency || null,
     paymentTerms: null,
     varianceTerms: null,
     shippingTerms: null,
@@ -286,7 +286,7 @@ const FullWidthModal = ({
     ProductID: 0,
     netweight: "",
     grossweight: "",
-    currency: "",
+    RevenueCurrency: null,
   });
 
   // currencies
@@ -628,7 +628,7 @@ const FullWidthModal = ({
         ProductID: selectedProduct.ProductID,
         netweight: selectedProduct.Weight,
         grossweight: "",
-        currency: "",
+        RevenueCurrency: null,
       });
     } else {
       console.error(`Product with ID ${parsedProductId} not found.`);
@@ -642,12 +642,31 @@ const FullWidthModal = ({
     });
   };
 
+  // useEffect(() => {
+  //   if (show) {
+  //     const currentDate = new Date();
+  //     const dueDate = new Date(currentDate);
+  //     dueDate.setDate(currentDate.getDate() + 30);
+
+  //     setFormData((prevData) => ({
+  //       ...prevData,
+  //       inquiryLine: `PIN-${Date.now()}`, // Simple auto-generated invoice number
+  //       invoiceDate: currentDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
+  //       dueDate: dueDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
+  //     }));
+  //   }
+  // }, [show]);
   useEffect(() => {
-    if (show) {
+    if (show && (!inquiry || !inquiry.InquiryID)) {
       const currentDate = new Date();
       const dueDate = new Date(currentDate);
       dueDate.setDate(currentDate.getDate() + 30);
 
+      // setFormData({
+      //   inquiryLine: `PIN-${Date.now()}`,
+      //   invoiceDate: currentDate.toISOString().split("T")[0],
+      //   dueDate: dueDate.toISOString().split("T")[0],
+      // });
       setFormData((prevData) => ({
         ...prevData,
         inquiryLine: `PIN-${Date.now()}`, // Simple auto-generated invoice number
@@ -655,7 +674,7 @@ const FullWidthModal = ({
         dueDate: dueDate.toISOString().split("T")[0], // Format as YYYY-MM-DD
       }));
     }
-  }, [show]);
+  }, [show, inquiry]);
 
   const [addsellercom, setAddsellercom] = useState(false);
   const [AddBuyercom, setAddBuyercom] = useState(false);
@@ -1042,12 +1061,25 @@ const FullWidthModal = ({
         buyerBusinessName:
           inquiry.selectedBuyerCompany || inquiry.buyerBusinessName || "",
         carrier: inquiry?.Carrier || "",
-        portOfDischargeCountry: inquiry.portOfDischargeCountry || "",
-        portOfDischarge: inquiry.portOfDischarge || "", // 🟢 must match existing port ID
+        RevenueCurrency: inquiry?.RevenueCurrency || null,
+        portOfDischargeCountry: inquiry?.portOfDischargeCountry || "",
+        portOfDischarge: inquiry?.portOfDischarge || "",
+        inquiryLine: inquiry?.InquiryLine || "",
+        // invoiceDate: inquiry?.invoiceDate || "", // Use existing if available
+        // dueDate: inquiry?.dueDate || "",
         // portOfDischargeName: inquiry.portOfDischargeName || "",
       });
 
       setInquireyId(inquiry.InquiryID); // ✅ use this for edit
+    }
+  }, [inquiry]);
+  useEffect(() => {
+    if (inquiry && inquiry.InquiryID) {
+      setFormData({
+        ...inquiry,
+        RevenueCurrency: inquiry.RevenueCurrency || null, // This should be a string like "USD"
+        // ... other fields
+      });
     }
   }, [inquiry]);
 
@@ -1184,7 +1216,7 @@ const FullWidthModal = ({
       ProductID: 0,
       netweight: 0,
       grossweight: 0,
-      currency: "",
+      RevenueCurrency: null,
     });
     setSelectedProduct("");
   };
@@ -1343,15 +1375,16 @@ const FullWidthModal = ({
       try {
         if (inquieryId) {
           // ✅ EDIT: InquiryID exists, so update instead of creating
-          await axios.put(
-            `http://localhost:3001/api/Inquiry/${inquieryId}`,
-            formData,
-            {
-              headers: {
-                Authorization: `Bearer ${abisolToken}`,
-              },
-            }
-          );
+          // await axios.put(
+          //   `http://localhost:3001/api/Inquiry/${inquieryId}`,
+          //   formData,
+          //   {
+          //     headers: {
+          //       Authorization: `Bearer ${abisolToken}`,
+          //     },
+          //   }
+          // );
+          await editInquiryApi(inquieryId);
           toast.success("Inquiry updated successfully");
         } else {
           // ✅ CREATE: InquiryID does not exist, so create new
@@ -1454,6 +1487,10 @@ const FullWidthModal = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (formData.inquiryLine) {
+      alert("Inquiry Line missing!", formData.inquiryLine);
+      return;
+    }
     const formDataWithFile = new FormData();
 
     if (formData.sellerLogo) {
@@ -1516,7 +1553,7 @@ const FullWidthModal = ({
         selectedSellerCompany: formData.BusinessName || null,
         selectedBuyerCompany: formData.buyerBusinessName || null,
 
-        inquiryLine: formData.inquiryLine || "",
+        // inquiryLine: formData.inquiryLine || "",
         BusinessName: formData.BusinessName || null,
         BusinessID: formData.businessID || null,
         contactID: null,
@@ -1548,7 +1585,7 @@ const FullWidthModal = ({
         expectedShipmentDate: formData.shipmentDate || null,
         countryofOrigin_CountryID: formData.countryOfOriginId || null,
         countryofDestination_CountryID: formData.countryOfDestinationId || null,
-
+        RevenueCurrency: formData.RevenueCurrency || null,
         // ShippingTermDRSName: formData.shippingTermsName || null,
         // ShippingMethodDRSName: formData.shippingMethodName || null,
         // transactionCurrencyID: formData.currencyId || null,
@@ -1938,9 +1975,9 @@ const FullWidthModal = ({
                     type="text"
                     placeholder="Invoice Number"
                     name="inquiryLine"
-                    value={formData.inquiryLine || ""}
+                    value={formData.inquiryLine || inquiry?.InquiryLine || ""}
                     onChange={handleFormChange}
-                    // readOnly
+                    readOnly
                   />
                 </Form.Group>
                 <Form.Group
@@ -2030,8 +2067,8 @@ const FullWidthModal = ({
                 >
                   <Form.Label>Currency</Form.Label>
                   <Form.Select
-                    name="currency"
-                    value={formData.currency || ""}
+                    name="RevenueCurrency"
+                    value={formData.RevenueCurrency || null}
                     onChange={handleFormChange}
                   >
                     <option value="" disabled>
@@ -2082,7 +2119,7 @@ const FullWidthModal = ({
               <Form.Control
                 type="date"
                 name="shipmentDate"
-                value={formData.shipmentDate || ""}
+                value={formData.shipmentDate || null}
                 onChange={handleFormChange}
               />
             </Form.Group>
@@ -2232,6 +2269,7 @@ const FullWidthModal = ({
                 <div className="portofLoad d-flex align-items-end justify-content-between">
                   <PortOfDischargeSelect
                     formData={formData}
+                    inquiry={inquiry}
                     setFormData={setFormData}
                   />
                 </div>

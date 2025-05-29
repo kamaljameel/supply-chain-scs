@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import axios from "axios";
 
 import { portOfDischargeApi } from "@/utils/apiRoutes";
-const PortOfDischargeSelect = ({ formData, setFormData }) => {
+const PortOfDischargeSelect = ({ formData, setFormData, inquiry }) => {
   const [ports, setPorts] = useState([]);
   const [newPortName, setNewPortName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ const PortOfDischargeSelect = ({ formData, setFormData }) => {
   useEffect(() => {
     fetchPorts();
   }, []);
-
+  console.log("dischrgn", inquiry?.PortOfDischargeDRSID);
   const fetchPorts = () => {
     axios
       .get(portOfDischargeApi, {
@@ -140,7 +140,9 @@ const PortOfDischargeSelect = ({ formData, setFormData }) => {
         {ports.length > 0 ? (
           <Form.Select
             name="portOfDischarge"
-            value={formData.portOfDischarge || ""}
+            value={
+              formData.portOfDischarge || inquiry?.PortOfDischargeDRSID || ""
+            }
             onChange={handleSelectChange}
           >
             <option value="">-- Select Port --</option>

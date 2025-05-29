@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
+import { getInquiries, deleteInquiry, getInquiryById } from "@/utils/apiRoutes";
+import { Modal, Button } from "react-bootstrap";
 
 const InquiriesTable = ({ onEditClick, refreshTrigger }) => {
   const [data, setData] = useState([]);
@@ -11,7 +13,8 @@ const InquiriesTable = ({ onEditClick, refreshTrigger }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [itemsPerPage, setItemsPerPage] = useState(5);
-
+  const [show, setShow] = useState(false);
+  const [deleteId, setDeleteId] = useState(null);
   const getToken = () => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("abisolToken");
@@ -29,11 +32,12 @@ const InquiriesTable = ({ onEditClick, refreshTrigger }) => {
 
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:3001/api/Inquiry", {
-        headers: {
-          Authorization: `Bearer ${abisolToken}`,
-        },
-      });
+      // const response = await axios.get(`${API_BASE_URL_inquiry}`, {
+      //   headers: {
+      //     Authorization: `Bearer ${abisolToken}`,
+      //   },
+      // });
+      const response = await getInquiries();
       setData(response.data);
     } catch (err) {
       console.error("Failed to fetch inquiries", err);
@@ -51,11 +55,12 @@ const InquiriesTable = ({ onEditClick, refreshTrigger }) => {
     if (!abisolToken) return;
 
     try {
-      const res = await axios.get(`http://localhost:3001/api/Inquiry/${id}`, {
-        headers: {
-          Authorization: `Bearer ${abisolToken}`,
-        },
-      });
+      // const res = await axios.get(`${API_BASE_URL_inquiry}/${id}`, {
+      //   headers: {
+      //     Authorization: `Bearer ${abisolToken}`,
+      //   },
+      // });
+      const res = await getInquiryById(id);
       onEditClick(res.data);
       console.log("akbar", res.data);
     } catch (error) {
@@ -63,33 +68,63 @@ const InquiriesTable = ({ onEditClick, refreshTrigger }) => {
     }
   };
 
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this inquiry?"
-    );
-    if (!confirmDelete) return;
+  // const handleDelete = async (id) => {
+  //   const confirmDelete = window.confirm(
+  //     "Are you sure you want to delete this inquiry?"
+  //   );
+  //   if (!confirmDelete) return;
 
-    console.log("Attempting to delete inquiry with ID:", id);
+  //   console.log("Attempting to delete inquiry with ID:", id);
 
-    const abisolToken = getToken();
-    if (!abisolToken) return;
+  //   const abisolToken = getToken();
+  //   if (!abisolToken) return;
 
+  //   try {
+  //     // const response = await axios.delete(`${API_BASE_URL_inquiry}/${id}`, {
+  //     //   headers: {
+  //     //     Authorization: `Bearer ${abisolToken}`,
+  //     //   },
+  //     // });
+  //     await deleteInquiry(id);
+  //     console.log("Delete response:", response);
+  //     alert("Inquiry deleted successfully");
+  //     fetchData();
+  //   } catch (error) {
+  //     alert("Failed to delete inquiry");
+  //     console.error("Delete error:", error);
+  //   }
+  // };
+
+  // const handleDelete = async (id) => {
+  //   // const confirmDelete = window.confirm(
+  //   //   "Are you sure you want to delete this inquiry?"
+  //   // );
+  //   // if (!confirmDelete) return;
+  //   try {
+  //     await deleteInquiry(id);
+  //     // Refresh list after delete
+  //     alert("Inquiry deleted successfully.");
+  //     fetchData();
+  //   } catch (error) {
+  //     console.error("Failed to delete inquiry:", error);
+  //     alert("Failed to delete. See console for details.");
+  //   }
+  // };
+
+  const handleDelete = (id) => {
+    setDeleteId(id);
+    setShow(true);
+  };
+
+  const confirmDelete = async () => {
     try {
-      const response = await axios.delete(
-        `http://localhost:3001/api/Inquiry/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${abisolToken}`,
-          },
-        }
-      );
-      console.log("Delete response:", response);
-      alert("Inquiry deleted successfully");
+      await deleteInquiry(deleteId);
+      alert("Deleted successfully");
       fetchData();
-    } catch (error) {
-      alert("Failed to delete inquiry");
-      console.error("Delete error:", error);
+    } catch {
+      alert("Delete failed");
     }
+    setShow(false);
   };
 
   // Filter data based on search term
@@ -163,8 +198,10 @@ const InquiriesTable = ({ onEditClick, refreshTrigger }) => {
                   <th>PI Date</th>
                   <th>Due Date</th>
                   <th>Buyer Name</th>
+                  <th>Supplier Name</th>
                   <th>Amount</th>
                   <th>Currency</th>
+                  <th>Carrier</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -176,8 +213,10 @@ const InquiriesTable = ({ onEditClick, refreshTrigger }) => {
                     <td>{item.ExpectedShipmentDate}</td>
                     <td>{item.ExpectedShipmentDate}</td>
                     <td>Alex</td>
+                    <td>Jhon</td>
                     <td>1209</td>
                     <td>{item.RevenueCurrency}</td>
+                    <td>{item.Carrier}</td>
                     <td>
                       <div className="d-flex justify-content-center">
                         <button
@@ -280,6 +319,21 @@ const InquiriesTable = ({ onEditClick, refreshTrigger }) => {
           </div>
         </>
       )}
+
+      <Modal show={show} onHide={() => setShow(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure to delete?</Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShow(false)}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
