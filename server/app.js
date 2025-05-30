@@ -24,7 +24,9 @@ const paymentMethodRoutes = require("./routers/paymentMethod");
 const varianceTermsRoutes = require("./routers/varianceTerms");
 const shippingTermsRoutes = require("./routers/shippingTerms");
 const shippingMethodRoutes = require("./routers/shippingMethod");
+const fileRoutes = require("./routers/fileRoutes");
 const path = require("path");
+
 const app = express();
 require("dotenv").config();
 
@@ -33,7 +35,7 @@ process.setUncaughtExceptionCaptureCallback((err) => {
 });
 
 // Middleware
-app.use(express.json());
+// app.use(express.json());
 
 // CORS Middleware
 app.use(
@@ -41,6 +43,12 @@ app.use(
     origin: "*",
   })
 );
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static files (uploaded files)
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 app.use(bodyParser.json());
 
 // Test Database Connection
@@ -51,6 +59,8 @@ sequelize
 
 // Mount routes
 // app.use("/api", productRouter);
+// Routes
+app.use("/api", fileRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/signup", signuproutes);
 app.use("/api/login", loginroutes);
@@ -78,6 +88,23 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send("Something broke!");
+});
+
+// Error handling middleware
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    if (error.code === "LIMIT_FILE_SIZE") {
+      return res.status(400).json({
+        success: false,
+        message: "File too large. Maximum size is 10MB.",
+      });
+    }
+  }
+
+  res.status(500).json({
+    success: false,
+    message: error.message || "Something went wrong!",
+  });
 });
 
 // Start server

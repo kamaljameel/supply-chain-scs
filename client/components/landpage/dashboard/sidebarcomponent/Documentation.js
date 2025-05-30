@@ -9,12 +9,15 @@ import axios from "axios";
 
 import { pdfsApi, sendpdfToEmailApi } from "@/utils/apiRoutes";
 import InquiriesTable from "./InquiriesTable";
+import FileUploadList from "../FileUploadList";
+import FileUpload from "./FileUpload";
 
 const Documentation = () => {
   const [showFullWidthModal, setShowFullWidthModal] = useState(false);
   const [selectedInvoiceType, setSelectedInvoiceType] = useState("");
   const [submittedData, setSubmittedData] = useState({});
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [uploadedPdfs, setUploadedPdfs] = useState([]);
   const [pdfs, setPdfs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,6 +36,7 @@ const Documentation = () => {
   ]);
   const [editInquiry, setEditInquiry] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [fileRefreshKey, setFileRefreshKey] = useState(0);
 
   const handleEditClick = (inquiry) => {
     setEditInquiry(inquiry);
@@ -42,6 +46,10 @@ const Documentation = () => {
   const triggerRefresh = () => {
     setRefreshKey((prev) => prev + 1);
   };
+  const triggerFileRefresh = () => {
+    setFileRefreshKey((prevKey) => prevKey + 1);
+  };
+
   // useEffect(() => {
   //   // Fetch the list of PDFs using Axios
   //   axios
@@ -61,7 +69,12 @@ const Documentation = () => {
     SetInvoiceConevert(false);
     setSelectedInvoiceType("");
   };
+
+  const handleCloseIMportModal = () => {
+    setShowImportModal(false);
+  };
   const handleShowInvoiceModal = () => setShowInvoiceModal(true);
+  const handleShowImportModal = () => setShowImportModal(true);
   const handleInvoiceConvert = () => {
     SetInvoiceConevert(true);
   };
@@ -323,12 +336,13 @@ const Documentation = () => {
   //   return doc;
   // };
 
-  const generatePDF = async (data) => {
+  const generatePDF = async (data, InquiryID) => {
     const doc = new jsPDF({
       orientation: "portrait",
       unit: "mm",
       format: "a4",
     });
+    doc.text(`Inquiry ID: ${InquiryID}`, 10, 10);
     const pageWidth = doc.internal.pageSize.getWidth();
 
     // Title - Centered Document Type
@@ -651,9 +665,13 @@ const Documentation = () => {
 
     return doc;
   };
-  const handleDownloadPDF = async () => {
-    const doc = await generatePDF(submittedData);
-    doc.save("submitted_data.pdf");
+  // const handleDownloadPDF = async (InquiryID) => {
+  //   const doc = await generatePDF(submittedData);
+  //   doc.save("submitted_data.pdf");
+  // };
+  const handleDownloadPDF = async (InquiryID) => {
+    const doc = await generatePDF(submittedData, InquiryID);
+    doc.save(`inquiry_${InquiryID}.pdf`);
   };
 
   const handleSendEmail = async () => {
@@ -713,7 +731,10 @@ const Documentation = () => {
             <div className="IXcard rounded-2">
               <div className="d-flex justify-content-between align-items-center bg-dark-subtle p-2">
                 <h6 className="m-0">Import</h6>
-                <Button className="btn rounded-3">
+                <Button
+                  className="btn rounded-3"
+                  onClick={handleShowImportModal}
+                >
                   <i className="bi bi-pencil-square me-2"></i> Create
                 </Button>
               </div>
@@ -742,12 +763,19 @@ const Documentation = () => {
           </div>
         </div>
 
-        <Button variant="primary" onClick={handleDownloadPDF}>
-          Download PDF
-        </Button>
-        <Button variant="success" onClick={handleSendEmail} className="ml-2">
-          Send PDF via Email
-        </Button>
+        <div className="p-4 my-3 border rounded-2 d-flex gap-2">
+          <Button variant="primary" onClick={handleDownloadPDF} disabled>
+            Download PDF
+          </Button>
+          <Button
+            variant="success"
+            onClick={handleSendEmail}
+            className="ml-2"
+            disabled
+          >
+            Send PDF via Email
+          </Button>
+        </div>
         <div>
           <h2 className="text-xl font-semibold mb-4">All Uploaded PDFs</h2>
           {/* {pdfs.length === 0 ? (
@@ -772,7 +800,9 @@ const Documentation = () => {
         <InquiriesTable
           onEditClick={handleEditClick}
           refreshTrigger={refreshKey}
+          onDownload={handleDownloadPDF}
         />
+        <FileUploadList refreshfileKey={fileRefreshKey} />
       </div>
       <Modal
         show={showInvoiceModal}
@@ -862,6 +892,28 @@ const Documentation = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* file opload modal */}
+      <Modal
+        show={showImportModal}
+        onHide={handleCloseIMportModal}
+        backdrop="static"
+        keyboard={false}
+        fullscreen="xl-down"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Select Document Type</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <FileUpload onUploadSuccess={triggerFileRefresh} />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseIMportModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* --- */}
       <ToastContainer />
       <FullWidthModal
         show={showFullWidthModal}

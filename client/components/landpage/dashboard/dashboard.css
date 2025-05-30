@@ -360,3 +360,6 @@ table tr td:last-child {
   z-index: 3;
   width: auto;
 }
+.bg-bluelight {
+  background: #e6f3ff !important;
+}

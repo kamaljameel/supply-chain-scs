@@ -7,7 +7,7 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 import { getInquiries, deleteInquiry, getInquiryById } from "@/utils/apiRoutes";
 import { Modal, Button } from "react-bootstrap";
 
-const InquiriesTable = ({ onEditClick, refreshTrigger }) => {
+const InquiriesTable = ({ onEditClick, refreshTrigger, onDownload }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -168,7 +168,10 @@ const InquiriesTable = ({ onEditClick, refreshTrigger }) => {
   }
 
   return (
-    <div className="table-container shadow-sm rounded p-3 mt-4">
+    <div
+      className="table-container shadow-sm rounded p-3 mt-4"
+      style={{ maxWidth: "1070px", margin: "0 auto" }}
+    >
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h5 className="mb-0">Inquiry List</h5>
         <div className="d-flex align-items-center gap-3">
@@ -184,8 +187,8 @@ const InquiriesTable = ({ onEditClick, refreshTrigger }) => {
       </div>
 
       {filteredData.length === 0 ? (
-        <div className="text-center p-3">
-          <p>No inquiries found.</p>
+        <div className="p-3 text-center border rounded-2">
+          <p className="fs-5 fw-medium text-danger mb-0">No inquiries found.</p>
         </div>
       ) : (
         <>
@@ -218,18 +221,29 @@ const InquiriesTable = ({ onEditClick, refreshTrigger }) => {
                     <td>{item.RevenueCurrency}</td>
                     <td>{item.Carrier}</td>
                     <td>
-                      <div className="d-flex justify-content-center">
+                      <div className="d-flex justify-content-center gap-2 p-2 border rounded-2">
                         <button
-                          className="btn btn-sm btn-outline-primary me-2"
+                          className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
                           onClick={() => handleEdit(item.InquiryID)}
                         >
                           <i className="bi bi-pencil-square"></i> Edit
                         </button>
                         <button
-                          className="btn btn-sm btn-outline-danger"
+                          className="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
                           onClick={() => handleDelete(item.InquiryID)}
                         >
                           <i className="bi bi-trash"></i> Delete
+                        </button>
+                        <button
+                          className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
+                          // onClick={onDownload}
+                          onClick={() => onDownload(item.InquiryID)}
+                        >
+                          <i className="bi bi-download"></i>
+                        </button>
+
+                        <button className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1">
+                          <i className="bi bi-send-check-fill"></i>
                         </button>
                       </div>
                     </td>

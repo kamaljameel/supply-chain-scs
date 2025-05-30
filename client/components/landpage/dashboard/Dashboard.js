@@ -255,15 +255,15 @@ const Dashboard = () => {
         >
           <div className="d-flex justify-content-between align-items-center mb-3 rounded-3 shadow-sm bgBlue p-2 px-3">
             <div>
-              <div className="input-group">
+              <div className="input-group bg-bluelight rounded-2">
                 <input
                   type="text"
-                  className="form-control"
+                  className="form-control border-0"
                   placeholder="Search ......"
                   aria-label="Recipient's username"
                 />
                 <div className="input-group-append">
-                  <span className="input-group-text">
+                  <span className="input-group-text bg-transparent border-0">
                     <i className="bi bi-search"></i>
                   </span>
                 </div>

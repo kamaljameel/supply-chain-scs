@@ -85,6 +85,13 @@ export const deletProductApi = `${host}/api/products`;
 
 export const deletExternalProductApi = (productId) =>
   `${host}/api/products/${productId}`;
+
+// file list
+export const uploadFileApi = `${host}/api/upload`;
+export const fetchFileApi = `${host}/api/files`;
+export const deleteFileApi = (id) => `${host}/api/delete/${id}`;
+
+export const downloadFileApi = (id) => `${host}/api/download/${id}`;
 // export const ApiINQUIRY = `${host}/api/inquiry`;
 
 // export const tariffcodeApi = `${host}/api/commodity/${query}`;
