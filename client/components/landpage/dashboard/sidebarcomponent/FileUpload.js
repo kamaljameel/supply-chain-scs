@@ -53,18 +53,9 @@ export default function FileUpload({ onUploadSuccess }) {
   return (
     <div>
       <div style={{ margin: "0 auto" }}>
-        <h1>File Upload System</h1>
-
+        <h5> File Upload here</h5>
         {/* Single File Upload */}
-        <div
-          style={{
-            marginBottom: "30px",
-            padding: "20px",
-            border: "1px solid #ddd",
-            borderRadius: "5px",
-          }}
-        >
-          <h2>Single File Upload</h2>
+        <div className="d-flex justify-content-between align-items-center gap-2 border rounded-2 p-3 mb-4">
           <input
             type="file"
             onChange={handleFileChange}
@@ -73,8 +64,9 @@ export default function FileUpload({ onUploadSuccess }) {
           <button
             onClick={uploadSingleFile}
             disabled={uploading}
-            style={{ marginLeft: "10px", padding: "10px 20px" }}
+            className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 p-2 shadow"
           >
+            <i className="bi bi-cloud-arrow-up-fill"></i>{" "}
             {uploading ? "Uploading..." : "Upload File"}
           </button>
         </div>
