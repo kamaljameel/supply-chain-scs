@@ -60,6 +60,7 @@ export default function FileUpload({ onUploadSuccess }) {
             type="file"
             onChange={handleFileChange}
             accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.jpeg,.png,.gif"
+            className=" w-50"
           />
           <button
             onClick={uploadSingleFile}
