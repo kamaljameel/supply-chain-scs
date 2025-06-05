@@ -13,11 +13,6 @@ export default function FileUpload({ onUploadSuccess }) {
     setFile(e.target.files[0]);
   };
 
-  // Handle multiple files selection
-  //   const handleMultipleFilesChange = (e) => {
-  //     setFiles(Array.from(e.target.files));
-  //   };
-
   // Upload single file
 
   const uploadSingleFile = async () => {
@@ -71,31 +66,6 @@ export default function FileUpload({ onUploadSuccess }) {
             {uploading ? "Uploading..." : "Upload File"}
           </button>
         </div>
-
-        {/* Multiple Files Upload */}
-        {/* <div
-        style={{
-          marginBottom: "30px",
-          padding: "20px",
-          border: "1px solid #ddd",
-          borderRadius: "5px",
-        }}
-      >
-        <h2>Multiple Files Upload</h2>
-        <input
-          type="file"
-          multiple
-          onChange={handleMultipleFilesChange}
-          accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.jpg,.jpeg,.png,.gif"
-        />
-        <button
-          onClick={uploadMultipleFiles}
-          disabled={uploading}
-          style={{ marginLeft: "10px", padding: "10px 20px" }}
-        >
-          {uploading ? "Uploading..." : "Upload Files"}
-        </button>
-      </div> */}
 
         {/* Message */}
         {message && (

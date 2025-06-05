@@ -1487,10 +1487,10 @@ const FullWidthModal = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.inquiryLine) {
-      alert("Inquiry Line missing!", formData.inquiryLine);
-      return;
-    }
+    // if (formData.inquiryLine) {
+    //   alert("Inquiry Line missing!", formData.inquiryLine);
+    //   return;
+    // }
     const formDataWithFile = new FormData();
 
     if (formData.sellerLogo) {
@@ -2385,7 +2385,7 @@ const FullWidthModal = ({
         return (
           <>
             <h6>Product Details</h6>
-            <div className="formgroupk w-100 h-100">
+            <div className="formgroupk w-100 pt-0 h-100 overflow-y-auto">
               <Table striped bordered hover>
                 <thead>
                   <tr>
@@ -3396,121 +3396,130 @@ const FullWidthModal = ({
         {currentStep === 1 ? (
           <>
             <h6>Seller/Shipper/Exporter/Supplier Information</h6>
+            <div className="modalOverflow">
+              <Form.Group className="formgroupk" htmlFor="companySelect">
+                <Form.Label>Select Company</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={formData.businessName}
+                  onChange={(e) => handleCompanySelect(e.target.value)} // Pass the selected BusinessID
+                >
+                  <option value="">Select a company</option>
+                  {businesses.map((company) => (
+                    <option
+                      key={company.BusinessID}
+                      value={company.BusinessID} // Use BusinessID as the value
+                    >
+                      {company.BusinessName}
+                    </option>
+                  ))}
+                </Form.Control>
+              </Form.Group>
 
-            <Form.Group className="formgroupk" htmlFor="companySelect">
-              <Form.Label>Select Company</Form.Label>
-              <Form.Control
-                as="select"
-                value={formData.businessName}
-                onChange={(e) => handleCompanySelect(e.target.value)} // Pass the selected BusinessID
-              >
-                <option value="">Select a company</option>
-                {businesses.map((company) => (
-                  <option
-                    key={company.BusinessID}
-                    value={company.BusinessID} // Use BusinessID as the value
+              {selectedSellerCompany === "addNew" ? (
+                <>
+                  <Form.Group
+                    className="formgroupk mt-3"
+                    htmlFor="newCompanyName"
                   >
-                    {company.BusinessName}
-                  </option>
-                ))}
-              </Form.Control>
-            </Form.Group>
-
-            {selectedSellerCompany === "addNew" ? (
-              <>
-                <Form.Group
-                  className="formgroupk mt-3"
-                  htmlFor="newCompanyName"
-                >
-                  <Form.Label>New Company Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter new company name"
-                    value={newCompany || ""}
-                    onChange={(e) => setNewCompany(e.target.value)}
-                  />
-                </Form.Group>
+                    <Form.Label>New Company Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="Enter new company name"
+                      value={newCompany || ""}
+                      onChange={(e) => setNewCompany(e.target.value)}
+                    />
+                  </Form.Group>
+                  <Button
+                    className="mt-3"
+                    variant="primary"
+                    onClick={handleAddCompany}
+                  >
+                    Add Company
+                  </Button>
+                </>
+              ) : (
                 <Button
-                  className="mt-3"
+                  className="mt-3 px-0 bg-transparent text-primary text-decoration-underline border-0 pb-0"
                   variant="primary"
-                  onClick={handleAddCompany}
+                  onClick={handleAddnewCompany}
                 >
-                  Add Company
+                  Add new Company
                 </Button>
-              </>
-            ) : (
-              <Button
-                className="mt-3 px-0 bg-transparent text-primary text-decoration-underline border-0 pb-0"
-                variant="primary"
-                onClick={handleAddnewCompany}
+              )}
+              <Form.Group
+                className="formgroupk mb-3"
+                htmlFor="formSellerAddress"
               >
-                Add new Company
-              </Button>
-            )}
-            <Form.Group className="formgroupk mb-3" htmlFor="formSellerAddress">
-              <Form.Label>Address</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Address"
-                name="Shipping_FullAddress"
-                value={formData.Shipping_FullAddress || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Group>
-            <Form.Group
-              className="formgroupk mb-3"
-              htmlFor="formSellerCityStateZIP"
-            >
-              <Form.Label>City, State, ZIP</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="City, State, ZIP"
-                name="sellerCityStateZIP"
-                value={formData.sellerCityStateZIP || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Group>
-            <Form.Group className="formgroupk mb-3" htmlFor="formSellerCountry">
-              <Form.Label>Country</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Country"
-                name="sellerCountry"
-                value={formData.sellerCountry || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Group>
-            <Form.Group className="formgroupk mb-3" htmlFor="formSellerPhone">
-              <Form.Label>Phone</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Phone Number"
-                name="sellerPhone"
-                value={formData.sellerPhone || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Group>
-            <Form.Group className="formgroupk mb-3" htmlFor="formSellerEmail">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                placeholder="Email Address"
-                name="sellerEmail"
-                value={formData.sellerEmail || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Group>
-            <Form.Group className="formgroupk mb-3" htmlFor="formSellerWebsite">
-              <Form.Label>Website</Form.Label>
-              <Form.Control
-                type="text"
-                placeholder="Website"
-                name="sellerWebsite"
-                value={formData.sellerWebsite || ""}
-                onChange={handleFormChange}
-              />
-            </Form.Group>
-
+                <Form.Label>Address</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Address"
+                  name="Shipping_FullAddress"
+                  value={formData.Shipping_FullAddress || ""}
+                  onChange={handleFormChange}
+                />
+              </Form.Group>
+              <Form.Group
+                className="formgroupk mb-3"
+                htmlFor="formSellerCityStateZIP"
+              >
+                <Form.Label>City, State, ZIP</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="City, State, ZIP"
+                  name="sellerCityStateZIP"
+                  value={formData.sellerCityStateZIP || ""}
+                  onChange={handleFormChange}
+                />
+              </Form.Group>
+              <Form.Group
+                className="formgroupk mb-3"
+                htmlFor="formSellerCountry"
+              >
+                <Form.Label>Country</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Country"
+                  name="sellerCountry"
+                  value={formData.sellerCountry || ""}
+                  onChange={handleFormChange}
+                />
+              </Form.Group>
+              <Form.Group className="formgroupk mb-3" htmlFor="formSellerPhone">
+                <Form.Label>Phone</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Phone Number"
+                  name="sellerPhone"
+                  value={formData.sellerPhone || ""}
+                  onChange={handleFormChange}
+                />
+              </Form.Group>
+              <Form.Group className="formgroupk mb-3" htmlFor="formSellerEmail">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  placeholder="Email Address"
+                  name="sellerEmail"
+                  value={formData.sellerEmail || ""}
+                  onChange={handleFormChange}
+                />
+              </Form.Group>
+              <Form.Group
+                className="formgroupk mb-3"
+                htmlFor="formSellerWebsite"
+              >
+                <Form.Label>Website</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Website"
+                  name="sellerWebsite"
+                  value={formData.sellerWebsite || ""}
+                  onChange={handleFormChange}
+                />
+              </Form.Group>
+            </div>
             <div className="mt-3 btndiv">
               {addsellercom && (
                 <Button variant="success" onClick={handleAddCompany}>
@@ -3521,9 +3530,11 @@ const FullWidthModal = ({
           </>
         ) : (
           <>
-            {renderFormFields()}
+            <div className="modalOverflow w-100 d-flex flex-wrap justify-content-between gap-3">
+              {renderFormFields()}
+            </div>
             {addsellercom ? (
-              <div className="w-100">
+              <div className="w-100 ">
                 <Button
                   variant="success addcombtn addbuyer mt-auto mb-3"
                   onClick={handleAddCompany}

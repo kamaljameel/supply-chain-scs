@@ -157,7 +157,7 @@ const InquiriesTable = ({ onEditClick, refreshTrigger, onDownload }) => {
   if (loading) {
     return (
       <div className="table-container shadow-sm rounded p-3 bg-white mt-4">
-        <h5 className="mb-3">Inquiry List</h5>
+        <h5 className="mb-3">Export Documents</h5>
         <div className="text-center p-3">
           <div className="spinner-border" role="status">
             <span className="visually-hidden">Loading...</span>
@@ -173,7 +173,7 @@ const InquiriesTable = ({ onEditClick, refreshTrigger, onDownload }) => {
       style={{ maxWidth: "1070px", margin: "0 auto" }}
     >
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h5 className="mb-0">Inquiry List</h5>
+        <h5 className="mb-0">Export Documents</h5>
         <div className="d-flex align-items-center gap-3">
           <input
             type="text"
@@ -226,13 +226,13 @@ const InquiriesTable = ({ onEditClick, refreshTrigger, onDownload }) => {
                           className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
                           onClick={() => handleEdit(item.InquiryID)}
                         >
-                          <i className="bi bi-pencil-square"></i> Edit
+                          <i className="bi bi-pencil-square"></i>
                         </button>
                         <button
                           className="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
                           onClick={() => handleDelete(item.InquiryID)}
                         >
-                          <i className="bi bi-trash"></i> Delete
+                          <i className="bi bi-trash"></i>
                         </button>
                         <button
                           className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"

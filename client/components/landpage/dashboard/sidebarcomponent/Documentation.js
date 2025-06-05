@@ -763,7 +763,7 @@ const Documentation = () => {
           </div>
         </div>
 
-        <div className="p-4 my-3 border rounded-2 d-flex gap-2">
+        {/* <div className="p-4 my-3 border rounded-2 d-flex gap-2">
           <Button variant="primary" onClick={handleDownloadPDF} disabled>
             Download PDF
           </Button>
@@ -775,9 +775,8 @@ const Documentation = () => {
           >
             Send PDF via Email
           </Button>
-        </div>
+        </div> */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">All Uploaded PDFs</h2>
           {/* {pdfs.length === 0 ? (
             <p>No PDFs found.</p>
           ) : (

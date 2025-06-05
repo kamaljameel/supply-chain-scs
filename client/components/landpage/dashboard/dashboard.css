@@ -363,3 +363,22 @@ table tr td:last-child {
 .bg-bluelight {
   background: #e6f3ff !important;
 }
+.modalOverflow {
+  max-height: 350px;
+  overflow-y: auto;
+  padding-bottom: 60px;
+  position: relative;
+  padding: 2px;
+  margin-bottom: 18px;
+}
+.btndiv {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 10px 20px;
+  background-color: #fff; /* ensure it's visible */
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.57);
+  z-index: 10;
+  text-align: center;
+}

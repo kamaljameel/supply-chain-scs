@@ -33,10 +33,10 @@ const fileFilter = (req, file, cb) => {
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     "application/vnd.ms-excel",
     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "text/plain",
-    "image/jpeg",
-    "image/png",
-    "image/gif",
+    // "text/plain",
+    // "image/jpeg",
+    // "image/png",
+    // "image/gif",
   ];
 
   if (allowedTypes.includes(file.mimetype)) {

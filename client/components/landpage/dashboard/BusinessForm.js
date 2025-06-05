@@ -1,6 +1,6 @@
 import { useState, forwardRef, useImperativeHandle } from "react";
 import axios from "axios";
-
+import { createBusiness } from "@/utils/apiRoutes";
 const BusinessForm = forwardRef((props, ref) => {
   const initialFormData = {
     AnnualRevenue: null,
@@ -88,17 +88,17 @@ const BusinessForm = forwardRef((props, ref) => {
     setResponse(null);
 
     try {
-      const res = await axios.post(
-        "http://localhost:3001/api/business/create",
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${abisolToken}`, // ✅ Send Token
-          },
-        }
-      );
-
+      // const res = await axios.post(
+      //   "http://localhost:3001/api/business/create",
+      //   formData,
+      //   {
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //       Authorization: `Bearer ${abisolToken}`, // ✅ Send Token
+      //     },
+      //   }
+      // );
+      const res = await createBusiness(formData);
       setResponse(res.data);
     } catch (err) {
       setError(err.response?.data || err.message);
