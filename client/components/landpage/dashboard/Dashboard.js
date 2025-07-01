@@ -27,6 +27,7 @@ const Dashboard = () => {
   const [selectedPage, setSelectedPage] = useState("home");
   const [businessbutton, setbuisnessButton] = useState("");
   const [showNewProduct, setNewProductShow] = useState(false);
+  const API_BASE_URL = process.env.NEXT_PUBLIC_HOST;
 
   const [showbuisness, setShowbuisness] = useState(false);
   const [showMyProfile, setShowMyProfile] = useState(false);
@@ -137,7 +138,7 @@ const Dashboard = () => {
       case "Customs Declarations":
         return <GoodsDeclarations />;
       case "Documentation":
-        return <Documentation />;
+        return <Documentation userId={user.id} />;
       case "Road Transport":
         return <RoadTransport />;
       case "Sea Shipment":
@@ -169,6 +170,9 @@ const Dashboard = () => {
       default:
         return "bi bi-pin";
     }
+  };
+  const goToProfile = () => {
+    router.push("/profile");
   };
   console.log("busi", showbuisness);
   return (
@@ -214,7 +218,7 @@ const Dashboard = () => {
 
           <Button
             className="fs-6 px-0 bg-transparent text-white mt-2 w-100 addproductbtn"
-            onClick={handleMyProfileShow}
+            onClick={goToProfile}
           >
             My Profile
           </Button>
@@ -271,7 +275,15 @@ const Dashboard = () => {
             </div>
             <div className="userdata">
               <Link href="/profile" className="text-white">
-                <i className="bi bi-person-circle me-2"></i>
+                {user.ProfilePicture ? (
+                  <img
+                    src={`${API_BASE_URL}/uploads/${user.ProfilePicture}`}
+                    alt="Profile Picture"
+                    className="profilePic mx-2 object-cover border"
+                  />
+                ) : (
+                  <i className="bi bi-person-circle me-2"></i>
+                )}
                 {user.FirstName} {user.LastName}
               </Link>
             </div>
@@ -306,6 +318,7 @@ const Dashboard = () => {
         onHide={handleFullWidthModalClose}
         businessbutton={businessbutton}
         showMyProfile={showMyProfile}
+        userId={user.id}
       />
     </>
   );

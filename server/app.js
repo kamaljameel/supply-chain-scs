@@ -25,6 +25,8 @@ const varianceTermsRoutes = require("./routers/varianceTerms");
 const shippingTermsRoutes = require("./routers/shippingTerms");
 const shippingMethodRoutes = require("./routers/shippingMethod");
 const fileRoutes = require("./routers/fileRoutes");
+const savedFormRoutes = require("./routers/savedForms");
+const eoriRoutes = require("./routers/eori");
 const path = require("path");
 
 const app = express();
@@ -54,7 +56,10 @@ app.use(bodyParser.json());
 // Test Database Connection
 sequelize
   .authenticate()
-  .then(() => console.log("Database connected..."))
+  .then(() => {
+    console.log("Database connected...");
+    require("./cron")();
+  })
   .catch((err) => console.log("Error: " + err));
 
 // Mount routes
@@ -84,6 +89,8 @@ app.use("/api/inquiry", inquiryRoutes);
 // busness inquiry
 app.use("/api/business-inquiries", businessInquiryRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api", savedFormRoutes);
+app.use("/api", eoriRoutes);
 // Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

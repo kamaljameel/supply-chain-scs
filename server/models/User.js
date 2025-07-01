@@ -68,6 +68,10 @@ const User = sequelize.define(
     State: { type: DataTypes.STRING },
     Country: { type: DataTypes.STRING },
     ZipCode: { type: DataTypes.STRING },
+    companyName: { type: DataTypes.STRING },
+    companyAddress: { type: DataTypes.STRING },
+    companyCityStateZip: { type: DataTypes.STRING },
+    companyPostCode: { type: DataTypes.STRING },
     ProfilePicture: { type: DataTypes.STRING },
   },
   { timestamps: true }

@@ -3,9 +3,13 @@
   background: #fff;
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  max-width: 400px;
+  box-shadow: 0 0px 12px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
   width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .signupForm form input[type="text"],
@@ -27,7 +31,7 @@
 
 .signupForm form label {
   font-size: 16px;
-  margin-left: 5px;
+  margin-bottom: 3px;
 }
 
 .signupForm form button {
@@ -47,6 +51,8 @@
 
 .signupForm form div {
   margin-bottom: 1rem;
+  width: 48%;
+  text-align: left;
 }
 
 .signupForm form p {

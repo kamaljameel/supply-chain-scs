@@ -2,7 +2,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const nodemailer = require("nodemailer");
-
+const fs = require("fs");
+const path = require("path");
 // Nodemailer transporter setup
 const transporter = nodemailer.createTransport({
   host: "i-scs.co.uk",
@@ -126,32 +127,151 @@ const resetPassword = async (token, newPassword) => {
 };
 
 // Update user profile
+// const updateUserProfile = async (req, res) => {
+//   try {
+//     const { userId } = req.params;
+//     const {
+//       FirstName,
+//       LastName,
+//       Address,
+//       City,
+//       State,
+//       Country,
+//       ZipCode,
+//       ProfilePicture,
+//       companyName,
+//       companyAddress,
+//       companyCityStateZip,
+//       companyPostCode,
+//     } = req.body;
+
+//     const user = await User.findByPk(userId);
+
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     await user.update({
+//       FirstName,
+//       LastName,
+//       Address,
+//       City,
+//       State,
+//       Country,
+//       ZipCode,
+//       companyName,
+//       companyAddress,
+//       companyCityStateZip,
+//       companyPostCode,
+//       ProfilePicture,
+//     });
+
+//     res.status(200).json({ message: "Profile updated successfully", user });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Error updating profile", error });
+//   }
+// };
+
+// Update user profile
 const updateUserProfile = async (req, res) => {
   try {
     const { userId } = req.params;
-    const { LastName, Address, City, State, Country, ZipCode, ProfilePicture } =
-      req.body;
 
+    // Check if user exists
     const user = await User.findByPk(userId);
-
     if (!user) {
+      // If user not found and file was uploaded, clean it up
+      if (req.file) {
+        fs.unlink(req.file.path, (err) => {
+          if (err) console.error("Error deleting uploaded file:", err);
+        });
+      }
       return res.status(404).json({ message: "User not found" });
     }
 
-    await user.update({
+    const {
+      FirstName,
       LastName,
       Address,
       City,
       State,
       Country,
       ZipCode,
-      ProfilePicture,
-    });
+      companyName,
+      companyAddress,
+      companyCityStateZip,
+      companyPostCode,
+    } = req.body;
 
-    res.status(200).json({ message: "Profile updated successfully", user });
+    // Prepare fields to update (only update fields that are provided)
+    const updatedFields = {};
+
+    if (FirstName !== undefined && FirstName !== "")
+      updatedFields.FirstName = FirstName;
+    if (LastName !== undefined && LastName !== "")
+      updatedFields.LastName = LastName;
+    if (Address !== undefined) updatedFields.Address = Address;
+    if (City !== undefined) updatedFields.City = City;
+    if (State !== undefined) updatedFields.State = State;
+    if (Country !== undefined) updatedFields.Country = Country;
+    if (ZipCode !== undefined) updatedFields.ZipCode = ZipCode;
+    if (companyName !== undefined) updatedFields.companyName = companyName;
+    if (companyAddress !== undefined)
+      updatedFields.companyAddress = companyAddress;
+    if (companyCityStateZip !== undefined)
+      updatedFields.companyCityStateZip = companyCityStateZip;
+    if (companyPostCode !== undefined)
+      updatedFields.companyPostCode = companyPostCode;
+
+    // Handle profile picture upload
+    if (req.file) {
+      // Delete old profile picture if it exists
+      if (user.ProfilePicture) {
+        const oldImagePath = path.join(
+          __dirname,
+          "../uploads",
+          user.ProfilePicture
+        );
+        fs.unlink(oldImagePath, (err) => {
+          if (err && err.code !== "ENOENT") {
+            console.error("Error deleting old profile picture:", err);
+          }
+        });
+      }
+      updatedFields.ProfilePicture = req.file.filename;
+    }
+
+    // Only update if there are fields to update
+    if (Object.keys(updatedFields).length > 0) {
+      await user.update(updatedFields);
+    }
+
+    // Fetch updated user
+    const updatedUser = await User.findByPk(userId);
+
+    // Return updated user without password
+    const { Password, ...userWithoutPassword } = updatedUser.toJSON();
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: userWithoutPassword,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error updating profile", error });
+    console.error("Error updating profile:", error);
+
+    // Clean up uploaded file in case of error
+    if (req.file) {
+      fs.unlink(req.file.path, (err) => {
+        if (err)
+          console.error("Error deleting uploaded file after error:", err);
+      });
+    }
+
+    res.status(500).json({
+      message: "Error updating profile",
+      error: error.message,
+    });
   }
 };
 

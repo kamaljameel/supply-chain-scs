@@ -75,6 +75,8 @@ export const shippingTermsApi = `${host}/api/shippingTerms`;
 export const shippingMethodApi = `${host}/api/shippingMethod`;
 export const pdfsApi = `${host}/api/pdfs`;
 export const sendpdfToEmailApi = `${host}/api`;
+export const checkEORIApi = `${host}/api/check-multiple-eori`;
+export const savedFormApi = `${host}/api/save`;
 
 export const addProductToListApi = `${host}/api/inquiry/add-product-to-list`;
 
@@ -83,8 +85,13 @@ export const updateProductApi = `${host}/api/products`;
 
 export const deletProductApi = `${host}/api/products`;
 
+export const deletesaveFormApi = (inquiryId) =>
+  `${host}/api/remove/${inquiryId}`;
+
 export const deletExternalProductApi = (productId) =>
   `${host}/api/products/${productId}`;
+
+export const getUserInquiryListApi = (userId) => `${host}/api/list/${userId}`;
 
 // file list
 export const uploadFileApi = `${host}/api/upload`;

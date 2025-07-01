@@ -7,12 +7,19 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import axios from "axios";
 
-import { pdfsApi, sendpdfToEmailApi } from "@/utils/apiRoutes";
+import {
+  pdfsApi,
+  sendpdfToEmailApi,
+  getInquiries,
+  fetchFileApi,
+  getInquiryById,
+  getUserInquiryListApi,
+} from "@/utils/apiRoutes";
 import InquiriesTable from "./InquiriesTable";
 import FileUploadList from "../FileUploadList";
 import FileUpload from "./FileUpload";
 
-const Documentation = () => {
+const Documentation = ({ userId }) => {
   const [showFullWidthModal, setShowFullWidthModal] = useState(false);
   const [selectedInvoiceType, setSelectedInvoiceType] = useState("");
   const [submittedData, setSubmittedData] = useState({});
@@ -22,6 +29,9 @@ const Documentation = () => {
   const [pdfs, setPdfs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [data, setData] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState([]);
+
   const [companyOptions, setCompanyOptions] = useState([
     "Company A",
     "Company B",
@@ -37,33 +47,76 @@ const Documentation = () => {
   const [editInquiry, setEditInquiry] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [fileRefreshKey, setFileRefreshKey] = useState(0);
+  const [editFromSaved, setEditFromSaved] = useState(false);
 
+  const [savedCount, setSavedCount] = useState(0);
+  const [showSavedFormModal, setShowSavedFormModal] = useState(false);
+  const [savedForms, setSavedForms] = useState([]);
+  // Fetch saved forms
+  const fetchSavedForms = () => {
+    if (userId) {
+      axios
+        .get(getUserInquiryListApi(userId))
+        .then((response) => {
+          const data = response.data;
+          setSavedCount(data.length);
+          setSavedForms(data);
+        })
+        .catch((err) => {
+          console.error("Axios fetch error:", err);
+        });
+    }
+  };
   const handleEditClick = (inquiry) => {
     setEditInquiry(inquiry);
     console.log("ahmad", inquiry);
   };
-
+  const handleSavedFormEdit = async (inquiryId) => {
+    try {
+      const res = await getInquiryById(inquiryId);
+      setEditInquiry(res.data);
+      setEditFromSaved(true); // Set flag to indicate this is from saved form
+      setShowSavedFormModal(false); // Close saved forms modal
+      setShowFullWidthModal(true); // Open the full width modal
+      console.log("Editing saved form:", res.data);
+    } catch (error) {
+      console.error("Failed to fetch inquiry for editing:", error);
+      toast.error("Failed to load saved form");
+    }
+  };
   const triggerRefresh = () => {
     setRefreshKey((prev) => prev + 1);
   };
   const triggerFileRefresh = () => {
     setFileRefreshKey((prevKey) => prevKey + 1);
   };
+  const fetchData = async () => {
+    try {
+      setLoading(true);
 
-  // useEffect(() => {
-  //   // Fetch the list of PDFs using Axios
-  //   axios
-  //     .get(`${pdfsApi}/all`)
-  //     .then((response) => {
-  //       setPdfs(response.data.files);
-  //       setLoading(false);
-  //     })
-  //     .catch((err) => {
-  //       console.error("Error fetching PDFs:", err);
-  //       setError("Failed to fetch PDFs.");
-  //       setLoading(false);
-  //     });
-  // }, []);
+      const response = await getInquiries();
+      setData(response.data);
+      console.log("submiteed", response.data);
+    } catch (err) {
+      console.error("Failed to fetch inquiries", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchUploadedFiles = async () => {
+    try {
+      const response = await axios.get(fetchFileApi);
+      setUploadedFiles(response.data.data);
+    } catch (error) {
+      console.error("Failed to fetch files:", error);
+    }
+  };
+  useEffect(() => {
+    fetchUploadedFiles();
+    fetchData();
+  }, []);
+
   const handleCloseInvoiceModal = () => {
     setShowInvoiceModal(false);
     SetInvoiceConevert(false);
@@ -85,11 +138,21 @@ const Documentation = () => {
     setShowInvoiceModal(false);
   };
 
+  // useEffect(() => {
+  //   if (editInquiry) {
+  //     setShowFullWidthModal(true);
+  //   }
+  // }, [editInquiry]);
   useEffect(() => {
-    if (editInquiry) {
+    fetchSavedForms();
+  }, [userId, showFullWidthModal, refreshKey]);
+
+  useEffect(() => {
+    if (editInquiry && !editFromSaved) {
       setShowFullWidthModal(true);
     }
-  }, [editInquiry]);
+  }, [editInquiry, editFromSaved]);
+
   const handleInvoiceTypeSelect = (e) => {
     const value = e.target.value;
     if (value === "Performa Invoice") {
@@ -106,235 +169,6 @@ const Documentation = () => {
     setSelectedInvoiceType("");
     setShowFullWidthModal(false);
   };
-
-  // const generatePDF = (data) => {
-  //   const doc = new jsPDF();
-
-  //   doc.setFontSize(18);
-  //   doc.text("Submitted Data", 14, 22);
-
-  //   doc.setFontSize(14);
-  //   doc.text(`Document Type: ${data.DocumentType}`, 14, 30);
-
-  //   if (data.productDetails && data.productDetails.length > 0) {
-  //     doc.setFontSize(14);
-  //     doc.text("Product Details:", 14, 40);
-
-  //     doc.autoTable({
-  //       startY: 50,
-  //       head: [
-  //         [
-  //           "Item No.",
-  //           "Description",
-  //           "HS Code",
-  //           "Origin of Goods",
-  //           "Quantity",
-  //           "Unit Price",
-  //           "Total Price",
-  //         ],
-  //       ],
-  //       body: data.productDetails.map((product, index) => [
-  //         index + 1,
-  //         product.description,
-  //         product.hsCode,
-  //         product.origin,
-  //         product.quantity,
-  //         product.unitPrice,
-  //         product.totalPrice,
-  //       ]),
-  //     });
-  //   }
-
-  //   // Table for tax, subtotal, and totals
-  //   if (data) {
-  //     doc.autoTable({
-  //       startY: doc.previousAutoTable.finalY + 10,
-  //       head: [["Tax in %", "Tax in amount", "Subtotal", "Total"]],
-  //       body: [
-  //         [data.tax, data.taxPercentage, data.subtotal, data.total], // Single row with the corresponding values
-  //       ],
-  //     });
-  //   }
-  //   doc.autoTable({
-  //     startY: doc.previousAutoTable ? doc.previousAutoTable.finalY + 10 : 50,
-  //     head: [["Field", "Value"]],
-  //     body: Object.entries(data)
-  //       .filter(([key]) => key !== "products")
-  //       .map(([key, value]) => [key, value]),
-  //   });
-
-  //   doc.save("submitted_data.pdf");
-  // };
-
-  // const generatePDF = async (data) => {
-  //   const doc = new jsPDF();
-
-  //   // Title
-  //   doc.setFontSize(18);
-  //   // doc.text("Submitted Data", 14, 22);
-
-  //   // Document Type
-  //   doc.setFontSize(14);
-  //   doc.text(`Document Type: ${data.DocumentType}`, 14, 30);
-
-  //   // Buyer Information (Left Column)
-  //   doc.setFontSize(16);
-  //   doc.text("Buyer Information", 14, 40);
-
-  //   doc.setFontSize(12);
-  //   doc.text(`Company: ${data.selectedBuyerCompany || "N/A"}`, 14, 50);
-  //   doc.text(`Address: ${data.buyerFullAddress || "N/A"}`, 14, 55);
-  //   doc.text(`City/State/ZIP: ${data.buyerCityStateZIP || "N/A"}`, 14, 60);
-  //   doc.text(`Email: ${data.buyerEmail || "N/A"}`, 14, 65);
-  //   doc.text(`Phone: ${data.buyerPhone || "N/A"}`, 14, 70);
-  //   doc.text(`Contact Person: ${data.buyerContactPerson || "N/A"}`, 14, 75);
-
-  //   // Buyer Bank Details
-  //   doc.setFontSize(16);
-  //   doc.text("Buyer Bank Details", 14, 85);
-  //   doc.setFontSize(12);
-  //   doc.text(`Bank Name: ${data.buyerBankName || "N/A"}`, 14, 90);
-  //   doc.text(`Account Number: ${data.buyerAccountNumber || "N/A"}`, 14, 95);
-  //   doc.text(`SWIFT Code: ${data.buyerSWIFTCode || "N/A"}`, 14, 100);
-  //   doc.text(`IBAN: ${data.buyerIBAN || "N/A"}`, 14, 105);
-  //   doc.text(`Bank Address: ${data.buyerBankAddress || "N/A"}`, 14, 110);
-
-  //   // Seller Information (Right Column)
-  //   const rightX = 105; // X-coordinate for the right column
-  //   doc.setFontSize(16);
-  //   doc.text("Seller Information", rightX, 40);
-
-  //   doc.setFontSize(12);
-  //   doc.text(`Company: ${data.selectedSellerCompany || "N/A"}`, rightX, 50);
-  //   doc.text(`Address: ${data.Shipping_FullAddress || "N/A"}`, rightX, 55);
-  //   doc.text(`City/State/ZIP: ${data.LCity || "N/A"}`, rightX, 60);
-  //   doc.text(`Email: ${data.BusinessEmail1 || "N/A"}`, rightX, 65);
-  //   doc.text(`Phone: ${data.BusinessPhone1 || "N/A"}`, rightX, 70);
-  //   doc.text(`Website: ${data.Website || "N/A"}`, rightX, 75);
-
-  //   // Seller Bank Details
-  //   doc.setFontSize(16);
-  //   doc.text("Seller Bank Details", rightX, 85);
-  //   doc.setFontSize(12);
-  //   doc.text(`Bank Name: ${data.sellerBankName || "N/A"}`, rightX, 90);
-  //   doc.text(
-  //     `Account Number: ${data.sellerAccountNumber || "N/A"}`,
-  //     rightX,
-  //     95
-  //   );
-  //   doc.text(`SWIFT Code: ${data.sellerSWIFTCode || "N/A"}`, rightX, 100);
-  //   doc.text(`IBAN: ${data.sellerIBAN || "N/A"}`, rightX, 105);
-  //   doc.text(`Bank Address: ${data.sellerBankAddress || "N/A"}`, rightX, 110);
-
-  //   // Shipping Information
-  //   doc.setFontSize(16);
-  //   doc.text("Shipping Information", 14, 125);
-  //   doc.setFontSize(12);
-  //   doc.text(`Shipping Terms: ${data.shippingTerms || "N/A"}`, 14, 130);
-  //   // if (data.shippingType === "LCL") {
-  //   //   doc.text(`Volume: ${data.volume || "N/A"}`, 14, 135);
-  //   // } else if (data.shippingType === "FCL") {
-  //   //   doc.text(`Container Type: ${data.containerType || "N/A"}`, 14, 135);
-  //   // }
-  //   doc.text(`Shipping Method: ${data.shippingMethod || "N/A"}`, 14, 140);
-  //   doc.text(`Payment Terms: ${data.paymentTerms || "N/A"}`, 14, 141);
-  //   doc.text(`Payment Method: ${data.paymentMethod || "N/A"}`, 14, 142);
-  //   doc.text(`Variance Terms: ${data.varianceTerms || "N/A"}`, 14, 143);
-  //   doc.text(
-  //     `Port Of dLoading Country: ${data.portOfLoadingCountry || "N/A"}`,
-  //     14,
-  //     144
-  //   );
-  //   doc.text(
-  //     `port Of Loading: ${data.portOfLoading || "N/A"}`,
-  //     14,
-  //     145
-  //   );
-
-  //   // Product Details
-  //   if (data.productDetails && data.productDetails.length > 0) {
-  //     doc.setFontSize(14);
-  //     doc.text("Product Details:", 14, 150);
-
-  //     doc.autoTable({
-  //       startY: 155,
-  //       head: [
-  //         [
-  //           "Item No.",
-  //           "Description",
-  //           "HS Code",
-  //           "Origin of Goods",
-  //           "Quantity",
-  //           "Unit Price",
-  //           "Total Price",
-  //         ],
-  //       ],
-  //       body: data.productDetails.map((product, index) => [
-  //         index + 1,
-  //         product.description || "N/A",
-  //         product.hsCode || "N/A",
-  //         product.origin || "N/A",
-  //         product.quantity || 0,
-  //         product.unitPrice || 0,
-  //         product.totalPrice || 0,
-  //       ]),
-  //     });
-  //   }
-
-  //   // Table for tax, subtotal, and totals
-  //   if (data) {
-  //     doc.autoTable({
-  //       startY: doc.previousAutoTable ? doc.previousAutoTable.finalY + 10 : 155,
-  //       head: [["Tax in %", "Tax in amount", "Subtotal", "Total"]],
-  //       body: [
-  //         [
-  //           data.taxPercentage || 0,
-  //           data.tax || 0,
-  //           data.subtotal || 0,
-  //           data.total || 0,
-  //         ],
-  //       ],
-  //     });
-  //   }
-
-  //   // Terms and Conditions
-  //   const startY = doc.previousAutoTable
-  //     ? doc.previousAutoTable.finalY + 20
-  //     : 175;
-  //   doc.setFontSize(14);
-  //   doc.text("Terms and Conditions:", 14, startY);
-
-  //   const termsText =
-  //     "1. Payment must be made within the due date.\n" +
-  //     "2. The seller is not responsible for any delay caused by the carrier.\n" +
-  //     "3. The buyer must inspect the goods upon receipt and notify the seller within 7 days of any discrepancies.\n" +
-  //     "4. All disputes will be settled in accordance with the laws of the seller's country.";
-  //   const termsStartY = startY + 5;
-  //   const lineHeight = 6;
-  //   const termsArray = doc.splitTextToSize(termsText, 180); // Wrap text to fit within page width
-  //   termsArray.forEach((line, index) => {
-  //     doc.text(line, 14, termsStartY + index * lineHeight);
-  //   });
-  //   // Convert to Blob and upload to API
-  //   try {
-  //     const pdfBlob = doc.output("blob");
-  //     const formData = new FormData();
-  //     formData.append("pdf", pdfBlob, "submitted_data.pdf");
-
-  //     const response = await axios.post(`${pdfsApi}/upload`, formData, {
-  //       headers: { "Content-Type": "multipart/form-data" },
-  //     });
-
-  //     alert(response.data.message);
-  //     // fetchUploadedPDFs();
-  //   } catch (error) {
-  //     console.error("Error uploading PDF:", error);
-  //     alert("Failed to upload PDF");
-  //   }
-  //   // Save the PDF
-  //   // doc.save("submitted_data.pdf");
-  //   return doc;
-  // };
 
   const generatePDF = async (data, InquiryID) => {
     const doc = new jsPDF({
@@ -741,7 +575,7 @@ const Documentation = () => {
               <div className="p-2 border-1 border-dark-subtle border-bottom">
                 Saved 3
               </div>
-              <div className="p-2">Submitted 7</div>
+              <div className="p-2">Submitted {uploadedFiles.length}</div>
             </div>
           </div>
           <div className="col-md-6 py-2">
@@ -755,14 +589,88 @@ const Documentation = () => {
                   <i className="bi bi-pencil-square me-2"></i> Create
                 </Button>
               </div>
-              <div className="p-2 border-1 border-dark-subtle border-bottom">
-                Saved 3
+              <div
+                className="p-2 border-1 border-dark-subtle border-bottom"
+                onClick={() => setShowSavedFormModal(true)}
+                style={{
+                  cursor: "pointer",
+                }}
+              >
+                Saved {savedCount}
               </div>
-              <div className="p-2">Submitted 7</div>
+              <div className="p-2">
+                Submitted{" "}
+                <span>
+                  {/* display inquiry details here */}
+                  {data.length}
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
+        <Modal
+          show={showSavedFormModal}
+          onClick={() => setShowSavedFormModal(false)}
+          size="lg"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Saved Forms</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {savedForms.length === 0 ? (
+              <p>No saved forms found.</p>
+            ) : (
+              <div className="list-group">
+                {savedForms.map((form) => (
+                  <div
+                    key={form.id}
+                    className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleSavedFormEdit(form.inquiry_id)}
+                  >
+                    <div>
+                      <p className="mb-0">
+                        <strong>Inquiry ID:</strong> {form.inquiry_id}{" "}
+                      </p>
+                      <p className="mb-0">
+                        <strong>Business Name:</strong> {form.business_name}
+                      </p>
+                      {form.created_at && (
+                        <>
+                          <p className="mb-0">
+                            <small className="text-muted">
+                              Saved:{" "}
+                              {new Date(form.created_at).toLocaleDateString()}
+                            </small>
+                          </p>
+                        </>
+                      )}
+                    </div>
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSavedFormEdit(form.inquiry_id);
+                      }}
+                    >
+                      <i className="bi bi-pencil"></i> Edit
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="secondary"
+              onClick={() => setShowSavedFormModal(false)}
+            >
+              Close
+            </Button>
+          </Modal.Footer>
+        </Modal>
         {/* <div className="p-4 my-3 border rounded-2 d-flex gap-2">
           <Button variant="primary" onClick={handleDownloadPDF} disabled>
             Download PDF
@@ -923,6 +831,7 @@ const Documentation = () => {
         selectedInvoiceType={selectedInvoiceType}
         inquiry={editInquiry}
         onUpdated={triggerRefresh}
+        userId={userId}
       />
       {submittedData && (
         <div>

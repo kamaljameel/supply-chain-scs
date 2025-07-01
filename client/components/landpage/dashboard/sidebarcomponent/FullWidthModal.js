@@ -22,6 +22,10 @@ import {
   deleteBusiness,
   updateBusiness,
   editInquiryApi,
+  loginApi,
+  checkEORIApi,
+  deletesaveFormApi,
+  savedFormApi,
 } from "@/utils/apiRoutes";
 import ProductForm from "./ProductForm";
 import Select from "react-select";
@@ -104,6 +108,7 @@ const reducer = (state, action) => {
   }
 };
 const FullWidthModal = ({
+  userId,
   show,
   onHide,
   onSubmit,
@@ -123,7 +128,7 @@ const FullWidthModal = ({
   const [inquieryId, setInquireyId] = useState(null);
   const [showDAN, setShowDAN] = useState(false);
   const [loading, setLoading] = useState(false);
-
+  // const [user, setUser] = useState(null);
   // const businessFormRef = useRef();
   const [businesses, setBusinesses] = useState([]);
   const [editingBusiness, setEditingBusiness] = useState(null);
@@ -270,6 +275,7 @@ const FullWidthModal = ({
   const [state, dispatch] = useReducer(reducer, initialState);
   // const apiKey = "AIzaSyA5DS0UK5hhUa7g4hGBMjkOXLupWrmdFkY";
   // const [isSearchVisible, setIsSearchVisible] = useState(true);
+
   const abisolToken = localStorage.getItem("abisolToken");
 
   if (!abisolToken) {
@@ -288,8 +294,57 @@ const FullWidthModal = ({
     grossweight: "",
     RevenueCurrency: null,
   });
+  const [message, setMessage] = useState("");
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      if (formData.BusinessName && formData.Legal_Identifier_Label1) {
+        checkEoriMatch();
+      }
+    }, 1000); // 1 second debounce
 
-  // currencies
+    return () => clearTimeout(delay); // clear timer if user is still typing
+  }, [formData.Legal_Identifier_Label1]);
+
+  const checkEoriMatch = async () => {
+    const companyName = formData.BusinessName.trim();
+    const eoriNumber = formData.Legal_Identifier_Label1.trim();
+
+    if (!companyName || !eoriNumber) return;
+
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await axios.post(checkEORIApi, {
+        eoris: [eoriNumber],
+      });
+
+      const result = Array.isArray(res.data) ? res.data[0] : res.data;
+
+      const isValid = result.valid;
+      const apiEori = result.eori;
+      const apiTraderName = result.companyDetails?.traderName
+        ?.trim()
+        ?.toLowerCase();
+      const inputTraderName = companyName.toLowerCase();
+
+      if (
+        isValid &&
+        apiEori === eoriNumber &&
+        apiTraderName === inputTraderName
+      ) {
+        setMessage("✅ Company name and EORI match.");
+      } else {
+        setMessage("❌ Company name and EORI do not match.");
+      }
+    } catch (error) {
+      console.error("EORI check error:", error);
+      setMessage("❌ Error verifying EORI. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const currencies = [
     { code: "USD", name: "United States Dollar" },
     { code: "EUR", name: "Euro" },
@@ -738,6 +793,7 @@ const FullWidthModal = ({
       setIsAddingNewForm(false);
     }
   }, [currentStep]);
+
   const onHidep = () => {
     if (!businessbutton) {
       if (currentStep === 11) {
@@ -1051,7 +1107,82 @@ const FullWidthModal = ({
   //     });
   //   }
   // };
+  useEffect(() => {
+    if (currentStep >= 5 && inquieryId) {
+      (async () => {
+        try {
+          // Edit the inquiry
+          const editPayload = {
+            ...formData,
+            productDetails,
+            subtotal,
+            tax,
+            total,
+            TotalNetWeight,
+            TotalGrossWeight,
+            taxPercentage,
+            selectedSellerCompany: formData.BusinessName || null,
+            selectedBuyerCompany: formData.buyerBusinessName || null,
 
+            // inquiryLine: formData.inquiryLine || "",
+            BusinessName: formData.BusinessName || null,
+            BusinessID: formData.businessID || null,
+            contactID: null,
+            convertStatusID: 1,
+            description: null,
+            engageStatusID: 2,
+            estimatedDeliveryDate: null,
+            estimatedRevenue: null,
+            estimatedRevenueString: null,
+            ExpectedShipmentDate: formData.shipmentDate || null,
+            PaymentMethodDRSName: formData.paymentMethod || null,
+            PaymentTermDRSName: formData.paymentTerms || null,
+            inquiryStatusID: 2,
+            interestedInID: 2,
+            leadID: null,
+            nextFollowupDate: null,
+            priorityID: 2,
+            probabilityID: 2,
+            qualifyStatusID: 2,
+            isDisabled: false,
+
+            varianceTermDRSID: formData.varianceTerms || null,
+            shippingTermDRSID: formData.shippingTerms || null,
+            shippingMethodDRSID: formData.shippingMethod || null,
+            portOfLoadingDRSID: formData.portOfLoading || null,
+            portOfDischargeDRSID: formData.portOfDischarge || null,
+            paymentTermDRSID: formData.paymentTerms || null,
+            paymentMethodDRSID: formData.paymentMethod || null,
+            expectedShipmentDate: formData.shipmentDate || null,
+            countryofOrigin_CountryID: formData.countryOfOriginId || null,
+            countryofDestination_CountryID:
+              formData.countryOfDestinationId || null,
+            RevenueCurrency: formData.RevenueCurrency || null,
+            // ShippingTermDRSName: formData.shippingTermsName || null,
+            // ShippingMethodDRSName: formData.shippingMethodName || null,
+            // transactionCurrencyID: formData.currencyId || null,
+          };
+
+          const saveEdit = await editInquiryApi(inquieryId, editPayload);
+          console.log("Edit API success kkk", saveEdit.data);
+
+          // Save to saved_forms table
+          await fetch(savedFormApi, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              inquiryId: inquieryId,
+              userId: userId,
+              businessName: formData.BusinessName,
+            }),
+          });
+          console.log("Saved form progress");
+        } catch (err) {
+          console.error("Error in edit/save process:", err);
+        }
+      })();
+    }
+  }, [currentStep, inquieryId, userId]);
   useEffect(() => {
     if (inquiry && inquiry.InquiryID) {
       setFormData({
@@ -1073,15 +1204,15 @@ const FullWidthModal = ({
       setInquireyId(inquiry.InquiryID); // ✅ use this for edit
     }
   }, [inquiry]);
-  useEffect(() => {
-    if (inquiry && inquiry.InquiryID) {
-      setFormData({
-        ...inquiry,
-        RevenueCurrency: inquiry.RevenueCurrency || null, // This should be a string like "USD"
-        // ... other fields
-      });
-    }
-  }, [inquiry]);
+  // useEffect(() => {
+  //   if (inquiry && inquiry.InquiryID) {
+  //     setFormData({
+  //       ...inquiry,
+  //       RevenueCurrency: inquiry.RevenueCurrency || null, // This should be a string like "USD"
+  //       // ... other fields
+  //     });
+  //   }
+  // }, [inquiry]);
 
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -1592,6 +1723,10 @@ const FullWidthModal = ({
       };
 
       const editRes = await editInquiryApi(currentInquiryId, editPayload);
+      const savedformDeleturl = deletesaveFormApi(currentInquiryId);
+      const response = await axios.delete(savedformDeleturl);
+      console.log("Delete success:", response.data);
+      alert("Form removed from saved list");
       console.log("Edit success:", editRes.data);
       alert("Updated successfully");
       onUpdated();
@@ -2807,7 +2942,7 @@ const FullWidthModal = ({
               />
             </Form.Group>
             <Form.Group className="formgroupk mb-3" controlId="formSellerLogo">
-              <Form.Label>Upload Seller Logo</Form.Label>
+              <Form.Label>Company Logo</Form.Label>
               <Form.Control
                 type="file"
                 accept="image/*"
@@ -2942,7 +3077,14 @@ const FullWidthModal = ({
             </Form.Group>
 
             <Form.Group className="formgroupk mb-3" htmlFor="formSellervat">
-              <Form.Label>EORI & VAT</Form.Label>
+              <div className="d-flex justify-content-between">
+                <Form.Label>EORI & VAT</Form.Label>
+                <div>
+                  {" "}
+                  {loading && <p>Checking EORI...</p>}
+                  {message && <p className="m-0 fs-6">{message}</p>}
+                </div>
+              </div>
               <div className="d-flex gap-2">
                 <Form.Control
                   type="text"
@@ -2950,6 +3092,7 @@ const FullWidthModal = ({
                   name="Legal_Identifier_Label1"
                   value={formData.Legal_Identifier_Label1 || ""}
                   onChange={handleFormChange}
+                  onBlur={checkEoriMatch}
                 />
 
                 <Form.Control
@@ -3386,7 +3529,7 @@ const FullWidthModal = ({
       centered
       className="mainmodelP"
     >
-      <div className="stepindi">{!businessbutton && renderProgress()}</div>
+      <div className="stepindi">{!businessbutton && renderProgress()} </div>
       <Modal.Header closeButton>
         <Modal.Title>
           {addsellercom ? "" : AddBuyercom ? "" : selectedInvoiceType}

@@ -32,11 +32,7 @@ const InquiriesTable = ({ onEditClick, refreshTrigger, onDownload }) => {
 
     try {
       setLoading(true);
-      // const response = await axios.get(`${API_BASE_URL_inquiry}`, {
-      //   headers: {
-      //     Authorization: `Bearer ${abisolToken}`,
-      //   },
-      // });
+
       const response = await getInquiries();
       setData(response.data);
     } catch (err) {
@@ -55,11 +51,6 @@ const InquiriesTable = ({ onEditClick, refreshTrigger, onDownload }) => {
     if (!abisolToken) return;
 
     try {
-      // const res = await axios.get(`${API_BASE_URL_inquiry}/${id}`, {
-      //   headers: {
-      //     Authorization: `Bearer ${abisolToken}`,
-      //   },
-      // });
       const res = await getInquiryById(id);
       onEditClick(res.data);
       console.log("akbar", res.data);
@@ -67,49 +58,6 @@ const InquiriesTable = ({ onEditClick, refreshTrigger, onDownload }) => {
       console.error("Edit failed", error);
     }
   };
-
-  // const handleDelete = async (id) => {
-  //   const confirmDelete = window.confirm(
-  //     "Are you sure you want to delete this inquiry?"
-  //   );
-  //   if (!confirmDelete) return;
-
-  //   console.log("Attempting to delete inquiry with ID:", id);
-
-  //   const abisolToken = getToken();
-  //   if (!abisolToken) return;
-
-  //   try {
-  //     // const response = await axios.delete(`${API_BASE_URL_inquiry}/${id}`, {
-  //     //   headers: {
-  //     //     Authorization: `Bearer ${abisolToken}`,
-  //     //   },
-  //     // });
-  //     await deleteInquiry(id);
-  //     console.log("Delete response:", response);
-  //     alert("Inquiry deleted successfully");
-  //     fetchData();
-  //   } catch (error) {
-  //     alert("Failed to delete inquiry");
-  //     console.error("Delete error:", error);
-  //   }
-  // };
-
-  // const handleDelete = async (id) => {
-  //   // const confirmDelete = window.confirm(
-  //   //   "Are you sure you want to delete this inquiry?"
-  //   // );
-  //   // if (!confirmDelete) return;
-  //   try {
-  //     await deleteInquiry(id);
-  //     // Refresh list after delete
-  //     alert("Inquiry deleted successfully.");
-  //     fetchData();
-  //   } catch (error) {
-  //     console.error("Failed to delete inquiry:", error);
-  //     alert("Failed to delete. See console for details.");
-  //   }
-  // };
 
   const handleDelete = (id) => {
     setDeleteId(id);
@@ -313,7 +261,7 @@ const InquiriesTable = ({ onEditClick, refreshTrigger, onDownload }) => {
 
               <div className="d-flex align-items-center">
                 <label htmlFor="itemsPerPage" className="form-label me-2 mb-0">
-                  Show per show
+                  Show per page
                 </label>
                 <select
                   id="itemsPerPage"
